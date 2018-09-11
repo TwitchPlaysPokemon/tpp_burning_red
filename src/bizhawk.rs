@@ -119,8 +119,6 @@ impl Bizhawk {
             body.push_str(&format!("{:02X}", i));
         }
 
-        println!("{:?}", body);
-
         if let Ok(mut result) = self.client.get(format!("http://localhost:5337/{}/WriteByteRange/{:X}", region.as_static(), address).as_str()).body(body).send() {
             let response = result.text().unwrap_or("".to_string());
             if response != "ok".to_string() {
