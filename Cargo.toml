@@ -1,0 +1,10 @@
+[package]
+name = "tpp_corrupted_red"
+version = "0.1.0"
+authors = ["Aissurteivos <traviz1232@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+reqwest = "0.8.8"
+strum = "0.10.0"
+strum_macros = "0.10.0"
