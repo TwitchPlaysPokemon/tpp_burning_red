@@ -248,5 +248,3 @@ pub const COLOSSEUM: u8 = 0xF0;
 pub const LORELEIS_ROOM: u8 = 0xF5;
 pub const BRUNOS_ROOM: u8 = 0xF6;
 pub const AGATHAS_ROOM: u8 = 0xF7;
-pub const LAST_MAP: u8 = 0xFF;
-pub const DONT_CHANGE: u8 = 0xFF;

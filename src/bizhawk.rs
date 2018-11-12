@@ -214,6 +214,54 @@ impl Bizhawk {
         Ok(())
     }
 
+    pub fn mute(&self) -> Result<(), String> {
+
+        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/mute", self.port).as_str()).send() {
+            let response = result.text().unwrap_or("".to_string());
+            if response != "ok".to_string() {
+                return Err(response)
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn unmute(&self) -> Result<(), String> {
+
+        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/unmute", self.port).as_str()).send() {
+            let response = result.text().unwrap_or("".to_string());
+            if response != "ok".to_string() {
+                return Err(response)
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn unthrottle(&self) -> Result<(), String> {
+
+        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/unthrottle", self.port).as_str()).send() {
+            let response = result.text().unwrap_or("".to_string());
+            if response != "ok".to_string() {
+                return Err(response)
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn throttle(&self) -> Result<(), String> {
+
+        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/throttle", self.port).as_str()).send() {
+            let response = result.text().unwrap_or("".to_string());
+            if response != "ok".to_string() {
+                return Err(response)
+            }
+        }
+
+        Ok(())
+    }
+
     pub fn clear_screen(&self, color: u32) -> Result<(), String> {
         
         if let Ok(mut result) = self.client.get(format!("http://localhost:{}/clearscreen/{:06X}", self.port, color).as_str()).send() {
