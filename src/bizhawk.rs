@@ -25,263 +25,205 @@ pub struct Bizhawk {
 }
 
 impl Bizhawk {
-
     pub fn new(port: u16) -> Bizhawk {
         Bizhawk {
             client: reqwest::Client::new(),
-            port: port
+            port
+        }
+    }
+
+    pub fn send_command(&self, command: &str) -> Result<(), String> {
+        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/{}", self.port, command).as_str()).send() {
+            let response = result.text().unwrap_or_default();
+            if response != "ok" {
+                return Err(response)
+            }
+        } else {
+            return Err("Failed to send command to bizhawk.".to_string())
+        }
+        Ok(())
+    }
+
+    pub fn send_command_and_get_response(&self, command: &str) -> Result<String, String> {
+        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/{}", self.port, command).as_str()).send() {
+            let response = result.text().unwrap_or_default();
+            if response.get(0..1) == Some("R") {
+                return Err(response)
+            }
+            return Ok(response)
+        } else {
+            return Err("Failed to send command to bizhawk".to_string())
         }
     }
 
     pub fn write_u8(&self, region: MemRegion, address: u32, value: u8) -> Result<(), String> {
+        self.send_command(format!("{}/WriteByte/{:X}/{:X}", region.as_static(), address, value).as_str())
+    }
 
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/{}/WriteByte/{:X}/{:X}", self.port, region.as_static(), address, value).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
+    pub fn write_u16(&self, region: MemRegion, address: u32, value: u16) -> Result<(), String> {
+        self.send_command(format!("{}/WriteU16LE/{:X}/{:X}", region.as_static(), address, value).as_str())
+    }
+
+    pub fn write_u32(&self, region: MemRegion, address: u32, value: u32) -> Result<(), String> {
+        self.send_command(format!("{}/WriteU32LE/{:X}/{:X}", region.as_static(), address, value).as_str())
+    }
+
+    pub fn write_u16_be(&self, region: MemRegion, address: u32, value: u16) -> Result<(), String> {
+        self.send_command(format!("{}/WriteU16BE/{:X}/{:X}", region.as_static(), address, value).as_str())
+    }
+
+    pub fn write_u32_be(&self, region: MemRegion, address: u32, value: u32) -> Result<(), String> {
+        self.send_command(format!("{}/WriteU32BE/{:X}/{:X}", region.as_static(), address, value).as_str())
+    }
+
+    pub fn write_slice(&self, region: MemRegion, address: u32, data: &[u8]) -> Result<(), String> {
+        let mut body = String::new();
+        for i in data {
+            body.push_str(&format!("{:02X}", i));
+        }
+        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/{}/WriteByteRange/{:X}", self.port, region.as_static(), address).as_str()).body(body).send() {
+            let response = result.text().unwrap_or_default();
+            if response != "ok" {
                 return Err(response)
             }
         }
-
         Ok(())
     }
 
     pub fn read_u8(&self, region: MemRegion, address: u32) -> Result<u8, String> {
-
-        let mut result = self.client.get(format!("http://localhost:{}/{}/ReadByte/{:X}", self.port, region.as_static(), address).as_str()).send().unwrap();
-        let response = result.text().unwrap_or("".to_string());
-        if response.get(0..1) == Some("R") {
-            return Err(response)
+        match self.send_command_and_get_response(format!("{}/ReadByte/{:X}", region.as_static(), address).as_str()) {
+            Ok(byte) => Ok(u8::from_str_radix(byte.as_str(), 16).unwrap()),
+            Err(error) => Err(error)
         }
-        Ok(u8::from_str_radix(response.as_str(), 16).unwrap())
-    }
-
-    pub fn write_u16(&self, region: MemRegion, address: u32, value: u16) -> Result<(), String> {
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/{}/WriteU16LE/{:X}/{:X}", self.port, region.as_static(), address, value).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-
-        Ok(())
     }
 
     pub fn read_u16(&self, region: MemRegion, address: u32) -> Result<u16, String> {
-
-        let mut result = self.client.get(format!("http://localhost:{}/{}/ReadU16LE/{:X}", self.port, region.as_static(), address).as_str()).send().unwrap();
-        let response = result.text().unwrap_or("".to_string());
-        if response.get(0..1) == Some("R") {
-            return Err(response)
+        match self.send_command_and_get_response(format!("{}/ReadU16LE/{:X}", region.as_static(), address).as_str()) {
+            Ok(word) => Ok(u16::from_str_radix(word.as_str(), 16).unwrap()),
+            Err(error) => Err(error)
         }
-        Ok(u16::from_str_radix(response.as_str(), 16).unwrap())
-    }
-
-    pub fn write_u32(&self, region: MemRegion, address: u32, value: u32) -> Result<(), String> {
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/{}/WriteU32LE/{:X}/{:X}", self.port, region.as_static(), address, value).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-
-        Ok(())
     }
 
     pub fn read_u32(&self, region: MemRegion, address: u32) -> Result<u32, String> {
-
-        let mut result = self.client.get(format!("http://localhost:{}/{}/ReadU32LE/{:X}", self.port, region.as_static(), address).as_str()).send().unwrap();
-        let response = result.text().unwrap_or("".to_string());
-        if response.get(0..1) == Some("R") {
-            return Err(response)
+        match self.send_command_and_get_response(format!("{}/ReadU32LE/{:X}", region.as_static(), address).as_str()) {
+            Ok(dword) => Ok(u32::from_str_radix(dword.as_str(), 16).unwrap()),
+            Err(error) => Err(error)
         }
-        Ok(u32::from_str_radix(response.as_str(), 16).unwrap())
+    }
+
+    pub fn read_u16_be(&self, region: MemRegion, address: u32) -> Result<u16, String> {
+        match self.send_command_and_get_response(format!("{}/ReadU16BE/{:X}", region.as_static(), address).as_str()) {
+            Ok(word) => Ok(u16::from_str_radix(word.as_str(), 16).unwrap()),
+            Err(error) => Err(error)
+        }
+    }
+
+    pub fn read_u32_be(&self, region: MemRegion, address: u32) -> Result<u32, String> {
+        match self.send_command_and_get_response(format!("{}/ReadU32BE/{:X}", region.as_static(), address).as_str()) {
+            Ok(dword) => Ok(u32::from_str_radix(dword.as_str(), 16).unwrap()),
+            Err(error) => Err(error)
+        }
     }
 
     pub fn read_slice(&self, region: MemRegion, address: u32, count: usize) -> Result<Box<[u8]>, String> {
-
-        let mut result = self.client.get(format!("http://localhost:{}/{}/ReadByteRange/{:X}/{:X}", self.port, region.as_static(), address, count).as_str()).send().unwrap();
-        let response = result.text().unwrap_or("".to_string());
-        if response.get(0..1) == Some("R") {
-            return Err(response)
+        match self.send_command_and_get_response(format!("{}/ReadByteRange/{:X}/{:X}", region.as_static(), address, count).as_str()) {
+            Ok(response) => {
+                let mut bytes = Vec::new();
+                for i in 0..count {
+                    bytes.push(u8::from_str_radix(&response[i*2..i*2+2], 16).unwrap());
+                }
+                Ok(bytes.into_boxed_slice())
+            },
+            Err(error) => Err(error)
         }
-        let mut bytes = Vec::new();
-        for i in 0..count {
-            bytes.push(u8::from_str_radix(&response[i*2..i*2+2], 16).unwrap());
-        }
-        Ok(bytes.into_boxed_slice())
     }
 
-    pub fn write_slice(&self, region: MemRegion, address: u32, data: Vec<u8>) -> Result<(), String> {
-
-        let mut body = String::new();
-
-        for i in data {
-            body.push_str(&format!("{:02X}", i));
+    pub fn read_slice_custom(&self, message: String, count: usize) -> Result<Box<[u8]>, String> {
+        match self.send_command_and_get_response(format!("ReadByteRange/{}", message).as_str()) {
+            Ok(response) => {
+                let mut bytes = Vec::new();
+                for i in 0..count {
+                    bytes.push(u8::from_str_radix(&response[i*2..i*2+2], 16).unwrap());
+                }
+                Ok(bytes.into_boxed_slice())
+            },
+            Err(error) => Err(error)
         }
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/{}/WriteByteRange/{:X}", self.port, region.as_static(), address).as_str()).body(body).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-        Ok(())
     }
 
-    pub fn save_state(&self, path: &str) -> Result<(), String> {
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/loadstate/States/{}.State", self.port, path).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-
-        Ok(())
+    pub fn save_state(&self, name: &str) -> Result<(), String> {
+        self.send_command(format!("savestate/States/{}.State", name).as_str())
     }
 
-    pub fn load_state(&self, path: &str) -> Result<(), String> {
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/loadstate/States/{}.State", self.port, path).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-
-        Ok(())
+    pub fn load_state(&self, name: &str) -> Result<(), String> {
+        self.send_command(format!("loadstate/States/{}.State", name).as_str())
     }
 
-    pub fn load_rom(&self, path: &str) -> Result<(), String> {
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/loadrom/Roms/{}", self.port, path).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-
-        Ok(())
+    pub fn load_rom(&self, name: &str) -> Result<(), String> {
+        self.send_command(format!("loadrom/Roms/{}", name).as_str())
     }
 
     pub fn pause(&self) -> Result<(), String> {
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/pause", self.port).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-
-        Ok(())
+        self.send_command("pause")
     }
 
     pub fn play(&self) -> Result<(), String> {
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/play", self.port).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-
-        Ok(())
+        self.send_command("play")
     }
 
     pub fn stop_drawing(&self) -> Result<(), String> {
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/stopdrawing", self.port).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-
-        Ok(())
+        self.send_command("stopdrawing")
     }
 
     pub fn start_drawing(&self) -> Result<(), String> {
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/startdrawing", self.port).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-
-        Ok(())
+        self.send_command("startdrawing")
     }
 
     pub fn mute(&self) -> Result<(), String> {
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/mute", self.port).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-
-        Ok(())
+        self.send_command("mute")
     }
 
     pub fn unmute(&self) -> Result<(), String> {
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/unmute", self.port).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-
-        Ok(())
+        self.send_command("unmute")
     }
 
-    pub fn unthrottle(&self) -> Result<(), String> {
-
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/unthrottle", self.port).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
+    pub fn unthrottle(&self, frames: u32) -> Result<(), String> {
+        if frames == 0 {
+            self.send_command("unthrottle")
+        } else {
+            self.send_command(format!("unthrottle/{}", frames).as_str())
         }
-
-        Ok(())
     }
 
     pub fn throttle(&self) -> Result<(), String> {
+        self.send_command("throttle")
+    }
 
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/throttle", self.port).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
+    pub fn frameadvance(&self) -> Result<(), String> {
+        self.send_command("frameadvance")
+    }
 
-        Ok(())
+    pub fn framerewind(&self) -> Result<(), String> {
+        self.send_command("framerewind")
     }
 
     pub fn clear_screen(&self, color: u32) -> Result<(), String> {
-        
-        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/clearscreen/{:06X}", self.port, color).as_str()).send() {
-            let response = result.text().unwrap_or("".to_string());
-            if response != "ok".to_string() {
-                return Err(response)
-            }
-        }
-
-        Ok(())
+        self.send_command(format!("clearscreen/{:06X}", color).as_str())
     }
 
     pub fn framecount(&self) -> Result<u32, String> {
-
-        let mut result = self.client.get(format!("http://localhost:{}/framecount", self.port).as_str()).send().unwrap();
-        let response = result.text().unwrap_or("".to_string());
-        if response.get(0..1) == Some("R") {
-            return Err(response)
+        match self.send_command_and_get_response("framecount") {
+            Ok(dword) => Ok(u32::from_str_radix(dword.as_str(), 10).unwrap()),
+            Err(error) => Err(error)
         }
-        Ok(response.parse().unwrap())
     }
 
+    pub fn get_rom_name(&self) -> Result<String, String> {
+        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/GetROMName", self.port).as_str()).send() {
+            let response = result.text().unwrap_or_default();
+            Ok(response)
+        } else {
+            Err("Failed to get rom name".to_string())
+        }
+    }
 }
