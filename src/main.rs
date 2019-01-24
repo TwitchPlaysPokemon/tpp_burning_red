@@ -35,6 +35,9 @@ fn main() {
     // Frame timing
     let mut current_frame = bizhawk.framecount().unwrap();
 
+    // keep the system enabled for now
+    game_state.enabled = true;
+
     loop { 
         if game_state.enabled {
             if let Ok(frame) = bizhawk.framecount() {
@@ -87,3 +90,13 @@ for i in 0..0x10 {
     }
     println!("");
 }*/
+
+/*
+bit 0-1 = text speed (0 = SLOW, 1 = MED, 2 = FAST)
+
+bit 3-6 = window frame (0-9)
+
+bit 8 = sound (0 = MONO, 1 = STEREO)
+bit 9 = battle style (0 = SHIFT, 1 = SET)
+bit 10 = battle animations (0 = ON, 1 = OFF)
+*/

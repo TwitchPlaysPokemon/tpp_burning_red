@@ -16,6 +16,8 @@ pub struct GameState {
 	pub game: Game,
 	money: u32,
 	badges: [u8;2],
+	seen: [u8;19], // 152 bits
+	owned: [u8;19], // 152 bits
 	party_uids: [u16;6], // For HashMap
 	pokemon_list: HashMap<u16, Pokemon>,
 	map_state: MapState,
@@ -32,6 +34,8 @@ impl GameState {
 			game: Game::FIRERED,
 			money: 0,
 			badges: [0,0],
+			seen: [0;19], // 152 bits
+			owned: [0;19], // 152 bits
 			party_uids: [0,0,0,0,0,0],
 			pokemon_list: HashMap::new(),
 			map_state: MapState::new(),
@@ -47,8 +51,9 @@ impl GameState {
     	} else {
             println!("No existing GameState found, using default.\n");
             let mut default = GameState::new();
-    		default.get_current_game(&bizhawk);
-    		default.collect_mapstate(&bizhawk);
+    		default.get_current_game(bizhawk);
+    		default.read_trainer_data(bizhawk);
+    		default.collect_mapstate(bizhawk);
     		Ok(default)
     	}
 	}
@@ -103,6 +108,8 @@ impl GameState {
 
         self.read_party(bizhawk);
 
+        self.read_misc(bizhawk);
+
 		match &self.game {
 			Game::RED => { 
                 println!("--Loading FIRE RED ROM");
@@ -114,11 +121,9 @@ impl GameState {
 
                 self.write_trainer_data(bizhawk);
 
-                println!("--Writing party");
-
                 self.write_party(bizhawk);
 
-                println!("--Writing map data");
+                self.write_misc(bizhawk);
 
                 bizhawk.write_u16(MemRegion::EWRAM, 0x0003_1DBC, map).unwrap();
                 bizhawk.write_u8(MemRegion::EWRAM, 0x0003_1DBE, warp).unwrap();
@@ -158,11 +163,9 @@ impl GameState {
 
                 self.write_trainer_data(bizhawk);
 
-                println!("--Writing party");
-
                 self.write_party(bizhawk);
 
-                println!("--Writing map data");
+                self.write_misc(bizhawk);
 
                 bizhawk.write_u8(MemRegion::WRAM, 0x1365, last_map).unwrap(); // lastmap
                 bizhawk.write_u8(MemRegion::WRAM, 0x142F, warp).unwrap(); // destination warp
@@ -351,7 +354,7 @@ impl GameState {
                     	data[0x04 + slot] = FIRERED_RED_SPECIES[pokemon.species as usize];
                         if let Some(ref gen1) = pokemon.gen1 {
                         	data[(0x0B + slot*0x2C)..(0x0B + (slot+1)*0x2C)].copy_from_slice(&gen1.bytes);
-                        	data[(0x113 + slot*0x07)..(0x113 + (slot+1)*0x07)].copy_from_slice(&self.trainer.gen_1_name);
+                        	data[(0x113 + slot*0x07)..(0x113 + (slot+1)*0x07 + 0x01)].copy_from_slice(&self.trainer.gen_1_name);
                         	data[(0x155 + slot*0x0B)..(0x155 + (slot+1)*0x0B)].copy_from_slice(&gen1.name);
                         } else {
                             panic!("Trying to write Gen 1 data but Gen 1 data is not generated yet");
@@ -418,10 +421,58 @@ impl GameState {
 		}
 	}
 
-	pub fn read_misc(&mut self, data: &[u8]) {
+	pub fn read_misc(&mut self, bizhawk: &Bizhawk) {
 		match &self.game {
-			Game::RED => {},
-			Game::FIRERED => {}
+			Game::RED => {
+				let options_byte = bizhawk.read_u8(MemRegion::WRAM, 0x1355).unwrap();
+				self.options.text_speed = options_byte & 0x0F;
+				self.options.animations = options_byte & 0x80 == 0x00;
+				self.options.switching = options_byte & 0x40 == 0x00;
+
+				self.owned.copy_from_slice(&bizhawk.read_slice(MemRegion::WRAM, 0x12f7, 19).unwrap());
+				self.seen.copy_from_slice(&bizhawk.read_slice(MemRegion::WRAM, 0x130a, 19).unwrap());
+			},
+			Game::FIRERED => {
+				let options_word = LittleEndian::read_u16(&bizhawk.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap());
+				self.options.text_speed = ((0x03 - (options_word & 0x0003) as u8) * 2) - 1; // convert to red text speed
+				self.options.animations = options_word & 0x0400 == 0x0000;
+				self.options.switching = options_word & 0x0200 == 0x0000;
+
+				self.owned.copy_from_slice(&bizhawk.read_slice_custom("*0300500C+28/13".to_string(), 19).unwrap());
+				self.seen.copy_from_slice(&bizhawk.read_slice_custom("*0300500C+5C/13".to_string(), 19).unwrap());
+			}
+		}
+	}
+
+	pub fn write_misc(&mut self, bizhawk: &Bizhawk) {
+		match &self.game {
+			Game::RED => {
+				let options_byte = (self.options.text_speed & 0x0F) | 
+				                   (if self.options.animations { 0x00 } else { 0x80 }) |
+				                   (if self.options.switching { 0x00 } else { 0x40 });
+
+				bizhawk.write_u8(MemRegion::WRAM, 0x1355, options_byte).unwrap();
+
+				bizhawk.write_slice(MemRegion::WRAM, 0x12f7, &self.owned).unwrap();
+				bizhawk.write_slice(MemRegion::WRAM, 0x130a, &self.seen).unwrap();
+			},
+			Game::FIRERED => {
+				let pointer1 = bizhawk.read_u32(MemRegion::IWRAM, 0x500C).unwrap() & 0x00FFFFFF;
+
+				// get the byte with the options we change from the game masked off
+				let mut options_word = LittleEndian::read_u16(&bizhawk.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap()) & 0xF9FC;
+
+				// apply our options
+				options_word |= ((0x03 - ((self.options.text_speed as u16 + 1) / 2)) & 0x0003) | 
+				                (if self.options.animations { 0x0000 } else { 0x0400 }) |
+				                (if self.options.switching { 0x0000 } else { 0x0200 });
+
+				// write it back
+				bizhawk.write_u16(MemRegion::EWRAM, pointer1 + 0x14, options_word).unwrap();
+
+				bizhawk.write_slice(MemRegion::EWRAM, pointer1 + 0x28, &self.owned).unwrap();
+				bizhawk.write_slice(MemRegion::EWRAM, pointer1 + 0x5C, &self.seen).unwrap();
+			}
 		}
 	}
 }
@@ -447,7 +498,7 @@ impl MapState {
 	}
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct TrainerInfo {
 	pub gen_1_name: Vec<u8>,
 	pub gen_3_name: Vec<u8>,
