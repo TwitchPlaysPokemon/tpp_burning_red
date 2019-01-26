@@ -146,7 +146,7 @@ impl GameState {
 	                //println!("--DONE\n");
 				},
 				Game::FIRERED => {
-	                //bizhawk.mute().unwrap();
+	                bizhawk.mute().unwrap();
 	                println!("Supported map, starting transition to RED map: {:02x}, warp: {:02x}, Lastmap {:02x}", map, warp, last_map);
 
 	                //println!("--Loading RED ROM");
@@ -191,7 +191,7 @@ impl GameState {
 	                let current_music = bizhawk.read_u8(MemRegion::WRAM, 0x0FCA).unwrap(); // map
 	                bizhawk.write_slice(MemRegion::WRAM, 0x0fC7, &[current_music, 0x00, 0x00]).unwrap();
 
-	                //bizhawk.unmute().unwrap();
+	                bizhawk.unmute().unwrap();
 
 	                self.map_state.previous_map = bizhawk.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16;
 	                self.map_state.previous_warp = bizhawk.read_u8(MemRegion::WRAM, 0x142F).unwrap();
