@@ -44,7 +44,7 @@ fn main() {
                 if current_frame != frame {
                     current_frame = frame;
                     //println!("{:?}", frame);
-                    game_state.check_for_transition(current_frame, &bizhawk);
+                    game_state.check_for_transition(&bizhawk, current_frame);
                 }
             }
         } else if game_state.game == gamestate::Game::FIRERED {

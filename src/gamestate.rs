@@ -69,7 +69,7 @@ impl GameState {
 	    self.game = if let Ok(name) = bizhawk.get_rom_name() {
 	        match name.as_str() {
 	            "Pokemon - Red Version (USA, Europe)" => Game::RED,
-	            "Pokemon - FireRed Version (USA)" => Game::FIRERED,
+	            "firered" => Game::FIRERED,
 	            _ => panic!("Neither red nor firered loaded!")
 	        }
 	    } else {
@@ -200,7 +200,7 @@ impl GameState {
 		}
 	}
 
-	pub fn check_for_transition(&mut self, current_frame: u32, bizhawk: &Bizhawk) {
+	pub fn check_for_transition(&mut self, bizhawk: &Bizhawk, current_frame: u32) {
         match self.game {
             Game::RED => {
             	let map_data = bizhawk.read_slice(MemRegion::WRAM, 0x1350, 0xFF).unwrap();
@@ -429,14 +429,22 @@ impl GameState {
 				self.options.animations = options_byte & 0x80 == 0x00;
 				self.options.switching = options_byte & 0x40 == 0x00;
 
+				self.money = u32::from_str_radix(&format!("{:06x}", bizhawk.read_u32_be(MemRegion::WRAM, 0x1347).unwrap() >> 8), 10).unwrap_or(0); // BCD
+
 				self.owned.copy_from_slice(&bizhawk.read_slice(MemRegion::WRAM, 0x12f7, 19).unwrap());
 				self.seen.copy_from_slice(&bizhawk.read_slice(MemRegion::WRAM, 0x130a, 19).unwrap());
 			},
 			Game::FIRERED => {
-				let options_word = LittleEndian::read_u16(&bizhawk.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap());
+				let options_word = LittleEndian::read_u16(&bizhawk.read_slice_custom("*03005008+14/2".to_string(), 0x02).unwrap());
+
 				self.options.text_speed = ((0x03 - (options_word & 0x0003) as u8) * 2) - 1; // convert to red text speed
 				self.options.animations = options_word & 0x0400 == 0x0000;
 				self.options.switching = options_word & 0x0200 == 0x0000;
+
+				let key = LittleEndian::read_u32(&bizhawk.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap());
+				self.money = LittleEndian::read_u32(&bizhawk.read_slice_custom("*03005008+290/4".to_string(), 0x04).unwrap()) ^ key;
+
+				println!("{}", self.money);
 
 				self.owned.copy_from_slice(&bizhawk.read_slice_custom("*0300500C+28/13".to_string(), 19).unwrap());
 				self.seen.copy_from_slice(&bizhawk.read_slice_custom("*0300500C+5C/13".to_string(), 19).unwrap());
@@ -453,11 +461,18 @@ impl GameState {
 
 				bizhawk.write_u8(MemRegion::WRAM, 0x1355, options_byte).unwrap();
 
+				let mut money_vec = vec![0;3];
+
+				LittleEndian::write_u24(&mut money_vec, u32::from_str_radix(&format!("{:06}", self.money), 16).unwrap());
+
+				bizhawk.write_slice(MemRegion::WRAM, 0x1347, &money_vec).unwrap(); // BCD
+
 				bizhawk.write_slice(MemRegion::WRAM, 0x12f7, &self.owned).unwrap();
 				bizhawk.write_slice(MemRegion::WRAM, 0x130a, &self.seen).unwrap();
 			},
 			Game::FIRERED => {
 				let pointer1 = bizhawk.read_u32(MemRegion::IWRAM, 0x500C).unwrap() & 0x00FFFFFF;
+				let pointer2 = bizhawk.read_u32(MemRegion::IWRAM, 0x5008).unwrap() & 0x00FFFFFF;
 
 				// get the byte with the options we change from the game masked off
 				let mut options_word = LittleEndian::read_u16(&bizhawk.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap()) & 0xF9FC;
@@ -469,6 +484,10 @@ impl GameState {
 
 				// write it back
 				bizhawk.write_u16(MemRegion::EWRAM, pointer1 + 0x14, options_word).unwrap();
+
+				let key = LittleEndian::read_u32(&bizhawk.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap());
+
+				bizhawk.write_u32(MemRegion::EWRAM, pointer2 + 0x290, self.money ^ key).unwrap();
 
 				bizhawk.write_slice(MemRegion::EWRAM, pointer1 + 0x28, &self.owned).unwrap();
 				bizhawk.write_slice(MemRegion::EWRAM, pointer1 + 0x5C, &self.seen).unwrap();
