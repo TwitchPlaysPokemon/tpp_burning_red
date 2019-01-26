@@ -35,9 +35,6 @@ fn main() {
     // Frame timing
     let mut current_frame = bizhawk.framecount().unwrap();
 
-    // keep the system enabled for now
-    game_state.enabled = true;
-
     loop { 
         if game_state.enabled {
             if let Ok(frame) = bizhawk.framecount() {
@@ -48,13 +45,19 @@ fn main() {
                 }
             }
         } else if game_state.game == gamestate::Game::FIRERED {
-            // Keep the system disabled until we get oaks parcel
-            if LittleEndian::read_u16(&bizhawk.read_slice_custom("*03005008+1000/AA".to_string(), 0x02).unwrap()) == 0x05 {
-                println!("Oaks parcel obtained, enabling system");
+            // Keep the system disabled until we get oaks parcel or STEREO sound is enabled (debug for now)
+            if LittleEndian::read_u16(&bizhawk.read_slice_custom("*03005008+1000/AA".to_string(), 0x02).unwrap()) >= 0x05 ||
+               LittleEndian::read_u16(&bizhawk.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap()) & 0x0100 > 0x01 {
+                println!("Enabling system");
                 game_state.collect_mapstate(&bizhawk);
                 game_state.read_trainer_data(&bizhawk);
                 game_state.enabled = true;
+                if LittleEndian::read_u16(&bizhawk.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap()) & 0x0100 > 0x01 {
+                    game_state.first_warp = false;
+                }
             }
+        } else {
+            game_state.collect_mapstate(&bizhawk);
         }
         std::thread::sleep(POLL_DELAY);
     }

@@ -22,7 +22,7 @@ pub struct GameState {
 	pokemon_list: HashMap<u16, Pokemon>,
 	map_state: MapState,
 	pub enabled: bool,
-	first_warp: bool
+	pub first_warp: bool
 }
 
 impl GameState {
@@ -59,7 +59,7 @@ impl GameState {
 	}
 
 	pub fn save_state(&mut self) -> std::io::Result<()> {
-        println!("Saving GameState to disk.\n");
+        //println!("Saving GameState to disk.\n");
     	let f = File::create("GameState")?;
     	bincode::serialize_into(f, self).unwrap();
     	Ok(())
@@ -104,100 +104,106 @@ impl GameState {
 
 		bizhawk.pause().unwrap();
 
-        println!("--Reading party");
+        //println!("--Reading party");
 
         self.read_party(bizhawk);
 
         self.read_misc(bizhawk);
 
-		match &self.game {
-			Game::RED => { 
-                println!("--Loading FIRE RED ROM");
+        if self.options.switching {
+        	match &self.game {
+				Game::RED => { 
+                    println!("Supported map, starting transition to FIRE RED map: {:04x}, warp: {:02x}", map, warp);
+	                //println!("--Loading FIRE RED ROM");
 
-                bizhawk.load_rom("firered.gba").unwrap();
-                bizhawk.load_state("firered_warp").unwrap();
+	                bizhawk.load_rom("firered.gba").unwrap();
+	                bizhawk.load_state("firered_warp").unwrap();
 
-                self.game = Game::FIRERED;
+	                self.game = Game::FIRERED;
 
-                self.write_trainer_data(bizhawk);
+	                self.write_trainer_data(bizhawk);
 
-                self.write_party(bizhawk);
+	                self.write_party(bizhawk);
 
-                self.write_misc(bizhawk);
+	                self.write_misc(bizhawk);
 
-                bizhawk.write_u16(MemRegion::EWRAM, 0x0003_1DBC, map).unwrap();
-                bizhawk.write_u8(MemRegion::EWRAM, 0x0003_1DBE, warp).unwrap();
+	                bizhawk.write_u16(MemRegion::EWRAM, 0x0003_1DBC, map).unwrap();
+	                bizhawk.write_u8(MemRegion::EWRAM, 0x0003_1DBE, warp).unwrap();
 
-                bizhawk.frameadvance().unwrap();
+	                bizhawk.frameadvance().unwrap();
 
-                bizhawk.write_u32(MemRegion::EWRAM, 0x0003_1DB4, 0xFFFF_FFFF).unwrap();
+	                bizhawk.write_u32(MemRegion::EWRAM, 0x0003_1DB4, 0xFFFF_FFFF).unwrap();
 
-                self.map_state.previous_lastmap = 0xFFFF_FFFF;
+	                self.map_state.previous_lastmap = 0xFFFF_FFFF;
 
-                bizhawk.play().unwrap();
+	                bizhawk.play().unwrap();
 
-                self.map_state.previous_map = map;
-                self.map_state.previous_warp = warp; 
+	                self.map_state.previous_map = map;
+	                self.map_state.previous_warp = warp; 
 
-                self.map_state.last_change = bizhawk.framecount().unwrap();
+	                self.map_state.last_change = bizhawk.framecount().unwrap();
 
-                println!("--DONE\n");
-			},
-			Game::FIRERED => {
-                //bizhawk.mute().unwrap();
+	                //println!("--DONE\n");
+				},
+				Game::FIRERED => {
+	                //bizhawk.mute().unwrap();
+	                println!("Supported map, starting transition to RED map: {:02x}, warp: {:02x}, Lastmap {:02x}", map, warp, last_map);
 
-                println!("--Loading RED ROM");
+	                //println!("--Loading RED ROM");
 
-                bizhawk.load_rom("red.gbc").unwrap();
-                if self.first_warp {
-                	bizhawk.load_state("red_default").unwrap();
-                	self.first_warp = false;
-                	println!("first warp");
-                } else {
-                	bizhawk.load_state("red_warp").unwrap();
-                }
+	                bizhawk.load_rom("red.gbc").unwrap();
+	                if self.first_warp {
+	                	bizhawk.load_state("red_default").unwrap();
+	                	self.first_warp = false;
+	                	println!("first warp");
+	                } else {
+	                	bizhawk.load_state("red_warp").unwrap();
+	                }
 
-                self.game = Game::RED;
+	                self.game = Game::RED;
 
-                let start_warp = bizhawk.framecount().unwrap();
+	                let start_warp = bizhawk.framecount().unwrap();
 
-                self.write_trainer_data(bizhawk);
+	                self.write_trainer_data(bizhawk);
 
-                self.write_party(bizhawk);
+	                self.write_party(bizhawk);
 
-                self.write_misc(bizhawk);
+	                self.write_misc(bizhawk);
 
-                bizhawk.write_u8(MemRegion::WRAM, 0x1365, last_map).unwrap(); // lastmap
-                bizhawk.write_u8(MemRegion::WRAM, 0x142F, warp).unwrap(); // destination warp
-                bizhawk.write_u8(MemRegion::HRAM, 0x000B, map as u8).unwrap(); // map
-                bizhawk.write_u8(MemRegion::WRAM, 0x135E, map as u8).unwrap(); // map
+	                bizhawk.write_u8(MemRegion::WRAM, 0x1365, last_map).unwrap(); // lastmap
+	                bizhawk.write_u8(MemRegion::WRAM, 0x142F, warp).unwrap(); // destination warp
+	                bizhawk.write_u8(MemRegion::HRAM, 0x000B, map as u8).unwrap(); // map
+	                bizhawk.write_u8(MemRegion::WRAM, 0x135E, map as u8).unwrap(); // map
 
-                bizhawk.stop_drawing().unwrap();
-                bizhawk.clear_screen(0x00000000).unwrap();
-                bizhawk.play().unwrap();
-                bizhawk.unthrottle(0).unwrap();
-                
-                while bizhawk.framecount().unwrap() - start_warp < 240 {
-                	bizhawk.write_u8(MemRegion::WRAM, 0x0002, 0x01).unwrap(); // Music
-                	std::thread::sleep(POLL_DELAY);
-                }; // wait 240 frames
+	                bizhawk.stop_drawing().unwrap();
+	                bizhawk.clear_screen(0x00000000).unwrap();
+	                bizhawk.play().unwrap();
+	                bizhawk.unthrottle(0).unwrap();
+	                
+	                while bizhawk.framecount().unwrap() - start_warp < 240 {
+	                	bizhawk.write_u8(MemRegion::WRAM, 0x0002, 0x01).unwrap(); // Music
+	                	std::thread::sleep(POLL_DELAY);
+	                }; // wait 240 frames
 
-                bizhawk.throttle().unwrap();
-                bizhawk.start_drawing().unwrap();
+	                bizhawk.throttle().unwrap();
+	                bizhawk.start_drawing().unwrap();
 
-                let current_music = bizhawk.read_u8(MemRegion::WRAM, 0x0FCA).unwrap(); // map
-                bizhawk.write_slice(MemRegion::WRAM, 0x0fC7, &[current_music, 0x00, 0x00]).unwrap();
+	                let current_music = bizhawk.read_u8(MemRegion::WRAM, 0x0FCA).unwrap(); // map
+	                bizhawk.write_slice(MemRegion::WRAM, 0x0fC7, &[current_music, 0x00, 0x00]).unwrap();
 
-                //bizhawk.unmute().unwrap();
+	                //bizhawk.unmute().unwrap();
 
-                self.map_state.previous_map = bizhawk.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16;
-                self.map_state.previous_warp = bizhawk.read_u8(MemRegion::WRAM, 0x142F).unwrap();
+	                self.map_state.previous_map = bizhawk.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16;
+	                self.map_state.previous_warp = bizhawk.read_u8(MemRegion::WRAM, 0x142F).unwrap();
 
-                self.map_state.last_change = bizhawk.framecount().unwrap();
+	                self.map_state.last_change = bizhawk.framecount().unwrap();
 
-                println!("--DONE\n");
+	                //println!("--DONE\n");
+				}
 			}
-		}
+        } else {
+        	bizhawk.play().unwrap();
+        }
 	}
 
 	pub fn check_for_transition(&mut self, bizhawk: &Bizhawk, current_frame: u32) {
@@ -223,9 +229,8 @@ impl GameState {
                 }
 
                 if !self.map_state.map_checked && current_frame - self.map_state.last_change > 18 {
-                	println!("Map change detected, Map: {:02x}, Warp: {:02x}, Lastmap {:02x}\n", current_map, current_warp, last_map);
+                	if current_warp != 0xFF {println!("Map change detected, Map: {:02x}, Warp: {:02x}, Lastmap {:02x}", current_map, current_warp, last_map)};
                     if let Some(destination) = RED_FIRERED_WARP_MAP.get(&(current_map, current_warp, last_map)) {
-                        println!("Supported map, starting transition to FIRE RED map: {:04x}, warp: {:02x}", destination.0, destination.1);
                         self.handle_map_change(&bizhawk, destination.0, destination.1, 0);
                     } else if current_warp != 0xFF {
                         println!("Map unknown or not supported.");
@@ -252,7 +257,6 @@ impl GameState {
                         bizhawk.framerewind().unwrap();
                         bizhawk.save_state("firered_warp").unwrap();
                         self.save_state().unwrap();
-                        println!("Supported map, starting transition to RED map: {:02x}, warp: {:02x}, Lastmap {:02x}", destination.0, destination.1, destination.2);
                         self.handle_map_change(&bizhawk, destination.0 as u16, destination.1, destination.2);
                     } else {
                         bizhawk.play().unwrap();
@@ -345,7 +349,6 @@ impl GameState {
 				let mut count = 0;
 				let mut data = bizhawk.read_slice(MemRegion::WRAM, 0x1160, 0x1A0).unwrap();
                 for i in &self.party_uids {
-                	println!("{:04x}", *i);
                     if *i == 0x0000 {
                     	data[0x04 + slot] = 0xFF;
                     	slot += 1;
@@ -424,10 +427,17 @@ impl GameState {
 	pub fn read_misc(&mut self, bizhawk: &Bizhawk) {
 		match &self.game {
 			Game::RED => {
+				let old_switching = self.options.switching;
+
 				let options_byte = bizhawk.read_u8(MemRegion::WRAM, 0x1355).unwrap();
+
 				self.options.text_speed = options_byte & 0x0F;
 				self.options.animations = options_byte & 0x80 == 0x00;
 				self.options.switching = options_byte & 0x40 == 0x00;
+
+				if old_switching != self.options.switching {
+					println!("Warps {}", if self.options.switching {"Enabled"} else {"Disabled"});
+				}
 
 				self.money = u32::from_str_radix(&format!("{:06x}", bizhawk.read_u32_be(MemRegion::WRAM, 0x1347).unwrap() >> 8), 10).unwrap_or(0); // BCD
 
@@ -435,16 +445,20 @@ impl GameState {
 				self.seen.copy_from_slice(&bizhawk.read_slice(MemRegion::WRAM, 0x130a, 19).unwrap());
 			},
 			Game::FIRERED => {
-				let options_word = LittleEndian::read_u16(&bizhawk.read_slice_custom("*03005008+14/2".to_string(), 0x02).unwrap());
+				let old_switching = self.options.switching;
+
+				let options_word = LittleEndian::read_u16(&bizhawk.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap());
 
 				self.options.text_speed = ((0x03 - (options_word & 0x0003) as u8) * 2) - 1; // convert to red text speed
 				self.options.animations = options_word & 0x0400 == 0x0000;
 				self.options.switching = options_word & 0x0200 == 0x0000;
 
+				if old_switching != self.options.switching {
+					println!("Warps {}", if self.options.switching {"Enabled"} else {"Disabled"});
+				}
+
 				let key = LittleEndian::read_u32(&bizhawk.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap());
 				self.money = LittleEndian::read_u32(&bizhawk.read_slice_custom("*03005008+290/4".to_string(), 0x04).unwrap()) ^ key;
-
-				println!("{}", self.money);
 
 				self.owned.copy_from_slice(&bizhawk.read_slice_custom("*0300500C+28/13".to_string(), 19).unwrap());
 				self.seen.copy_from_slice(&bizhawk.read_slice_custom("*0300500C+5C/13".to_string(), 19).unwrap());
