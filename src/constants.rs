@@ -258,61 +258,61 @@ pub const POLL_DELAY: time::Duration = time::Duration::from_millis(1);
 
 #[derive(Debug, Clone)]
 pub struct PKBase {
-	pub stats: [u16;6],
-	pub _type: [u8;2],
-	pub catch_rate: u8,
-	pub exp_growth: u8,
-	pub gender_ratio: u8,
+    pub stats: [u16;6],
+    pub _type: [u8;2],
+    pub catch_rate: u8,
+    pub exp_growth: u8,
+    pub gender_ratio: u8,
 }
 
 pub struct BaseStats {
-	pub gen1: PKBase,
-	pub gen3: PKBase
+    pub gen1: PKBase,
+    pub gen3: PKBase
 }
 
 impl BaseStats {
     pub fn from_bytes(gen1_bytes: &[u8], gen2_bytes: &[u8], gen3_bytes: &[u8]) -> Vec<BaseStats> {
-    	let mut stats_vec = Vec::new();
-    	for i in 0..152 {
-    		let mut current_mon = &gen1_bytes[(i*0x1C)..(i*0x1C)+0x1C];
-    		let gen1 = PKBase {
-    			stats: [u16::from(current_mon[0x01]),
-    			        u16::from(current_mon[0x02]),
-    			        u16::from(current_mon[0x03]),
-    			        u16::from(current_mon[0x04]),
-    			        u16::from(current_mon[0x05]),
-    			        u16::from(current_mon[0x05])],
-				_type: [current_mon[0x06], current_mon[0x07]],
-				catch_rate: current_mon[0x08],
-				exp_growth: current_mon[0x13],
-				gender_ratio: gen2_bytes[i*0x20 + 0xD]
-        	};
-    		current_mon = &gen3_bytes[(i*0x1C)..(i*0x1C)+0x1C];
-    		let gen3 = PKBase {
-    			stats: [u16::from(current_mon[0x00]),
-    			        u16::from(current_mon[0x01]),
-    			        u16::from(current_mon[0x02]),
-    			        u16::from(current_mon[0x03]),
-    			        u16::from(current_mon[0x04]),
-    			        u16::from(current_mon[0x05])],
-				_type: [current_mon[0x06], current_mon[0x07]],
-				catch_rate: 0x00,
-				exp_growth: current_mon[0x13],
-				gender_ratio: current_mon[0x10],
-        	};
-        	stats_vec.push(BaseStats {gen1, gen3});
-    	}
-    	stats_vec
+        let mut stats_vec = Vec::new();
+        for i in 0..152 {
+            let mut current_mon = &gen1_bytes[(i*0x1C)..(i*0x1C)+0x1C];
+            let gen1 = PKBase {
+                stats: [u16::from(current_mon[0x01]),
+                        u16::from(current_mon[0x02]),
+                        u16::from(current_mon[0x03]),
+                        u16::from(current_mon[0x04]),
+                        u16::from(current_mon[0x05]),
+                        u16::from(current_mon[0x05])],
+                _type: [current_mon[0x06], current_mon[0x07]],
+                catch_rate: current_mon[0x08],
+                exp_growth: current_mon[0x13],
+                gender_ratio: gen2_bytes[i*0x20 + 0xD]
+            };
+            current_mon = &gen3_bytes[(i*0x1C)..(i*0x1C)+0x1C];
+            let gen3 = PKBase {
+                stats: [u16::from(current_mon[0x00]),
+                        u16::from(current_mon[0x01]),
+                        u16::from(current_mon[0x02]),
+                        u16::from(current_mon[0x03]),
+                        u16::from(current_mon[0x04]),
+                        u16::from(current_mon[0x05])],
+                _type: [current_mon[0x06], current_mon[0x07]],
+                catch_rate: 0x00,
+                exp_growth: current_mon[0x13],
+                gender_ratio: current_mon[0x10],
+            };
+              stats_vec.push(BaseStats {gen1, gen3});
+        }
+        stats_vec
     }
 }
 
 lazy_static! {
-	pub static ref RED_FIRERED_WARP_MAP: HashMap<(u8, u8, u8), (u16, u8)> = get_connections_red_firered();
-	pub static ref FIRERED_RED_WARP_MAP: HashMap<(u16, u8), (u8, u8, u8)> = get_connections_firered_red();
-	static ref GEN_1_BYTES: &'static [u8] = include_bytes!("personal_rb");
-	static ref GEN_2_BYTES: &'static [u8] = include_bytes!("personal_gs"); // for gender ratios
-	static ref GEN_3_BYTES: &'static [u8] = include_bytes!("personal_fr");
-	pub static ref BASE_STATS: Vec<BaseStats> = BaseStats::from_bytes(&GEN_1_BYTES, &GEN_2_BYTES, &GEN_3_BYTES);
+    pub static ref RED_FIRERED_WARP_MAP: HashMap<(u8, u8, u8), (u16, u8)> = get_connections_red_firered();
+    pub static ref FIRERED_RED_WARP_MAP: HashMap<(u16, u8), (u8, u8, u8)> = get_connections_firered_red();
+    static ref GEN_1_BYTES: &'static [u8] = include_bytes!("personal_rb");
+    static ref GEN_2_BYTES: &'static [u8] = include_bytes!("personal_gs"); // for gender ratios
+    static ref GEN_3_BYTES: &'static [u8] = include_bytes!("personal_fr");
+    pub static ref BASE_STATS: Vec<BaseStats> = BaseStats::from_bytes(&GEN_1_BYTES, &GEN_2_BYTES, &GEN_3_BYTES);
 }
                                           
 pub static NATURE_EFFECTS: [[f32;5];25] = [/*ATK, DEF, SPE, SPA, SPD*/
