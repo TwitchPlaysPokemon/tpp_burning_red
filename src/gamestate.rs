@@ -11,7 +11,8 @@ use byteorder::{ByteOrder, LittleEndian, BigEndian};
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GameState {
     pub trainer: TrainerInfo,
-    items: [Vec<Item>;2],
+    red_items: Bag,
+    firered_items: Bag,
     options: Options,
     pub game: Game,
     money: u32,
@@ -29,7 +30,8 @@ impl GameState {
     pub fn new() -> GameState {
         GameState {
             trainer: TrainerInfo::new(),
-            items: [Vec::new(),Vec::new()],
+            red_items: Bag::new(),
+            firered_items: Bag::new(),
             options: Options::new(),
             game: Game::FIRERED,
             money: 0,
@@ -508,6 +510,65 @@ impl GameState {
             }
         }
     }
+
+    pub fn read_items(&mut self, bizhawk: &Bizhawk) {
+        match &self.game {
+            Game::RED => {
+                // Dont use this function
+            },
+            Game::FIRERED => {
+                let key = LittleEndian::read_u32(&bizhawk.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap()) as u16;
+
+                let mut item_memory = bizhawk.read_slice_custom("*03005008+310/2E8".to_string(), 0x2E8).unwrap();
+
+                // Decrypt
+                for i in 0..(item_memory.len() / 0x04) {
+                    let current_section = LittleEndian::read_u16(&item_memory[(i*0x04 + 0x02)..(i*0x04) + 0x04]);
+                    LittleEndian::write_u16(&mut item_memory[(i*0x04 + 0x02)..(i*0x04) + 0x04], current_section ^ key);
+                }
+                
+                /*println!("Address 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F");
+                for i in 0..(item_memory.len() / 0x10) {
+                    print!("{:07X}", i);
+                    for j in 0..0x10 {
+                        print!(" {:02X}", item_memory[(i*0x10)+j]);
+                    }
+                    println!("");
+                }*/
+                
+                let item_pocket = &item_memory[0x0000..0x00A8];
+                for i in 0..item_pocket.len() / 0x04 {
+
+                }
+
+                let key_pocket = &item_memory[0x00A8..0x0120];
+                for i in 0..key_pocket.len() / 0x04 {
+
+                }
+
+                let ball_pocket = &item_memory[0x0120..0x0154];
+                for i in 0..ball_pocket.len() / 0x04 {
+
+                }
+
+                let tmhm_pocket = &item_memory[0x0154..0x023C];
+                for i in 0..tmhm_pocket.len() / 0x04 {
+
+                }
+            }
+        }
+    }
+
+    pub fn write_items(&mut self, bizhawk: &Bizhawk) {
+        match &self.game {
+            Game::RED => {
+                // Dont use this function
+            },
+            Game::FIRERED => {
+                
+            }
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -598,11 +659,37 @@ impl TrainerInfo {
     }
 }
 
+#[derive(PartialEq, Eq, Serialize, Deserialize, Clone)]
+pub enum PocketName {
+    ITEMS,
+    KEYITEMS,
+    POKEBALLS,
+    TMHM
+}
+
 #[derive(Serialize, Deserialize, Clone)]
-pub struct Item {
-    pub id: u16,
-    pub count: u16,
-    pub pocket: u8
+pub struct Pocket {
+    pub contents: HashMap<u16, u16>, // ID, Count
+    pub name: PocketName
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Bag {
+    pub items: Pocket,
+    pub key: Pocket,
+    pub pokeballs: Pocket,
+    pub tmhm: Pocket
+}
+
+impl Bag {
+    pub fn new() -> Bag {
+        Bag {
+            items: Pocket { contents: HashMap::new(), name: PocketName::ITEMS },
+            key: Pocket { contents: HashMap::new(), name: PocketName::KEYITEMS },
+            pokeballs: Pocket { contents: HashMap::new(), name: PocketName::POKEBALLS },
+            tmhm: Pocket { contents: HashMap::new(), name: PocketName::TMHM },
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
