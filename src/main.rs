@@ -45,8 +45,8 @@ fn main() {
                 }
             }
         } else if game_state.game == gamestate::Game::FIRERED {
-            // Keep the system disabled until we get oaks parcel
-            if LittleEndian::read_u16(&bizhawk.read_slice_custom("*03005008+1000+AA/02".to_string(), 0x02).unwrap()) >= 0x05 {
+            // Keep the system disabled until we get oaks parcel 0x015D
+            if LittleEndian::read_u16(&bizhawk.read_slice_custom("*03005008+3b8/2".to_string(), 0x02).unwrap()) == 0x015D { // if first slot is oaks parcel
                 println!("Enabling system");
                 game_state.collect_mapstate(&bizhawk);
                 game_state.read_trainer_data(&bizhawk);

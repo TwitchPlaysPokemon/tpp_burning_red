@@ -207,7 +207,7 @@ impl GameState {
         }
     }
 
-    pub fn check_for_transition(&mut self, bizhawk: &Bizhawk, current_frame: u32) {
+    pub fn check_for_transition(&mut self, bizhawk: &Bizhawk, mut current_frame: u32) {
         match self.game {
             Game::RED => {
                 let map_data = bizhawk.read_slice(MemRegion::WRAM, 0x1350, 0xFF).unwrap();
@@ -217,6 +217,7 @@ impl GameState {
                 
                 if current_map as u16 != self.map_state.previous_map || (current_warp != self.map_state.previous_warp) {
                     self.map_state.last_change = bizhawk.framecount().unwrap();
+                    current_frame = self.map_state.last_change; //  Needed in case the emulator is unthrottled
                     self.map_state.previous_map = current_map as u16;
                     self.map_state.previous_warp = current_warp;
                     self.map_state.map_checked = false;
@@ -623,6 +624,8 @@ impl TrainerInfo {
     }
     pub fn from_gen1(tid: u16, nickname: &[u8], rival: &[u8]) -> TrainerInfo {
 
+        let mut gen_1_name = nickname.to_vec();
+        let mut gen_1_rival_name = rival.to_vec();
         let mut gen_3_name = nickname.to_vec();
         let mut gen_3_rival_name = rival.to_vec();
 
@@ -634,10 +637,16 @@ impl TrainerInfo {
             *character = RED_FIRERED_TEXT[*character as usize];
         }
 
+        // Force terminators
+        gen_1_name[0x07] = 0x50;
+        gen_1_rival_name[0x07] = 0x50;
+        gen_3_name[0x07] = 0xFF;
+        gen_3_rival_name[0x07] = 0xFF;
+
         TrainerInfo {
-            gen_1_name: nickname.to_vec(),
+            gen_1_name,
             gen_3_name,
-            gen_1_rival_name: rival.to_vec(),
+            gen_1_rival_name,
             gen_3_rival_name,
             tid,
             sid: rand::random::<u16>()
@@ -647,6 +656,8 @@ impl TrainerInfo {
 
         let mut gen_1_name = nickname.to_vec();
         let mut gen_1_rival_name = rival.to_vec();
+        let mut gen_3_name = nickname.to_vec();
+        let mut gen_3_rival_name = rival.to_vec();
 
         for character in &mut gen_1_name {
             *character = FIRERED_RED_TEXT[*character as usize];
@@ -656,11 +667,17 @@ impl TrainerInfo {
             *character = FIRERED_RED_TEXT[*character as usize];
         }
 
+        // Force terminators
+        gen_1_name[0x07] = 0x50;
+        gen_1_rival_name[0x07] = 0x50;
+        gen_3_name[0x07] = 0xFF;
+        gen_3_rival_name[0x07] = 0xFF;
+
         TrainerInfo {
             gen_1_name,
-            gen_3_name: nickname.to_vec(),
+            gen_3_name,
             gen_1_rival_name,
-            gen_3_rival_name: rival.to_vec(),
+            gen_3_rival_name,
             tid,
             sid
         }
