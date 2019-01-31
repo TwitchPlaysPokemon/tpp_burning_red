@@ -2,9 +2,8 @@ use crate::pokemon::*;
 use crate::constants::*;
 use crate::bizhawk::*;
 use bincode;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::fs::File;
-use std::io::Write;
 use rand;
 use byteorder::{ByteOrder, LittleEndian, BigEndian};
 
@@ -535,25 +534,34 @@ impl GameState {
                     }
                     println!("");
                 }*/
-                
-                let item_pocket = &item_memory[0x0000..0x00A8];
-                for i in 0..item_pocket.len() / 0x04 {
 
-                }
+                for i in 0..4 {
+                    let pocket = match i {
+                        0 => &item_memory[0x0000..0x00A8],
+                        1 => &item_memory[0x00A8..0x0120],
+                        2 => &item_memory[0x0120..0x0154],
+                        _ => &item_memory[0x0154..0x023C]
+                    };
 
-                let key_pocket = &item_memory[0x00A8..0x0120];
-                for i in 0..key_pocket.len() / 0x04 {
+                    let pocket_to_update = match i {
+                        0 => &mut self.firered_items.general,
+                        1 => &mut self.firered_items.key,
+                        2 => &mut self.firered_items.balls,
+                        _ => &mut self.firered_items.tmhm,
+                    };
 
-                }
-
-                let ball_pocket = &item_memory[0x0120..0x0154];
-                for i in 0..ball_pocket.len() / 0x04 {
-
-                }
-
-                let tmhm_pocket = &item_memory[0x0154..0x023C];
-                for i in 0..tmhm_pocket.len() / 0x04 {
-
+                    for j in 0..pocket.len() / 0x04 {
+                        let id = LittleEndian::read_u16(&pocket[j*0x04..0x02 + j*0x04]);
+                        let count = LittleEndian::read_u16(&pocket[0x02 + j*0x04..0x04 + j*0x04]);
+                        if id == 0 || count == 0 {
+                            break;
+                        }
+                        if let Some(entry) = pocket_to_update.get_mut(&id) {
+                            *entry = count;
+                        } else {
+                            pocket_to_update.insert(id, count);
+                        }
+                    }
                 }
             }
         }
@@ -659,35 +667,21 @@ impl TrainerInfo {
     }
 }
 
-#[derive(PartialEq, Eq, Serialize, Deserialize, Clone)]
-pub enum PocketName {
-    ITEMS,
-    KEYITEMS,
-    POKEBALLS,
-    TMHM
-}
-
-#[derive(Serialize, Deserialize, Clone)]
-pub struct Pocket {
-    pub contents: HashMap<u16, u16>, // ID, Count
-    pub name: PocketName
-}
-
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Bag {
-    pub items: Pocket,
-    pub key: Pocket,
-    pub pokeballs: Pocket,
-    pub tmhm: Pocket
+    pub general: BTreeMap<u16, u16>, // ID, Count
+    pub key: BTreeMap<u16, u16>,
+    pub balls: BTreeMap<u16, u16>,
+    pub tmhm: BTreeMap<u16, u16>
 }
 
 impl Bag {
     pub fn new() -> Bag {
         Bag {
-            items: Pocket { contents: HashMap::new(), name: PocketName::ITEMS },
-            key: Pocket { contents: HashMap::new(), name: PocketName::KEYITEMS },
-            pokeballs: Pocket { contents: HashMap::new(), name: PocketName::POKEBALLS },
-            tmhm: Pocket { contents: HashMap::new(), name: PocketName::TMHM },
+            general: BTreeMap::new(),
+            key: BTreeMap::new(),
+            balls: BTreeMap::new(),
+            tmhm: BTreeMap::new()
         }
     }
 }
