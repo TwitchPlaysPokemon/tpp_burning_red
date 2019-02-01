@@ -6,6 +6,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::fs::File;
 use rand;
 use byteorder::{ByteOrder, LittleEndian, BigEndian};
+use std::sync::{Arc, Mutex};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GameState {
@@ -101,7 +102,7 @@ impl GameState {
         };
     }
 
-    pub fn handle_map_change(&mut self, bizhawk: &Bizhawk, map: u16, warp: u8, last_map: u8) {
+    pub fn handle_map_change(&mut self, bizhawk: &Bizhawk, map: u16, warp: u8, last_map: u8, warp_enable: Arc<Mutex<bool>>) {
 
         bizhawk.pause().unwrap();
 
@@ -111,7 +112,9 @@ impl GameState {
 
         self.read_misc(bizhawk);
 
-        if self.options.switching {
+        let warp_enable = warp_enable.lock().unwrap();
+
+        if *warp_enable {
             match &self.game {
                 Game::RED => { 
                     println!("Supported map, starting transition to FIRE RED map: {:04x}, warp: {:02x}", map, warp);
@@ -207,7 +210,7 @@ impl GameState {
         }
     }
 
-    pub fn check_for_transition(&mut self, bizhawk: &Bizhawk, mut current_frame: u32) {
+    pub fn check_for_transition(&mut self, bizhawk: &Bizhawk, mut current_frame: u32, warp_enable: Arc<Mutex<bool>>) {
         match self.game {
             Game::RED => {
                 let map_data = bizhawk.read_slice(MemRegion::WRAM, 0x1350, 0xFF).unwrap();
@@ -233,7 +236,7 @@ impl GameState {
                 if !self.map_state.map_checked && current_frame - self.map_state.last_change > 18 {
                     if current_warp != 0xFF {println!("Map change detected, Map: {:02x}, Warp: {:02x}, Lastmap {:02x}", current_map, current_warp, last_map)};
                     if let Some(destination) = RED_FIRERED_WARP_MAP.get(&(current_map, current_warp, last_map)) {
-                        self.handle_map_change(&bizhawk, destination.0, destination.1, 0);
+                        self.handle_map_change(&bizhawk, destination.0, destination.1, 0, warp_enable);
                     } else if current_warp != 0xFF {
                         println!("Map unknown or not supported.");
                     }
@@ -259,7 +262,7 @@ impl GameState {
                         bizhawk.framerewind().unwrap();
                         bizhawk.save_state("firered_warp").unwrap();
                         self.save_state().unwrap();
-                        self.handle_map_change(&bizhawk, destination.0 as u16, destination.1, destination.2);
+                        self.handle_map_change(&bizhawk, destination.0 as u16, destination.1, destination.2, warp_enable);
                     } else {
                         bizhawk.play().unwrap();
                         println!("Map unknown or not supported.");
@@ -429,35 +432,23 @@ impl GameState {
     pub fn read_misc(&mut self, bizhawk: &Bizhawk) {
         match &self.game {
             Game::RED => {
-                let old_switching = self.options.switching;
-
                 let options_byte = bizhawk.read_u8(MemRegion::WRAM, 0x1355).unwrap();
 
                 self.options.text_speed = options_byte & 0x0F;
                 self.options.animations = options_byte & 0x80 == 0x00;
                 self.options.switching = options_byte & 0x40 == 0x00;
-
-                if old_switching != self.options.switching {
-                    println!("Warps {}", if self.options.switching {"Enabled"} else {"Disabled"});
-                }
-
+                
                 self.money = u32::from_str_radix(&format!("{:06x}", bizhawk.read_u32_be(MemRegion::WRAM, 0x1347).unwrap() >> 8), 10).unwrap_or(0); // BCD
 
                 self.owned.copy_from_slice(&bizhawk.read_slice(MemRegion::WRAM, 0x12f7, 19).unwrap());
                 self.seen.copy_from_slice(&bizhawk.read_slice(MemRegion::WRAM, 0x130a, 19).unwrap());
             },
             Game::FIRERED => {
-                let old_switching = self.options.switching;
-
                 let options_word = LittleEndian::read_u16(&bizhawk.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap());
 
                 self.options.text_speed = ((0x03 - (options_word & 0x0003) as u8) * 2) - 1; // convert to red text speed
                 self.options.animations = options_word & 0x0400 == 0x0000;
                 self.options.switching = options_word & 0x0200 == 0x0000;
-
-                if old_switching != self.options.switching {
-                    println!("Warps {}", if self.options.switching {"Enabled"} else {"Disabled"});
-                }
 
                 let key = LittleEndian::read_u32(&bizhawk.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap());
                 self.money = LittleEndian::read_u32(&bizhawk.read_slice_custom("*03005008+290/4".to_string(), 0x04).unwrap()) ^ key;

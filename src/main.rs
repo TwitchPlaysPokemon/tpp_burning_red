@@ -17,15 +17,30 @@ mod warp_connections;
 mod constants;
 mod pokemon;
 mod gamestate;
+mod gfx_system;
 
 use crate::gamestate::*;
 use crate::constants::*;
+use crate::gfx_system::*;
+use std::thread;
 use byteorder::{ByteOrder, LittleEndian};
+use std::sync::{Arc, Mutex};
 
 fn main() {
 
     // Game / Warp map
     let bizhawk = bizhawk::Bizhawk::new(5337);
+
+    let warp_enable = Arc::new(Mutex::new(false));
+
+    let mut gfx = GfxSystem::new(Arc::clone(&warp_enable));
+
+    thread::Builder::new()
+        .name("Gui".to_string())
+        .spawn(move || {
+            gfx.run();
+        })
+        .expect("error: failed to start gui");
 
     let mut game_state = GameState::from_file(&bizhawk).unwrap();
 
@@ -41,7 +56,7 @@ fn main() {
                 if current_frame != frame {
                     current_frame = frame;
                     //println!("{:?}", frame);
-                    game_state.check_for_transition(&bizhawk, current_frame);
+                    game_state.check_for_transition(&bizhawk, current_frame, Arc::clone(&warp_enable));
                 }
             }
         } else if game_state.game == gamestate::Game::FIRERED {
