@@ -2,6 +2,9 @@
 **/*.rs.bk
 GameState
 
+# build directory
+build
+
 # precompiled python
 *.pyc
 
