@@ -1,6 +1,6 @@
-/target
-**/*.rs.bk
-GameState
+controller/target
+controller/**/*.rs.bk
+controller/GameState
 
 # build directory
 build
