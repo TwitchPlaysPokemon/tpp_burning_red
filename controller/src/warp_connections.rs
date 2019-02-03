@@ -820,9 +820,9 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (PATH_ENTRANCE_ROUTE_7      , 0x00, ROUTE_7                     ) => (0x2101, 0x01),
 
         //ROUTE_7_GATE
-        (ROUTE_7                    , 0x03, ROUTE_7                     ) => (0x0A03, 0x08),
-        (ROUTE_7                    , 0x00, ROUTE_7                     ) => (0x1903, 0x01),
-        (ROUTE_7                    , 0x01, ROUTE_7                     ) => (0x1903, 0x01),
+        (ROUTE_7                    , 0x03, ROUTE_7                     ) => (0x1903, 0x01),
+        (ROUTE_7                    , 0x00, ROUTE_7                     ) => (0x0A03, 0x08),
+        (ROUTE_7                    , 0x01, ROUTE_7                     ) => (0x0A03, 0x08),
 
         //PATH_ENTRANCE_ROUTE_7
         (ROUTE_7                    , 0x04, ROUTE_7                     ) => (0x1903, 0x00),
@@ -1868,16 +1868,16 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x1F01, 0x01) => (UNDERGROUND_PATH_NS        , 0x01, ROUTE_6                     ),
 
         //ROUTE_7
-        (0x0013, 0x02) => (ROUTE_7_GATE               , 0x02, ROUTE_7                     ),
+        (0x0013, 0x02) => (ROUTE_7_GATE               , 0x02, ROUTE_7                     ), //line does nothing
         (0x0013, 0x02) => (ROUTE_7_GATE               , 0x03, ROUTE_7                     ),
-        (0x0013, 0x00) => (ROUTE_7_GATE               , 0x00, ROUTE_7                     ),
+        (0x0013, 0x00) => (ROUTE_7_GATE               , 0x00, ROUTE_7                     ), //line does nothing
         (0x0013, 0x00) => (ROUTE_7_GATE               , 0x01, ROUTE_7                     ),
         (0x2101, 0x01) => (PATH_ENTRANCE_ROUTE_7      , 0x00, ROUTE_7                     ),
 
         //ROUTE_7_GATE
-        (0x0A03, 0x08) => (ROUTE_7                    , 0x03, ROUTE_7                     ),
-        (0x1903, 0x01) => (ROUTE_7                    , 0x00, ROUTE_7                     ),
-        (0x1903, 0x01) => (ROUTE_7                    , 0x01, ROUTE_7                     ),
+        (0x1903, 0x01) => (ROUTE_7                    , 0x03, ROUTE_7                     ),
+        (0x0A03, 0x08) => (ROUTE_7                    , 0x00, ROUTE_7                     ),
+        (0x0A03, 0x08) => (ROUTE_7                    , 0x01, ROUTE_7                     ),
 
         //PATH_ENTRANCE_ROUTE_7
         (0x1903, 0x00) => (ROUTE_7                    , 0x04, ROUTE_7                     ),
