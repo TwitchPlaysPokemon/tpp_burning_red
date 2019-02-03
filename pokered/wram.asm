@@ -2321,20 +2321,20 @@ wPokedexSeenEnd::
 wItemAPICommand:: ; d31d
 	ds 1
 wItemAPIBuffer:: ; d31e
-	ds 39
+	ds 19
 
-wCurrentItemPage:: ; d345
+wCurrentItemPage:: ; d331
 	ds 1
-wCurrentPCItemPage:: ; d346
+wCurrentPCItemPage:: ; d332
 	ds 1
 
-wPlayerMoney:: ; d347
+wPlayerMoney:: ; d333
 	ds 3 ; BCD
 
-wRivalName:: ; d34a
+wRivalName:: ; d336
 	ds NAME_LENGTH
 
-wOptions:: ; d355
+wOptions:: ; d341
 ; bit 7 = battle animation
 ; 0: On
 ; 1: Off
@@ -2347,296 +2347,296 @@ wOptions:: ; d355
 ; 5: Slow
 	ds 1
 
-wObtainedBadges:: ; d356
+wObtainedBadges:: ; d342
 	flag_array 8
 
 	ds 1
 
-wLetterPrintingDelayFlags:: ; d358
+wLetterPrintingDelayFlags:: ; d344
 ; bit 0: If 0, limit the delay to 1 frame. Note that this has no effect if
 ;        the delay has been disabled entirely through bit 1 of this variable
 ;        or bit 6 of wd730.
 ; bit 1: If 0, no delay.
 	ds 1
 
-wPlayerID:: ; d359
+wPlayerID:: ; d345
 	ds 2
 
-wMapMusicSoundID:: ; d35b
+wMapMusicSoundID:: ; d347
 	ds 1
 
-wMapMusicROMBank:: ; d35c
+wMapMusicROMBank:: ; d348
 	ds 1
 
-wMapPalOffset:: ; d35d
+wMapPalOffset:: ; d349
 ; offset subtracted from FadePal4 to get the background and object palettes for the current map
 ; normally, it is 0. it is 6 when Flash is needed, causing FadePal2 to be used instead of FadePal4
 	ds 1
 
-wCurMap:: ; d35e
+wCurMap:: ; d34a
 	ds 1
 
-wCurrentTileBlockMapViewPointer:: ; d35f
+wCurrentTileBlockMapViewPointer:: ; d34b
 ; pointer to the upper left corner of the current view in the tile block map
 	ds 2
 
-wYCoord:: ; d361
+wYCoord:: ; d34d
 ; player’s position on the current map
 	ds 1
 
-wXCoord:: ; d362
+wXCoord:: ; d34e
 	ds 1
 
-wYBlockCoord:: ; d363
+wYBlockCoord:: ; d34f
 ; player's y position (by block)
 	ds 1
 
-wXBlockCoord:: ; d364
+wXBlockCoord:: ; d350
 	ds 1
 
-wLastMap:: ; d365
+wLastMap:: ; d351
 	ds 1
 
-wUnusedD366:: ; d366
+wUnusedD366:: ; d352
 	ds 1
 
-wCurMapTileset:: ; d367
+wCurMapTileset:: ; d353
 	ds 1
 
-wCurMapHeight:: ; d368
+wCurMapHeight:: ; d354
 ; blocks
 	ds 1
 
-wCurMapWidth:: ; d369
+wCurMapWidth:: ; d355
 ; blocks
 	ds 1
 
-wMapDataPtr:: ; d36a
+wMapDataPtr:: ; d356
 	ds 2
 
-wMapTextPtr:: ; d36c
+wMapTextPtr:: ; d358
 	ds 2
 
-wMapScriptPtr:: ; d36e
+wMapScriptPtr:: ; d35a
 	ds 2
 
-wMapConnections:: ; d370
+wMapConnections:: ; d35c
 ; connection byte
 	ds 1
 
-wMapConn1Ptr:: ; d371
+wMapConn1Ptr:: ; d35d
 	ds 1
 
-wNorthConnectionStripSrc:: ; d372
+wNorthConnectionStripSrc:: ; d35e
 	ds 2
 
-wNorthConnectionStripDest:: ; d374
+wNorthConnectionStripDest:: ; d360
 	ds 2
 
-wNorthConnectionStripWidth:: ; d376
+wNorthConnectionStripWidth:: ; d362
 	ds 1
 
-wNorthConnectedMapWidth:: ; d377
+wNorthConnectedMapWidth:: ; d363
 	ds 1
 
-wNorthConnectedMapYAlignment:: ; d378
+wNorthConnectedMapYAlignment:: ; d364
 	ds 1
 
-wNorthConnectedMapXAlignment:: ; d379
+wNorthConnectedMapXAlignment:: ; d365
 	ds 1
 
-wNorthConnectedMapViewPointer:: ; d37a
+wNorthConnectedMapViewPointer:: ; d366
 	ds 2
 
-wMapConn2Ptr:: ; d37c
+wMapConn2Ptr:: ; d368
 	ds 1
 
-wSouthConnectionStripSrc:: ; d37d
+wSouthConnectionStripSrc:: ; d369
 	ds 2
 
-wSouthConnectionStripDest:: ; d37f:
+wSouthConnectionStripDest:: ; d36b
 	ds 2
 
-wSouthConnectionStripWidth:: ; d381
+wSouthConnectionStripWidth:: ; d36d
 	ds 1
 
-wSouthConnectedMapWidth:: ; d382
+wSouthConnectedMapWidth:: ; d36e
 	ds 1
 
-wSouthConnectedMapYAlignment:: ; d383
+wSouthConnectedMapYAlignment:: ; d36f
 	ds 1
 
-wSouthConnectedMapXAlignment:: ; d384
+wSouthConnectedMapXAlignment:: ; d370
 	ds 1
 
-wSouthConnectedMapViewPointer:: ; d385
+wSouthConnectedMapViewPointer:: ; d371
 	ds 2
 
-wMapConn3Ptr:: ; d387
+wMapConn3Ptr:: ; d373
 	ds 1
 
-wWestConnectionStripSrc:: ; d388
+wWestConnectionStripSrc:: ; d374
 	ds 2
 
-wWestConnectionStripDest:: ; d38a
+wWestConnectionStripDest:: ; d376
 	ds 2
 
-wWestConnectionStripHeight:: ; d38c
+wWestConnectionStripHeight:: ; d378
 	ds 1
 
-wWestConnectedMapWidth:: ; d38d
+wWestConnectedMapWidth:: ; d379
 	ds 1
 
-wWestConnectedMapYAlignment:: ; d38e
+wWestConnectedMapYAlignment:: ; d37a
 	ds 1
 
-wWestConnectedMapXAlignment:: ; d38f
+wWestConnectedMapXAlignment:: ; d37b
 	ds 1
 
-wWestConnectedMapViewPointer:: ; d390
+wWestConnectedMapViewPointer:: ; d37c
 	ds 2
 
-wMapConn4Ptr:: ; d392
+wMapConn4Ptr:: ; d37e
 	ds 1
 
-wEastConnectionStripSrc:: ; d393
+wEastConnectionStripSrc:: ; d37f
 	ds 2
 
-wEastConnectionStripDest:: ; d395
+wEastConnectionStripDest:: ; d381
 	ds 2
 
-wEastConnectionStripHeight:: ; d397
+wEastConnectionStripHeight:: ; d383
 	ds 1
 
-wEastConnectedMapWidth:: ; d398
+wEastConnectedMapWidth:: ; d384
 	ds 1
 
-wEastConnectedMapYAlignment:: ; d399
+wEastConnectedMapYAlignment:: ; d385
 	ds 1
 
-wEastConnectedMapXAlignment:: ; d39a
+wEastConnectedMapXAlignment:: ; d386
 	ds 1
 
-wEastConnectedMapViewPointer:: ; d39b
+wEastConnectedMapViewPointer:: ; d387
 	ds 2
 
-wSpriteSet:: ; d39d
+wSpriteSet:: ; d389
 ; sprite set for the current map (11 sprite picture ID's)
 	ds 11
 
-wSpriteSetID:: ; d3a8
+wSpriteSetID:: ; d394
 ; sprite set ID for the current map
 	ds 1
 
-wObjectDataPointerTemp:: ; d3a9
+wObjectDataPointerTemp:: ; d395
 	ds 2
 
 	ds 2
 
-wMapBackgroundTile:: ; d3ad
+wMapBackgroundTile:: ; d399
 ; the tile shown outside the boundaries of the map
 	ds 1
 
-wNumberOfWarps:: ; d3ae
+wNumberOfWarps:: ; d39a
 ; number of warps in current map
 	ds 1
 
-wWarpEntries:: ; d3af
+wWarpEntries:: ; d39b
 ; current map warp entries
 	ds 128
 
-wDestinationWarpID:: ; d42f
+wDestinationWarpID:: ; d41b
 ; if $ff, the player's coordinates are not updated when entering the map
 	ds 1
 
 	ds 128
 
-wNumSigns:: ; d4b0
+wNumSigns:: ; d49c
 ; number of signs in the current map (up to 16)
 	ds 1
 
-wSignCoords:: ; d4b1
+wSignCoords:: ; d49d
 ; 2 bytes each
 ; Y, X
 	ds 32
 
-wSignTextIDs:: ; d4d1
+wSignTextIDs:: ; d4bd
 	ds 16
 
-wNumSprites:: ; d4e1
+wNumSprites:: ; d4cd
 ; number of sprites on the current map
 	ds 1
 
 ; these two variables track the X and Y offset in blocks from the last special warp used
 ; they don't seem to be used for anything
-wYOffsetSinceLastSpecialWarp:: ; d4e2
+wYOffsetSinceLastSpecialWarp:: ; d4ce
 	ds 1
-wXOffsetSinceLastSpecialWarp:: ; d4e3
+wXOffsetSinceLastSpecialWarp:: ; d4cf
 	ds 1
 
-wMapSpriteData:: ; d4e4
+wMapSpriteData:: ; d4d0
 ; two bytes per sprite (movement byte 2, text ID)
 	ds 32
 
-wMapSpriteExtraData:: ; d504
+wMapSpriteExtraData:: ; d4f0
 ; two bytes per sprite (trainer class/item ID, trainer set ID)
 	ds 32
 
-wCurrentMapHeight2:: ; d524
+wCurrentMapHeight2:: ; d510
 ; map height in 2x2 meta-tiles
 	ds 1
 
-wCurrentMapWidth2:: ; d525
+wCurrentMapWidth2:: ; d511
 ; map width in 2x2 meta-tiles
 	ds 1
 
-wMapViewVRAMPointer:: ; d526
+wMapViewVRAMPointer:: ; d512
 ; the address of the upper left corner of the visible portion of the BG tile map in VRAM
 	ds 2
 
 ; In the comments for the player direction variables below, "moving" refers to
 ; both walking and changing facing direction without taking a step.
 
-wPlayerMovingDirection:: ; d528
+wPlayerMovingDirection:: ; d514
 ; if the player is moving, the current direction
 ; if the player is not moving, zero
 ; map scripts write to this in order to change the player's facing direction
 	ds 1
 
-wPlayerLastStopDirection:: ; d529
+wPlayerLastStopDirection:: ; d515
 ; the direction in which the player was moving before the player last stopped
 	ds 1
 
-wPlayerDirection:: ; d52a
+wPlayerDirection:: ; d516
 ; if the player is moving, the current direction
 ; if the player is not moving, the last the direction in which the player moved
 	ds 1
 
-wTilesetBank:: ; d52b
+wTilesetBank:: ; d517
 	ds 1
 
-wTilesetBlocksPtr:: ; d52c
+wTilesetBlocksPtr:: ; d518
 ; maps blocks (4x4 tiles) to tiles
 	ds 2
 
-wTilesetGfxPtr:: ; d52e
+wTilesetGfxPtr:: ; d51a
 	ds 2
 
-wTilesetCollisionPtr:: ; d530
+wTilesetCollisionPtr:: ; d51c
 ; list of all walkable tiles
 	ds 2
 
-wTilesetTalkingOverTiles:: ; d532
+wTilesetTalkingOverTiles:: ; d51e
 	ds 3
 
-wGrassTile:: ; d535
+wGrassTile:: ; d521
 	ds 1
 
 	ds 4
 
-wNumItems:: ; d53a
+wNumItems:: ; d526
 	ds 1
-wItems:: ; d53b
+wItems:: ; d527
 ; item, quantity
 	ds ITEM_CAPACITY * 2
 	ds 1 ; end
