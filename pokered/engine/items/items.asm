@@ -578,7 +578,7 @@ ItemUseBall:
 	ret nz ; if so, don't remove a ball from the bag
 
 ; Remove a ball from the bag.
-	ld hl, wNumBagItems
+	ld hl, wCurrentItemPage
 	inc a
 	ld [wItemQuantity], a
 	jp RemoveItemFromInventory
@@ -784,7 +784,7 @@ ItemUseEvoStone:
 	jr z, .noEffect
 	pop af
 	ld [wWhichPokemon], a
-	ld hl, wNumBagItems
+	ld hl, wCurrentItemPage
 	ld a, 1 ; remove 1 stone
 	ld [wItemQuantity], a
 	jp RemoveItemFromInventory
@@ -2317,7 +2317,7 @@ PrintItemUseTextAndRemoveItem:
 	call WaitForTextScrollButtonPress ; wait for button press
 
 RemoveUsedItem:
-	ld hl, wNumBagItems
+	ld hl, wCurrentItemPage
 	ld a, 1 ; one item
 	ld [wItemQuantity], a
 	jp RemoveItemFromInventory
