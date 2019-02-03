@@ -33,9 +33,9 @@ _StandByMeText::
 	IF DEF(_GIRL)
 		line "on TV. A girl"
 		cont "with her hair in"
-		cont "pigtails is"
-		cont "walking up a"
-		cont "brick road."
+		cont "pigtails is walk-"
+		cont "ing up a brick"
+		cont "road."
 	ELSE
 		line "on TV. Four boys"
 		cont "are walking on"
