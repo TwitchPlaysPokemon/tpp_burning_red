@@ -26,10 +26,12 @@ DisplayListMenuID::
 	ld h, a ; hl = address of the list
 	ld a, [wListMenuID]
 	cp ITEMLISTMENU
-	push af
-	call z, LoadCurrentItemPageLimits
-	pop af
-	call z, LoadItemListFromAPI
+	jr nz, .no_API_loads
+	push hl
+	callba LoadCurrentItemPageLimits
+	callba LoadItemListFromAPI
+	pop hl
+.no_API_loads
 	ld a, [hl] ; the first byte is the number of entries in the list
 	ld [wListCount], a
 	ld a, LIST_MENU_BOX
@@ -246,7 +248,7 @@ DisplayListMenuIDLoop::
 .got_new_page
 	ld [hl], a
 	ld c, a
-	call LoadItemListFromAPI
+	callba LoadItemListFromAPI
 	xor a
 	ld [wListScrollOffset], a
 	ld [wCurrentMenuItem], a
@@ -260,68 +262,3 @@ DisplayListMenuIDLoop::
 .got_max_menu_item
 	ld [wMaxMenuItem], a
 	jr .jump_to_loop
-
-LoadItemListFromAPI::
-	ld a, [wCurrentItemList]
-	cp 2
-	ret nc
-	push hl
-	and a
-	ld a, ITEMAPI_GET_PAGE
-	ld hl, wCurrentItemPage
-	jr z, .got_pointer
-	ld a, ITEMAPI_GET_PC_PAGE
-	inc hl
-.got_pointer
-	add a, [hl]
-	call ItemAPI
-	jr c, .no_name
-	jr nz, .done
-	xor a
-	ld hl, wNumItems
-	ld [hli], a
-	ld [hl], -1
-.no_name
-	ld a, "@"
-	ld [wItemAPIBuffer], a
-.done
-	pop hl
-	ret
-
-LoadCurrentItemPageLimits::
-	ld a, [wCurrentItemList]
-	cp 2
-	ret nc
-	push hl
-	push bc
-	ld a, ITEMAPI_GET_PAGE_LIMITS
-	call ItemAPI
-	ld a, 0
-	jr c, .got_limit
-	ld a, 1
-	jr z, .got_limit
-	ld a, [wCurrentItemList]
-	ld b, a
-	and a
-	ld hl, wItemAPIBuffer
-	ld a, [hli]
-	jr z, .got_limit
-	ld a, [hl]
-.got_limit
-	ld c, a
-	ld a, b
-	and a
-	ld hl, wCurrentItemPage
-	jr z, .got_page_pointer
-	inc hl
-.got_page_pointer
-	ld a, [hl]
-	cp c
-	jr c, .page_OK
-	xor a
-	ld [hl], a
-.page_OK
-	ld [wCurrentItemPageLimit], a
-	pop bc
-	pop hl
-	ret
