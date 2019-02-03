@@ -745,7 +745,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
 
         //ROUTE_4
         (MT_MOON_POKECENTER         , 0x00, ROUTE_4                     ) => (0x0010, 0x01),
-        (MT_MOON_1                  , 0x01, ROUTE_4                     ) => (0x0101, 0x03),
+        (MT_MOON_1                  , 0x00, ROUTE_4                     ) => (0x0101, 0x03),
         (MT_MOON_2                  , 0x07, ROUTE_4                     ) => (0x0201, 0x07),
 
         //MT_MOON_POKECENTER
@@ -1800,7 +1800,7 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
 
         //ROUTE_4
         (0x0010, 0x01) => (MT_MOON_POKECENTER         , 0x00, ROUTE_4                     ),
-        (0x0101, 0x03) => (MT_MOON_1                  , 0x01, ROUTE_4                     ),
+        (0x0101, 0x03) => (MT_MOON_1                  , 0x00, ROUTE_4                     ),
         (0x0201, 0x07) => (MT_MOON_2                  , 0x07, ROUTE_4                     ),
 
         //MT_MOON_POKECENTER
