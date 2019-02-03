@@ -1357,7 +1357,7 @@ AddAmountSoldToMoney::
 
 ; function to remove an item (in varying quantities) from the player's bag or PC box
 ; INPUT:
-; HL = address of inventory (either wNumBagItems or wNumBoxItems)
+; hl = address of page number: wCurrentItemPage, wCurrentPCItemPage (specific pages)
 ; [wWhichPokemon] = index (within the inventory) of the item to remove
 ; [wItemQuantity] = quantity to remove
 RemoveItemFromInventory::
@@ -1374,7 +1374,7 @@ RemoveItemFromInventory::
 
 ; function to add an item (in varying quantities) to the player's bag or PC box
 ; INPUT:
-; HL = address of inventory (either wNumBagItems or wNumBoxItems)
+; hl = address of page number: wCurrentItemPage, wCurrentPCItemPage (specific pages), LOW(wCurrentItemPage), LOW(wCurrentPCItemPage) (any page)
 ; [wcf91] = item ID
 ; [wItemQuantity] = item quantity
 ; sets carry flag if successful, unsets carry flag if unsuccessful
