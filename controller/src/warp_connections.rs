@@ -151,7 +151,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (LAVENDER_TOWN              , 0x02, LAVENDER_TOWN               ) => (0x0403, 0x02),
 
         //LAVENDER_HOUSE_2
-        (LAVENDER_TOWN              , 0x04, LAVENDER_TOWN               ) => (0x0403, 0x04),
+        (LAVENDER_TOWN              , 0x04, LAVENDER_TOWN               ) => (0x0403, 0x03),
 
         //POKEMONTOWER_1
         (LAVENDER_TOWN              , 0x01, LAVENDER_TOWN               ) => (0x0403, 0x00),
@@ -181,7 +181,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (POKEMONTOWER_6             , 0x01, LAVENDER_TOWN               ) => (0x5D01, 0x00),
 
         //NAME_RATERS_HOUSE
-        (LAVENDER_TOWN              , 0x05, LAVENDER_TOWN               ) => (0x0403, 0x03),
+        (LAVENDER_TOWN              , 0x05, LAVENDER_TOWN               ) => (0x0403, 0x04),
 
         // VERMILION_CITY
         (VERMILION_POKECENTER       , 0x00, VERMILION_CITY              ) => (0x0109, 0x01), 
