@@ -113,6 +113,19 @@ ItemAPI::
 	pop hl
 	ret
 
+UpdateCurrentItemPage::
+	; intentionally returns wCurrentItemPage in hl
+	ld hl, wCurrentItemPage
+	cp [hl]
+	ret z
+	ld [hl], a
+	xor a
+	ld [wListScrollOffset], a
+	ld [wCurrentMenuItem], a
+	ld [wBagSavedMenuItem], a
+	ld [wSavedListScrollOffset], a
+	ret
+
 SECTION "Entry", ROM0
 
 	nop

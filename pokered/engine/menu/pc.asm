@@ -116,26 +116,21 @@ AccessedMyPCText:
 
 ; removes one of the specified item ID [hItemToRemoveID] from bag (if existent)
 RemoveItemByID:
-	ld hl, wBagItems
 	ld a, [hItemToRemoveID]
-	ld b, a
-	xor a
-	ld [hItemToRemoveIndex], a
-.loop
-	ld a, [hli]
-	cp -1 ; reached terminator?
+	ld hl, wItemAPIBuffer
+	ld [hli], a
+	ld a, 1
+	ld [hli], a
+	ld [hl], -1
+	ld a, ITEMAPI_HAS_ITEM
+	call ItemAPI
+	ret c
 	ret z
-	cp b
-	jr z, .foundItem
-	inc hl
-	ld a, [hItemToRemoveIndex]
-	inc a
-	ld [hItemToRemoveIndex], a
-	jr .loop
-.foundItem
-	ld a, $1
-	ld [wItemQuantity], a
-	ld a, [hItemToRemoveIndex]
+	dec hl
+	ld a, [hld]
 	ld [wWhichPokemon], a
-	ld hl, wNumBagItems
+	ld a, 1
+	ld [wItemQuantity], a
+	ld a, [hl]
+	call UpdateCurrentItemPage
 	jp RemoveItemFromInventory

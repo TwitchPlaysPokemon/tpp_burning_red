@@ -663,8 +663,7 @@ OaksLabScript_RemoveParcel:
 	ret z
 	ld a, [hli]
 	ld c, [hl]
-	ld hl, wCurrentItemPage
-	ld [hl], a
+	call UpdateCurrentItemPage
 	ld a, c
 	ld [wWhichPokemon], a
 	ld a, 1
