@@ -307,7 +307,7 @@ StartMenu_Item:
 	call PrintText
 	jr .exitMenu
 .notInCableClubRoom
-	ld bc, wNumBagItems
+	ld bc, wNumItems
 	ld hl, wListPointer
 	ld a, c
 	ld [hli], a
@@ -318,6 +318,8 @@ StartMenu_Item:
 	ld [wListMenuID], a
 	ld a, [wBagSavedMenuItem]
 	ld [wCurrentMenuItem], a
+	xor a
+	ld [wCurrentItemList], a
 	call DisplayListMenuID
 	ld a, [wCurrentMenuItem]
 	ld [wBagSavedMenuItem], a
@@ -360,9 +362,8 @@ StartMenu_Item:
 	ld [hl], a ; old menu item id
 	call HandleMenuInput
 	call PlaceUnfilledArrowMenuCursor
-	bit 1, a ; was the B button pressed?
-	jr z, .useOrTossItem
-	jp ItemMenuLoop
+	bit BIT_B_BUTTON, a
+	jr nz, ItemMenuLoop
 .useOrTossItem ; if the player made the choice to use or toss the item
 	ld a, [wcf91]
 	ld [wd11e], a
@@ -433,7 +434,7 @@ StartMenu_Item:
 	inc a
 	jr z, .tossZeroItems
 .skipAskingQuantity
-	ld hl, wNumBagItems
+	ld hl, wCurrentItemPage
 	call TossItem
 .tossZeroItems
 	jp ItemMenuLoop

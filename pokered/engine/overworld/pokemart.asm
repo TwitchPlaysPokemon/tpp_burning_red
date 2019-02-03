@@ -137,10 +137,9 @@ DisplayPokemartDialogue_:
 	ld a, MONEY_BOX
 	ld [wTextBoxID], a
 	call DisplayTextBoxID
-	ld hl, wItemList
-	ld a, l
+	ld a, LOW(wItemList)
 	ld [wListPointer], a
-	ld a, h
+	ld a, HIGH(wItemList)
 	ld [wListPointer + 1], a
 	xor a
 	ld [wCurrentMenuItem], a
@@ -148,6 +147,7 @@ DisplayPokemartDialogue_:
 	ld [wPrintItemPrices], a
 	inc a ; a = 2 (PRICEDITEMLISTMENU)
 	ld [wListMenuID], a
+	ld [wCurrentItemList], a
 	call DisplayListMenuID
 	jr c, .returnToMainPokemartMenu ; if the player closed the menu
 	ld a, 99
