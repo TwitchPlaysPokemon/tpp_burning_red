@@ -26,6 +26,8 @@ pub struct GameState {
     pub first_warp: bool
 }
 
+
+
 impl GameState {
     pub fn new() -> GameState {
         GameState {
@@ -57,6 +59,21 @@ impl GameState {
             default.read_trainer_data(bizhawk);
             default.collect_mapstate(bizhawk);
             Ok(default)
+        }
+    }
+
+    pub fn delay_frames(&mut self, bizhawk: &Bizhawk, frames: u32, rewind: bool) {
+
+        let start_delay = bizhawk.framecount().unwrap();
+
+        if rewind {
+            while start_delay - bizhawk.framecount().unwrap() < frames {
+                std::thread::sleep(POLL_DELAY);
+            }; // wait 60 frames*/
+        } else {
+            while bizhawk.framecount().unwrap() - start_delay < frames {
+                std::thread::sleep(POLL_DELAY);
+            }; // wait 60 frames*/
         }
     }
 
@@ -100,6 +117,67 @@ impl GameState {
                 }
             }
         };
+    }
+
+    // send the player back through the warp they just came from
+    pub fn warp_rebound(&mut self, bizhawk: &Bizhawk, map: u16, warp: u8, last_map: u8) {
+        bizhawk.pause().unwrap();
+        match &self.game {
+            Game::FIRERED => { 
+
+                bizhawk.toggle_rewind(true).unwrap();
+                bizhawk.play().unwrap();
+                //bizhawk.unthrottle(0).unwrap();
+
+                let mut entered_menu = false;
+                let start_rewind = bizhawk.framecount().unwrap();
+
+                loop {
+                    let map_data = bizhawk.read_slice(MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
+                    let xy = bizhawk.read_slice(MemRegion::IWRAM, 0x0000_0014, 0x4).unwrap();
+                    if xy[0] == 0x00 && xy[2] == 0x00 {entered_menu = true;}
+                    if (LittleEndian::read_u16(&map_data[0x0C..0x0E]) != map || map_data[0x0E] != warp) && 
+                        xy[0] % 0x10 == 0x00 && 
+                        xy[2] % 0x10 == 0x08 && 
+                        start_rewind - bizhawk.framecount().unwrap() > 10 {
+
+                        if entered_menu {
+                            self.delay_frames(bizhawk, 30, true);
+                        }
+                        break;
+
+                    }
+                    std::thread::sleep(POLL_DELAY);
+                }
+                bizhawk.pause().unwrap();
+
+                bizhawk.toggle_rewind(false).unwrap();
+                //bizhawk.throttle().unwrap();
+
+                let map_data = bizhawk.read_slice(MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
+
+                self.map_state.previous_lastmap = LittleEndian::read_u32(&map_data[0x04..0x08]);
+                self.map_state.previous_map = LittleEndian::read_u16(&map_data[0x0C..0x0E]);
+                self.map_state.previous_warp = map_data[0x0E];
+
+                bizhawk.play().unwrap();
+            },
+            Game::RED => {
+                bizhawk.write_u8(MemRegion::WRAM, 0x1365, last_map).unwrap(); // lastmap
+                bizhawk.write_u8(MemRegion::WRAM, 0x142F, warp).unwrap(); // destination warp
+                bizhawk.write_u8(MemRegion::HRAM, 0x000B, map as u8).unwrap(); // map
+                bizhawk.write_u8(MemRegion::WRAM, 0x135E, map as u8).unwrap(); // map
+
+                bizhawk.play().unwrap();
+
+                self.map_state.previous_map = bizhawk.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16;
+                self.map_state.previous_warp = bizhawk.read_u8(MemRegion::WRAM, 0x142F).unwrap();
+
+                self.map_state.last_change = bizhawk.framecount().unwrap();
+
+                //println!("--DONE\n");
+            }
+        }
     }
 
     pub fn handle_map_change(&mut self, bizhawk: &Bizhawk, map: u16, warp: u8, last_map: u8, warp_enable: Arc<Mutex<bool>>) {
@@ -262,10 +340,12 @@ impl GameState {
                         bizhawk.framerewind().unwrap();
                         bizhawk.save_state("firered_warp").unwrap();
                         self.save_state().unwrap();
+                        //self.warp_rebound(&bizhawk, current_map, current_warp, 0x00);
                         self.handle_map_change(&bizhawk, destination.0 as u16, destination.1, destination.2, warp_enable);
                     } else {
                         bizhawk.play().unwrap();
                         println!("Map unknown or not supported.");
+                        //self.warp_rebound(&bizhawk, current_map, current_warp, 0x00);
                     }
                     self.map_state.map_checked = true;
                 } else {
@@ -320,27 +400,32 @@ impl GameState {
                         let mut decrypted_pk3 = pk3.clone();
                         decrypt_unshuffle_pk3(&mut decrypted_pk3);
 
-                        let mut uid = get_uid(decrypted_pk3[0x20], decrypted_pk3[0x3E]);
+                        let species = LittleEndian::read_u16(&decrypted_pk3[0x20..0x22]);
 
-                        if uid == 0x0000 {
-                            let mut j = 1;
-                            loop {
-                                uid = get_uid(decrypted_pk3[0x20], j as u8);
-                                if uid != 0x0000 && !self.pokemon_list.contains_key(&uid) {
-                                    self.pokemon_list.insert(uid, Pokemon::from_pk3(pk3, &self.trainer, uid));
-                                    break;
+                        if species <= 151 || species == 410 {
+                            let mut uid = get_uid(decrypted_pk3[0x20], decrypted_pk3[0x3E]);
+                            if uid == 0x0000 {
+                                let mut j = 1;
+                                loop {
+                                    uid = get_uid(decrypted_pk3[0x20], j as u8);
+                                    if uid != 0x0000 && !self.pokemon_list.contains_key(&uid) {
+                                        self.pokemon_list.insert(uid, Pokemon::from_pk3(pk3, &self.trainer, uid));
+                                        break;
+                                    }
+                                    j += 1;
                                 }
-                                j += 1;
-                            }
-                        } else {
-                            if let Some(pokemon) = self.pokemon_list.get_mut(&uid) {
-                                pokemon.update_from_pk3(pk3).unwrap();
                             } else {
-                                self.pokemon_list.insert(uid, Pokemon::from_pk3(pk3, &self.trainer, uid));
+                                if let Some(pokemon) = self.pokemon_list.get_mut(&uid) {
+                                    pokemon.update_from_pk3(pk3).unwrap();
+                                } else {
+                                    self.pokemon_list.insert(uid, Pokemon::from_pk3(pk3, &self.trainer, uid));
+                                }
                             }
-                        }
 
-                        self.party_uids[i as usize] = uid;
+                            self.party_uids[i as usize] = uid;
+                        } else {
+                            self.party_uids[i as usize] = 0x0000;
+                        }
                     }
                 }
             }

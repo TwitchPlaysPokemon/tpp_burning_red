@@ -151,7 +151,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (LAVENDER_TOWN              , 0x02, LAVENDER_TOWN               ) => (0x0403, 0x02),
 
         //LAVENDER_HOUSE_2
-        (LAVENDER_TOWN              , 0x04, LAVENDER_TOWN               ) => (0x0403, 0x04),
+        (LAVENDER_TOWN              , 0x04, LAVENDER_TOWN               ) => (0x0403, 0x03),
 
         //POKEMONTOWER_1
         (LAVENDER_TOWN              , 0x01, LAVENDER_TOWN               ) => (0x0403, 0x00),
@@ -181,7 +181,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (POKEMONTOWER_6             , 0x01, LAVENDER_TOWN               ) => (0x5D01, 0x00),
 
         //NAME_RATERS_HOUSE
-        (LAVENDER_TOWN              , 0x05, LAVENDER_TOWN               ) => (0x0403, 0x03),
+        (LAVENDER_TOWN              , 0x05, LAVENDER_TOWN               ) => (0x0403, 0x04),
 
         // VERMILION_CITY
         (VERMILION_POKECENTER       , 0x00, VERMILION_CITY              ) => (0x0109, 0x01), 
@@ -717,6 +717,8 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (VIRIDIAN_FOREST_ENTRANCE   , 0x02, ROUTE_2                     ) => (0x000F, 0x01),
 
         //DIGLETTS_CAVE_EXIT
+        (ROUTE_2                    , 0x00, ROUTE_11                    ) => (0x1403, 0x03),
+        (DIGLETTS_CAVE              , 0x00, ROUTE_11                    ) => (0x2501, 0x00),
         (ROUTE_2                    , 0x00, ROUTE_2                     ) => (0x1403, 0x03),
         (DIGLETTS_CAVE              , 0x00, ROUTE_2                     ) => (0x2501, 0x00),
 
@@ -737,13 +739,13 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (ROUTE_2                    , 0x05, ROUTE_2                     ) => (0x1403, 0x02),
         
         //VIRIDIAN_FOREST
-        (VIRIDIAN_FOREST_EXIT       , 0x02, ROUTE_2                     ) => (0x030F, 0x03),
+        (VIRIDIAN_FOREST_EXIT       , 0x02, ROUTE_2                     ) => (0x030F, 0x01),
         (VIRIDIAN_FOREST_EXIT       , 0x03, ROUTE_2                     ) => (0x030F, 0x03),
         (VIRIDIAN_FOREST_ENTRANCE   , 0x01, ROUTE_2                     ) => (0x000F, 0x03),
 
         //ROUTE_4
-        (MT_MOON_POKECENTER         , 0x01, ROUTE_4                     ) => (0x0110, 0x01),
-        (MT_MOON_1                  , 0x01, ROUTE_4                     ) => (0x0101, 0x03),
+        (MT_MOON_POKECENTER         , 0x00, ROUTE_4                     ) => (0x0010, 0x01),
+        (MT_MOON_1                  , 0x00, ROUTE_4                     ) => (0x0101, 0x03),
         (MT_MOON_2                  , 0x07, ROUTE_4                     ) => (0x0201, 0x07),
 
         //MT_MOON_POKECENTER
@@ -792,6 +794,8 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         
         //UNDERGROUND_PATH_NS
         (PATH_ENTRANCE_ROUTE_5      , 0x02, ROUTE_5                     ) => (0x1E01, 0x03),
+        (PATH_ENTRANCE_ROUTE_5      , 0x02, ROUTE_6                     ) => (0x1E01, 0x03),
+        (PATH_ENTRANCE_ROUTE_6      , 0x02, ROUTE_5                     ) => (0x2001, 0x03),
         (PATH_ENTRANCE_ROUTE_6      , 0x02, ROUTE_6                     ) => (0x2001, 0x03),
 
         //ROUTE_6
@@ -816,9 +820,9 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (PATH_ENTRANCE_ROUTE_7      , 0x00, ROUTE_7                     ) => (0x2101, 0x01),
 
         //ROUTE_7_GATE
-        (ROUTE_7                    , 0x03, ROUTE_7                     ) => (0x0A03, 0x08),
-        (ROUTE_7                    , 0x00, ROUTE_7                     ) => (0x1903, 0x01),
-        (ROUTE_7                    , 0x01, ROUTE_7                     ) => (0x1903, 0x01),
+        (ROUTE_7                    , 0x03, ROUTE_7                     ) => (0x1903, 0x01),
+        (ROUTE_7                    , 0x00, ROUTE_7                     ) => (0x0A03, 0x08),
+        (ROUTE_7                    , 0x01, ROUTE_7                     ) => (0x0A03, 0x08),
 
         //PATH_ENTRANCE_ROUTE_7
         (ROUTE_7                    , 0x04, ROUTE_7                     ) => (0x1903, 0x00),
@@ -826,6 +830,8 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
 
         //UNDERGROUND_PATH_WE
         (PATH_ENTRANCE_ROUTE_7      , 0x02, ROUTE_7                     ) => (0x2101, 0x03),
+        (PATH_ENTRANCE_ROUTE_7      , 0x02, ROUTE_8                     ) => (0x2101, 0x03),
+        (PATH_ENTRANCE_ROUTE_8      , 0x02, ROUTE_7                     ) => (0x2301, 0x03),
         (PATH_ENTRANCE_ROUTE_8      , 0x02, ROUTE_8                     ) => (0x2301, 0x03),
 
         //ROUTE_8
@@ -888,6 +894,8 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         //DIGLETTS_CAVE_ENTRANCE
         (ROUTE_11                   , 0x04, ROUTE_11                    ) => (0x1D03, 0x00),
         (DIGLETTS_CAVE              , 0x01, ROUTE_11                    ) => (0x2501, 0x01),
+        (ROUTE_11                   , 0x04, ROUTE_2                     ) => (0x1D03, 0x00),
+        (DIGLETTS_CAVE              , 0x01, ROUTE_2                     ) => (0x2501, 0x01),
 
         //ROUTE_11_GATE_2F
         (ROUTE_11_GATE_1F           , 0x04, ROUTE_11                    ) => (0x0016, 0x04),
@@ -895,6 +903,8 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         //DIGLETTS_CAVE
         (DIGLETTS_CAVE_EXIT         , 0x02, ROUTE_11                    ) => (0x2401, 0x00),
         (DIGLETTS_CAVE_ENTRANCE     , 0x02, ROUTE_11                    ) => (0x2601, 0x01),
+        (DIGLETTS_CAVE_EXIT         , 0x02, ROUTE_2                     ) => (0x2401, 0x00),
+        (DIGLETTS_CAVE_ENTRANCE     , 0x02, ROUTE_2                     ) => (0x2601, 0x01),
 
         //ROUTE_12
         (ROUTE_12_GATE_1F           , 0x00, ROUTE_12                    ) => (0x0017, 0x00),
@@ -1046,7 +1056,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (VICTORY_ROAD_2             , 0x06, ROUTE_23                    ) => (0x2801, 0x01),
 
         //ROUTE_25
-        (BILLS_HOUSE                , 0x01, ROUTE_25                    ) => (0x001E, 0x01),      
+        (BILLS_HOUSE                , 0x00, ROUTE_25                    ) => (0x001E, 0x01),      
 
         //BILLS_HOUSE
         (ROUTE_25                   , 0x00, ROUTE_25                    ) => (0x2C03, 0x00)
@@ -1788,13 +1798,13 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x1403, 0x02) => (ROUTE_2                    , 0x05, ROUTE_2                     ),
         
         //VIRIDIAN_FOREST
-        (0x030F, 0x03) => (VIRIDIAN_FOREST_EXIT       , 0x02, ROUTE_2                     ),
+        (0x030F, 0x01) => (VIRIDIAN_FOREST_EXIT       , 0x02, ROUTE_2                     ),
         (0x030F, 0x03) => (VIRIDIAN_FOREST_EXIT       , 0x03, ROUTE_2                     ),
         (0x000F, 0x03) => (VIRIDIAN_FOREST_ENTRANCE   , 0x01, ROUTE_2                     ),
 
         //ROUTE_4
-        (0x0110, 0x01) => (MT_MOON_POKECENTER         , 0x01, ROUTE_4                     ),
-        (0x0101, 0x03) => (MT_MOON_1                  , 0x01, ROUTE_4                     ),
+        (0x0010, 0x01) => (MT_MOON_POKECENTER         , 0x00, ROUTE_4                     ),
+        (0x0101, 0x03) => (MT_MOON_1                  , 0x00, ROUTE_4                     ),
         (0x0201, 0x07) => (MT_MOON_2                  , 0x07, ROUTE_4                     ),
 
         //MT_MOON_POKECENTER
@@ -1860,16 +1870,16 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x1F01, 0x01) => (UNDERGROUND_PATH_NS        , 0x01, ROUTE_6                     ),
 
         //ROUTE_7
-        (0x0013, 0x02) => (ROUTE_7_GATE               , 0x02, ROUTE_7                     ),
+        (0x0013, 0x02) => (ROUTE_7_GATE               , 0x02, ROUTE_7                     ), //line does nothing
         (0x0013, 0x02) => (ROUTE_7_GATE               , 0x03, ROUTE_7                     ),
-        (0x0013, 0x00) => (ROUTE_7_GATE               , 0x00, ROUTE_7                     ),
+        (0x0013, 0x00) => (ROUTE_7_GATE               , 0x00, ROUTE_7                     ), //line does nothing
         (0x0013, 0x00) => (ROUTE_7_GATE               , 0x01, ROUTE_7                     ),
         (0x2101, 0x01) => (PATH_ENTRANCE_ROUTE_7      , 0x00, ROUTE_7                     ),
 
         //ROUTE_7_GATE
-        (0x0A03, 0x08) => (ROUTE_7                    , 0x03, ROUTE_7                     ),
-        (0x1903, 0x01) => (ROUTE_7                    , 0x00, ROUTE_7                     ),
-        (0x1903, 0x01) => (ROUTE_7                    , 0x01, ROUTE_7                     ),
+        (0x1903, 0x01) => (ROUTE_7                    , 0x03, ROUTE_7                     ),
+        (0x0A03, 0x08) => (ROUTE_7                    , 0x00, ROUTE_7                     ),
+        (0x0A03, 0x08) => (ROUTE_7                    , 0x01, ROUTE_7                     ),
 
         //PATH_ENTRANCE_ROUTE_7
         (0x1903, 0x00) => (ROUTE_7                    , 0x04, ROUTE_7                     ),
@@ -2096,7 +2106,7 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x2801, 0x01) => (VICTORY_ROAD_2             , 0x06, ROUTE_23                    ),
 
         //ROUTE_25
-        (0x001E, 0x01) => (BILLS_HOUSE                , 0x01, ROUTE_25                    ),      
+        (0x001E, 0x01) => (BILLS_HOUSE                , 0x00, ROUTE_25                    ),      
 
         //BILLS_HOUSE
         (0x2C03, 0x00) => (ROUTE_25                   , 0x00, ROUTE_25                    )
