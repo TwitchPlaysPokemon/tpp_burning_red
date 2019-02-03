@@ -737,7 +737,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (ROUTE_2                    , 0x05, ROUTE_2                     ) => (0x1403, 0x02),
         
         //VIRIDIAN_FOREST
-        (VIRIDIAN_FOREST_EXIT       , 0x02, ROUTE_2                     ) => (0x030F, 0x03),
+        (VIRIDIAN_FOREST_EXIT       , 0x02, ROUTE_2                     ) => (0x030F, 0x01),
         (VIRIDIAN_FOREST_EXIT       , 0x03, ROUTE_2                     ) => (0x030F, 0x03),
         (VIRIDIAN_FOREST_ENTRANCE   , 0x01, ROUTE_2                     ) => (0x000F, 0x03),
 
@@ -1788,7 +1788,7 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x1403, 0x02) => (ROUTE_2                    , 0x05, ROUTE_2                     ),
         
         //VIRIDIAN_FOREST
-        (0x030F, 0x03) => (VIRIDIAN_FOREST_EXIT       , 0x02, ROUTE_2                     ),
+        (0x030F, 0x01) => (VIRIDIAN_FOREST_EXIT       , 0x02, ROUTE_2                     ),
         (0x030F, 0x03) => (VIRIDIAN_FOREST_EXIT       , 0x03, ROUTE_2                     ),
         (0x000F, 0x03) => (VIRIDIAN_FOREST_ENTRANCE   , 0x01, ROUTE_2                     ),
 
