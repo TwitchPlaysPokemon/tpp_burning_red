@@ -2318,12 +2318,15 @@ wPokedexSeen:: ; d30a
 wPokedexSeenEnd::
 
 
-wNumBagItems:: ; d31d
+wItemAPICommand:: ; d31d
 	ds 1
-wBagItems:: ; d31e
-; item, quantity
-	ds BAG_ITEM_CAPACITY * 2
-	ds 1 ; end
+wItemAPIBuffer:: ; d31e
+	ds 39
+
+wCurrentItemPage:: ; d345
+	ds 1
+wCurrentPCItemPage:: ; d346
+	ds 1
 
 wPlayerMoney:: ; d347
 	ds 3 ; BCD
@@ -2631,11 +2634,11 @@ wGrassTile:: ; d535
 
 	ds 4
 
-wNumBoxItems:: ; d53a
+wNumItems:: ; d53a
 	ds 1
-wBoxItems:: ; d53b
+wItems:: ; d53b
 ; item, quantity
-	ds PC_ITEM_CAPACITY * 2
+	ds ITEM_CAPACITY * 2
 	ds 1 ; end
 
 wCurrentBoxNum:: ; d5a0
