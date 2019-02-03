@@ -830,6 +830,8 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
 
         //UNDERGROUND_PATH_WE
         (PATH_ENTRANCE_ROUTE_7      , 0x02, ROUTE_7                     ) => (0x2101, 0x03),
+        (PATH_ENTRANCE_ROUTE_7      , 0x02, ROUTE_8                     ) => (0x2101, 0x03),
+        (PATH_ENTRANCE_ROUTE_8      , 0x02, ROUTE_7                     ) => (0x2301, 0x03),
         (PATH_ENTRANCE_ROUTE_8      , 0x02, ROUTE_8                     ) => (0x2301, 0x03),
 
         //ROUTE_8
