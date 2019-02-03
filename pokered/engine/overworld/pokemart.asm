@@ -55,13 +55,14 @@ DisplayPokemartDialogue_:
 	ld a, MONEY_BOX
 	ld [wTextBoxID], a
 	call DisplayTextBoxID ; draw money text box
-	ld hl, wNumBagItems
+	ld hl, wNumItems
 	ld a, l
 	ld [wListPointer], a
 	ld a, h
 	ld [wListPointer + 1], a
 	xor a
 	ld [wPrintItemPrices], a
+	ld [wCurrentItemList], a
 	ld [wCurrentMenuItem], a
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
@@ -107,7 +108,7 @@ DisplayPokemartDialogue_:
 	ld [wBoughtOrSoldItemInMart], a
 .skipSettingFlag1
 	call AddAmountSoldToMoney
-	ld hl, wNumBagItems
+	ld hl, wCurrentItemPage
 	call RemoveItemFromInventory
 	jp .sellMenuLoop
 .unsellableItem
@@ -180,7 +181,7 @@ DisplayPokemartDialogue_:
 .buyItem
 	call .isThereEnoughMoney
 	jr c, .notEnoughMoney
-	ld hl, wNumBagItems
+	ld hl, LOW(wCurrentItemPage)
 	call AddItemToInventory
 	jr nc, .bagFull
 	call SubtractAmountPaidFromMoney

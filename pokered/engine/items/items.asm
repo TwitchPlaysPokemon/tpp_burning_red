@@ -2582,7 +2582,7 @@ GetSelectedMoveOffset2:
 
 ; confirms the item toss and then tosses the item
 ; INPUT:
-; hl = address of inventory (either wNumBagItems or wNumBoxItems)
+; hl = address of page number (wCurrentItemPage or wCurrentPCItemPage)
 ; [wcf91] = item ID
 ; [wWhichPokemon] = index of item within inventory
 ; [wItemQuantity] = quantity to toss
