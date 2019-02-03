@@ -794,6 +794,8 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         
         //UNDERGROUND_PATH_NS
         (PATH_ENTRANCE_ROUTE_5      , 0x02, ROUTE_5                     ) => (0x1E01, 0x03),
+        (PATH_ENTRANCE_ROUTE_5      , 0x02, ROUTE_6                     ) => (0x1E01, 0x03),
+        (PATH_ENTRANCE_ROUTE_6      , 0x02, ROUTE_5                     ) => (0x2001, 0x03),
         (PATH_ENTRANCE_ROUTE_6      , 0x02, ROUTE_6                     ) => (0x2001, 0x03),
 
         //ROUTE_6
