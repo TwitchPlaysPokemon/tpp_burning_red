@@ -875,7 +875,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (ROCK_TUNNEL_1              , 0x07, ROUTE_10                    ) => (0x5101, 0x04),
 
         //POWER_PLANT
-        (ROUTE_10                   , 0x03, ROUTE_10                    ) => (0x1C03, 0x01),
+        (ROUTE_10                   , 0x03, ROUTE_10                    ) => (0x1C03, 0x02),
 
         //ROUTE_11
         (ROUTE_11_GATE_1F           , 0x00, ROUTE_11                    ) => (0x0016, 0x00),
@@ -1930,7 +1930,7 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x5101, 0x04) => (ROCK_TUNNEL_1              , 0x07, ROUTE_10                    ),
 
         //POWER_PLANT
-        (0x1C03, 0x01) => (ROUTE_10                   , 0x03, ROUTE_10                    ),
+        (0x1C03, 0x02) => (ROUTE_10                   , 0x03, ROUTE_10                    ),
 
         //ROUTE_11
         (0x0016, 0x00) => (ROUTE_11_GATE_1F           , 0x00, ROUTE_11                    ),
