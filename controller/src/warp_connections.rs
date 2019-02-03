@@ -1018,6 +1018,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
 
         //ROUTE_22_GATE
         (ROUTE_22                   , 0x00, ROUTE_22                    ) => (0x2903, 0x00),
+        (ROUTE_23                   , 0x00, ROUTE_23                    ) => (0x2A03, 0x02),
         (ROUTE_23                   , 0x01, ROUTE_23                    ) => (0x2A03, 0x02),
 
         //ROUTE_23
