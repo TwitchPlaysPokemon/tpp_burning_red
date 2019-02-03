@@ -27,7 +27,7 @@ const_value = $30
 	const ITEMAPI_SWAP_ITEMS ;(page, first stack, second stack)
 	const ITEMAPI_SWAP_PC_ITEMS ;(page, first stack, second stack)
 
-	const ITEMAPI_USE_ITEM ;(item ID)
+	const ITEMAPI_INITIALIZE_ITEM_LISTS ;(void)
 
 	const ITEMAPI_GET_PAGE_LIMITS ;(void) - returns max page, max PC page
 

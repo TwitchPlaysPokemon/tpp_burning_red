@@ -264,6 +264,14 @@ DisplayListMenuIDLoop::
 	jr .jump_to_loop
 
 PrintListMenuEntries::
+	ld a, [wListMenuID]
+	cp ITEMLISTMENU
+	jr nz, .no_page_title
+	ld a, [wCurrentItemList]
+	cp 2
+	jr nc, .no_page_title
+	callba PrintItemPageName
+.no_page_title
 	coord hl, 5, 3
 	ld b, 9
 	ld c, 14
@@ -399,10 +407,14 @@ PrintListMenuEntries::
 .printItemQuantity
 	ld a, [wd11e]
 	ld [wcf91], a
+	ld a, [de]
+	cp 2
+	jr nc, .force_printing_quantity
 	call IsKeyItem ; check if item is unsellable
 	ld a, [wIsKeyItem]
 	and a ; is the item unsellable?
 	jr nz, .skipPrintingItemQuantity ; if so, don't print the quantity
+.force_printing_quantity
 	push hl
 	ld bc, SCREEN_WIDTH + 8 ; 1 row down and 8 columns right
 	add hl, bc

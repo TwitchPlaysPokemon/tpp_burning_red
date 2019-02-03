@@ -59,3 +59,28 @@ LoadCurrentItemPageLimits::
 	pop bc
 	pop hl
 	ret
+
+PrintItemPageName::
+	ld a, "@"
+	ld [wItemAPIBuffer + 12], a
+	ld de, wItemAPIBuffer
+	coord hl, 5, 2
+	ld c, 12
+.name_loop
+	ld a, [de]
+	cp "@"
+	jr z, .name_done
+	inc de
+	ld [hli], a
+	dec c
+	jr nz, .name_loop
+.name_done
+	ld a, c
+	and a
+	ret z
+	ld a, "─"
+.dash_loop
+	ld [hli], a
+	dec c
+	jr nz, .dash_loop
+	ret
