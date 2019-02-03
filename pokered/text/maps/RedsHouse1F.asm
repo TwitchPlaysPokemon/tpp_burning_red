@@ -1,7 +1,12 @@
 _MomWakeUpText::
 	text "MOM: Right."
-	line "All boys leave"
-	cont "home some day."
+	IF DEF(_GIRL)
+		line "All girls dream"
+		cont "of traveling."
+	ELSE
+		line "All boys leave"
+		cont "home some day."
+	ENDC
 	cont "It said so on TV."
 
 	para "PROF.OAK, next"
@@ -25,9 +30,17 @@ _MomHealText2::
 
 _StandByMeText::
 	text "There's a movie"
-	line "on TV. Four boys"
-	cont "are walking on"
-	cont "railroad tracks."
+	IF DEF(_GIRL)
+		line "on TV. A girl"
+		cont "with her hair in"
+		cont "pigtails is"
+		cont "walking up a"
+		cont "brick road."
+	ELSE
+		line "on TV. Four boys"
+		cont "are walking on"
+		cont "railroad tracks."
+	ENDC
 
 	para "I better go too."
 	done
