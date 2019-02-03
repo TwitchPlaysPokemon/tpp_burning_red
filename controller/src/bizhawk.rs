@@ -218,6 +218,10 @@ impl Bizhawk {
         }
     }
 
+    pub fn toggle_rewind(&self, enable: bool) -> Result<(), String> {
+        self.send_command(format!("togglerewind/{}", enable).as_str())
+    }
+
     pub fn get_rom_name(&self) -> Result<String, String> {
         if let Ok(mut result) = self.client.get(format!("http://localhost:{}/GetROMName", self.port).as_str()).send() {
             let response = result.text().unwrap_or_default();
