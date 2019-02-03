@@ -1052,7 +1052,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (VICTORY_ROAD_2             , 0x06, ROUTE_23                    ) => (0x2801, 0x01),
 
         //ROUTE_25
-        (BILLS_HOUSE                , 0x01, ROUTE_25                    ) => (0x001E, 0x01),      
+        (BILLS_HOUSE                , 0x00, ROUTE_25                    ) => (0x001E, 0x01),      
 
         //BILLS_HOUSE
         (ROUTE_25                   , 0x00, ROUTE_25                    ) => (0x2C03, 0x00)
@@ -2102,7 +2102,7 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x2801, 0x01) => (VICTORY_ROAD_2             , 0x06, ROUTE_23                    ),
 
         //ROUTE_25
-        (0x001E, 0x01) => (BILLS_HOUSE                , 0x01, ROUTE_25                    ),      
+        (0x001E, 0x01) => (BILLS_HOUSE                , 0x00, ROUTE_25                    ),      
 
         //BILLS_HOUSE
         (0x2C03, 0x00) => (ROUTE_25                   , 0x00, ROUTE_25                    )
