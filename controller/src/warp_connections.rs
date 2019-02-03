@@ -717,6 +717,8 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (VIRIDIAN_FOREST_ENTRANCE   , 0x02, ROUTE_2                     ) => (0x000F, 0x01),
 
         //DIGLETTS_CAVE_EXIT
+        (ROUTE_2                    , 0x00, ROUTE_11                    ) => (0x1403, 0x03),
+        (DIGLETTS_CAVE              , 0x00, ROUTE_11                    ) => (0x2501, 0x00),
         (ROUTE_2                    , 0x00, ROUTE_2                     ) => (0x1403, 0x03),
         (DIGLETTS_CAVE              , 0x00, ROUTE_2                     ) => (0x2501, 0x00),
 
@@ -888,6 +890,8 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         //DIGLETTS_CAVE_ENTRANCE
         (ROUTE_11                   , 0x04, ROUTE_11                    ) => (0x1D03, 0x00),
         (DIGLETTS_CAVE              , 0x01, ROUTE_11                    ) => (0x2501, 0x01),
+        (ROUTE_11                   , 0x04, ROUTE_2                     ) => (0x1D03, 0x00),
+        (DIGLETTS_CAVE              , 0x01, ROUTE_2                     ) => (0x2501, 0x01),
 
         //ROUTE_11_GATE_2F
         (ROUTE_11_GATE_1F           , 0x04, ROUTE_11                    ) => (0x0016, 0x04),
@@ -895,6 +899,8 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         //DIGLETTS_CAVE
         (DIGLETTS_CAVE_EXIT         , 0x02, ROUTE_11                    ) => (0x2401, 0x00),
         (DIGLETTS_CAVE_ENTRANCE     , 0x02, ROUTE_11                    ) => (0x2601, 0x01),
+        (DIGLETTS_CAVE_EXIT         , 0x02, ROUTE_2                     ) => (0x2401, 0x00),
+        (DIGLETTS_CAVE_ENTRANCE     , 0x02, ROUTE_2                     ) => (0x2601, 0x01),
 
         //ROUTE_12
         (ROUTE_12_GATE_1F           , 0x00, ROUTE_12                    ) => (0x0017, 0x00),
