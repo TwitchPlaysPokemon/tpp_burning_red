@@ -4,6 +4,9 @@
 ; $02 = null
 ; $03 = error / timeout
 
+const_value = $20
+	const ITEMAPI_IS_BAG_EMPTY ;(void)
+
 const_value = $30
 	const ITEMAPI_CAN_GET_ITEM ;(item, quantity, page)
 	const ITEMAPI_ADD_ITEM ;(item, quantity, page)
@@ -26,7 +29,8 @@ const_value = $30
 
 	const ITEMAPI_USE_ITEM ;(item ID)
 
-	const ITEMAPI_GET_PAGE_LIMITS ;(void)
+	const ITEMAPI_GET_PAGE_LIMITS ;(void) - returns max page, max PC page
 
+; return name in buffer, contents in wItems; false = no items, true = OK, null = items but w/o name
 ITEMAPI_GET_PC_PAGE EQU $40
 ITEMAPI_GET_PAGE EQU $80

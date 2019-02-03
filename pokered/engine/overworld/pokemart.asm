@@ -44,9 +44,9 @@ DisplayPokemartDialogue_:
 	ld [wInitListType], a
 	callab InitList
 
-	ld a, [wNumBagItems]
-	and a
-	jp z, .bagEmpty
+	ld a, ITEMAPI_IS_BAG_EMPTY
+	call ItemAPI
+	jr nz, .bagEmpty
 	ld hl, PokemonSellingGreetingText
 	call PrintText
 	call SaveScreenTilesToBuffer1 ; save screen

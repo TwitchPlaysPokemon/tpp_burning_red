@@ -2321,8 +2321,14 @@ wPokedexSeenEnd::
 wItemAPICommand:: ; d31d
 	ds 1
 wItemAPIBuffer:: ; d31e
-	ds 19
+	ds 16
 
+	ds 1
+
+wCurrentItemPageLimit:: ; d32f
+	ds 1
+wCurrentItemList:: ; d330
+	ds 1 ;0 = items, 1 = PC items; >1: some other list of items (perhaps hardcoded?)
 wCurrentItemPage:: ; d331
 	ds 1
 wCurrentPCItemPage:: ; d332
