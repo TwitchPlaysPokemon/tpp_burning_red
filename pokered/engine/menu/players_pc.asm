@@ -196,34 +196,29 @@ PlayerPCWithdraw:
 	jr .loop
 
 PlayerPCToss:
-	xor a
-	ld [wCurrentMenuItem], a
-	ld [wListScrollOffset], a
-	ld a, [wNumBoxItems]
-	and a
-	jr nz, .loop
+	ld a, ITEMAPI_IS_PC_EMPTY
+	call ItemAPI
+	jr c, .loop
+	jr z, .loop
 	ld hl, NothingStoredText
 	call PrintText
 	jp PlayerPCMenu
 .loop
 	ld hl, WhatToTossText
 	call PrintText
-	ld hl, wNumBoxItems
-	ld a, l
+	ld a, LOW(wNumItems)
 	ld [wListPointer], a
-	ld a, h
+	ld a, HIGH(wNumItems)
 	ld [wListPointer + 1], a
 	xor a
 	ld [wPrintItemPrices], a
+	inc a
+	ld [wCurrentItemList], a
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
-	push hl
 	call DisplayListMenuID
-	pop hl
 	jp c, PlayerPCMenu
-	push hl
 	call IsKeyItem
-	pop hl
 	ld a, 1
 	ld [wItemQuantity], a
 	ld a, [wIsKeyItem]
@@ -239,10 +234,11 @@ PlayerPCToss:
 	call DisplayChooseQuantityMenu
 	pop hl
 	cp $ff
-	jp z, .loop
+	jr z, .loop
 .next
+	ld hl, wCurrentPCItemPage
 	call TossItem ; disallows tossing key items
-	jp .loop
+	jr .loop
 
 PlayersPCMenuEntries:
 	db   "WITHDRAW ITEM"
