@@ -109,7 +109,7 @@ ItemAPI::
 	ld a, [hl]
 	cp 2
 	scf
-	jr c, .return
+	jr z, .return
 	and a
 .return
 	pop hl

@@ -23,6 +23,9 @@ InitPlayerData2:
 	jr c, .items_initialized
 	jr z, .initialize_player_items
 .items_initialized
+	xor a
+	ld [wCurrentItemPage], a
+	ld [wCurrentPCItemPage], a
 
 START_MONEY EQU $3000
 	ld hl, wPlayerMoney + 1
