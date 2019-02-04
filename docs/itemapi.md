@@ -58,11 +58,11 @@ The following table lists all API calls. Note that the arguments and return valu
 |`$06`|`INITIALIZE_ITEM_LISTS` |_(void)_                                     |_(none)_                               |
 |`$10`|`CAN_GET_ITEM`          |item ID, quantity, page #                    |_(none)_                               |
 |`$11`|`ADD_ITEM`              |item ID, quantity, page #                    |_(none)_                               |
-|`$12`|`HAS_ITEM`              |item ID, quantity,                           |page #, index #, quantity              |
+|`$12`|`HAS_ITEM`              |item ID, quantity                            |page #, index #, quantity              |
 |`$13`|`REMOVE_ITEM`           |index #, quantity, page #                    |page #, item count                     |
 |`$14`|`CAN_GET_PC_ITEM`       |item ID, quantity, page #                    |_(none)_                               |
 |`$15`|`ADD_ITEM_TO_PC`        |item ID, quantity, page #                    |_(none)_                               |
-|`$16`|`HAS_ITEM_IN_PC`        |item ID, quantity,                           |page #, index #, quantity              |
+|`$16`|`HAS_ITEM_IN_PC`        |item ID, quantity                            |page #, index #, quantity              |
 |`$17`|`REMOVE_ITEM_FROM_PC`   |index #, quantity, page #                    |page #, item count                     |
 |`$18`|`DEPOSIT`               |page #, index #, quantity                    |_(none)_                               |
 |`$19`|`WITHDRAW`              |page #, index #, quantity                    |_(none)_                               |
