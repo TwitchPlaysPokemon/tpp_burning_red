@@ -4,10 +4,10 @@
 ; $02 = null
 ; $03 = error / timeout
 
-const_value = $20
+const_value = $04
 	const ITEMAPI_IS_BAG_EMPTY ;(void)
 
-const_value = $30
+const_value = $10
 	const ITEMAPI_CAN_GET_ITEM ;(item, quantity, page)
 	const ITEMAPI_ADD_ITEM ;(item, quantity, page)
 	const ITEMAPI_HAS_ITEM ;(item, quantity, page) - returns page, index, quantity
