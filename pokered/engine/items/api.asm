@@ -30,9 +30,8 @@ LoadCurrentItemPageLimits::
 	push bc
 	ld a, ITEMAPI_GET_PAGE_LIMITS
 	call ItemAPI
-	ld a, 0
-	jr c, .got_limit
 	ld a, 1
+	jr c, .got_limit
 	jr z, .got_limit
 	ld a, [wCurrentItemList]
 	ld b, a
@@ -55,6 +54,7 @@ LoadCurrentItemPageLimits::
 	xor a
 	ld [hl], a
 .page_OK
+	ld a, c
 	ld [wCurrentItemPageLimit], a
 	pop bc
 	pop hl
@@ -64,7 +64,7 @@ PrintItemPageName::
 	ld a, "@"
 	ld [wItemAPIBuffer + 12], a
 	ld de, wItemAPIBuffer
-	coord hl, 5, 2
+	coord hl, 6, 2
 	ld c, 12
 .name_loop
 	ld a, [de]
