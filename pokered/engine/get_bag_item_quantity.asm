@@ -5,9 +5,7 @@ GetQuantityOfItemInBag:
 	ld hl, wItemAPIBuffer
 	ld a, b
 	ld [hli], a
-	ld a, 1
-	ld [hli], a
-	ld [hl], -1
+	ld [hl], 1
 	ld a, ITEMAPI_HAS_ITEM
 	call ItemAPI
 	jr c, .nope

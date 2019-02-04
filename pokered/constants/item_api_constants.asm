@@ -13,13 +13,13 @@ const_value = $04
 const_value = $10
 	const ITEMAPI_CAN_GET_ITEM ;(item, quantity, page)
 	const ITEMAPI_ADD_ITEM ;(item, quantity, page)
-	const ITEMAPI_HAS_ITEM ;(item, quantity, page) - returns page, index, quantity
+	const ITEMAPI_HAS_ITEM ;(item, quantity) - returns page, index, quantity
 	const ITEMAPI_REMOVE_ITEM ;(index, quantity, page) - null indicates stack is empty and returns active page and number of items in page
 
 	; completely equivalent to the bag functions, but for the PC
 	const ITEMAPI_CAN_GET_PC_ITEM ;(item, quantity, page)
 	const ITEMAPI_ADD_ITEM_TO_PC ;(item, quantity, page)
-	const ITEMAPI_HAS_ITEM_IN_PC ;(item, quantity, page)
+	const ITEMAPI_HAS_ITEM_IN_PC ;(item, quantity)
 	const ITEMAPI_REMOVE_ITEM_FROM_PC ;(index, quantity, page)
 
 	const ITEMAPI_DEPOSIT ;(item page, item stack, quantity) - true: deposited, false: no room, null: nothing happened

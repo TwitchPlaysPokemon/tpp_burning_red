@@ -119,14 +119,11 @@ RemoveItemByID:
 	ld a, [hItemToRemoveID]
 	ld hl, wItemAPIBuffer
 	ld [hli], a
-	ld a, 1
-	ld [hli], a
-	ld [hl], -1
+	ld [hl], 1
 	ld a, ITEMAPI_HAS_ITEM
 	call ItemAPI
 	ret c
 	ret z
-	dec hl
 	ld a, [hld]
 	ld [wWhichPokemon], a
 	ld a, 1

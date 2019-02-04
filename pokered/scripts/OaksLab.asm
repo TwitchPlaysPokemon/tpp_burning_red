@@ -651,9 +651,7 @@ OaksLabScript18:
 	ret
 
 OaksLabScript_RemoveParcel:
-	ld hl, wItemAPIBuffer + 2
-	ld a, -1
-	ld [hld], a
+	ld hl, wItemAPIBuffer + 1
 	ld a, 1
 	ld [hld], a
 	ld [hl], OAKS_PARCEL
