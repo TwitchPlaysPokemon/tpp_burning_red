@@ -23,8 +23,7 @@ PlayerPCMenu:
 	set 5, [hl]
 	call LoadScreenTilesFromBuffer2
 	coord hl, 0, 0
-	ld b, $8
-	ld c, $e
+	lb bc, 8, 14
 	call TextBoxBorder
 	call UpdateSprites
 	coord hl, 2, 2
