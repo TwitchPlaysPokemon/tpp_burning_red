@@ -75,6 +75,7 @@ HandleItemListSwapping:
 	xor a
 	ld [wListScrollOffset], a
 	ld [wCurrentMenuItem], a
+	callba LoadItemListFromAPI
 .done
 	xor a
 	ld [wMenuItemToSwap], a
