@@ -9,6 +9,7 @@ AddItemToInventory_:
 	push hl
 	push bc
 	push de
+	push hl
 	ld a, h
 	and a
 	ld a, [hl]
@@ -33,8 +34,9 @@ AddItemToInventory_:
 .got_kind
 	ld b, a
 	call ItemAPI
-	ccf
+	jr c, .okay
 	jr z, .done
+.okay
 	ld hl, wItemAPIBuffer + 2
 	ld a, e
 	ld [hld], a
