@@ -83,25 +83,24 @@ ExitPlayerPC:
 	ret
 
 PlayerPCDeposit:
-	xor a
-	ld [wCurrentMenuItem], a
-	ld [wListScrollOffset], a
-	ld a, [wNumBagItems]
-	and a
-	jr nz, .loop
+	ld a, ITEMAPI_IS_BAG_EMPTY
+	call ItemAPI
+	jr c, .loop
+	jr z, .loop
 	ld hl, NothingToDepositText
 	call PrintText
 	jp PlayerPCMenu
 .loop
 	ld hl, WhatToDepositText
 	call PrintText
-	ld hl, wNumBagItems
+	ld hl, wNumItems
 	ld a, l
 	ld [wListPointer], a
 	ld a, h
 	ld [wListPointer + 1], a
 	xor a
 	ld [wPrintItemPrices], a
+	ld [wCurrentItemList], a
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
 	call DisplayListMenuID
@@ -117,24 +116,28 @@ PlayerPCDeposit:
 	call PrintText
 	call DisplayChooseQuantityMenu
 	cp $ff
-	jp z, .loop
+	jr z, .loop
 .next
-	ld hl, wNumBoxItems
-	call AddItemToInventory
-	jr c, .roomAvailable
+	ld hl, wItemAPIBuffer
+	ld a, [wCurrentItemPage]
+	ld [hli], a
+	ld a, [wWhichPokemon]
+	ld [hli], a
+	ld a, [wItemQuantity]
+	ld [hl], a
+	ld a, ITEMAPI_DEPOSIT
+	call ItemAPI
+	jr c, .loop
 	ld hl, NoRoomToStoreText
-	call PrintText
-	jp .loop
-.roomAvailable
-	ld hl, wNumBagItems
-	call RemoveItemFromInventory
+	jr z, .done
 	call WaitForSoundToFinish
 	ld a, SFX_WITHDRAW_DEPOSIT
 	call PlaySound
 	call WaitForSoundToFinish
 	ld hl, ItemWasStoredText
+.done
 	call PrintText
-	jp .loop
+	jr .loop
 
 PlayerPCWithdraw:
 	xor a
