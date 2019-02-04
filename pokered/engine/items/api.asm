@@ -84,3 +84,51 @@ PrintItemPageName::
 	dec c
 	jr nz, .dash_loop
 	ret
+
+GetFilteredItemList::
+	; in: de: desired items
+	ld hl, wItemAPIBuffer
+	push de
+	push hl
+.copy_loop
+	ld a, [de]
+	ld [hli], a
+	inc de
+	and a
+	jr nz, .copy_loop
+	ld a, ITEMAPI_GET_ITEM_QUANTITIES
+	call ItemAPI
+	pop hl
+	pop de
+	ld bc, wFilteredBagItemsCount
+	push af
+	xor a
+	ld [bc], a
+	inc bc
+	dec a
+	ld [bc], a
+	pop af
+	ret c
+	ret z
+.check_loop
+	ld a, [de]
+	and a
+	jr z, .done
+	ld a, [hli]
+	and a
+	jr z, .next
+	ld a, [de]
+	ld [bc], a
+	inc bc
+	push hl
+	ld hl, wFilteredBagItemsCount
+	inc [hl]
+	pop hl
+.next
+	inc de
+	jr .check_loop
+
+.done
+	dec a
+	ld [bc], a
+	ret

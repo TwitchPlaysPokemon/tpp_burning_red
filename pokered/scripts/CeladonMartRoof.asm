@@ -3,35 +3,10 @@ CeladonMartRoof_Script:
 
 CeladonMartRoofScript_GetDrinksInBag:
 ; construct a list of all drinks in the player's bag
-	xor a
-	ld [wFilteredBagItemsCount], a
-	ld de, wFilteredBagItems
-	ld hl, CeladonMartRoofDrinkList
-.loop
-	ld a, [hli]
-	and a
-	jr z, .done
-	push hl
-	push de
-	ld [wd11e], a
-	ld b, a
-	predef GetQuantityOfItemInBag
-	pop de
-	pop hl
-	ld a, b
-	and a
-	jr z, .loop ; if the item isn't in the bag
-	ld a, [wd11e]
-	ld [de], a
-	inc de
-	push hl
-	ld hl, wFilteredBagItemsCount
-	inc [hl]
-	pop hl
-	jr .loop
-.done
-	ld a, $ff
-	ld [de], a
+	push bc
+	ld de, CeladonMartRoofDrinkList
+	callba GetFilteredItemList
+	pop bc
 	ret
 
 CeladonMartRoofDrinkList:

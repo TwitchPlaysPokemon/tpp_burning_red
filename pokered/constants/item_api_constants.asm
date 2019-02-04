@@ -8,6 +8,8 @@ const_value = $04
 	const ITEMAPI_LOCK ;(void)
 	const ITEMAPI_UNLOCK ;(key) - key = "InitItemAPI@"
 
+	const ITEMAPI_INITIALIZE_ITEM_LISTS ;(void)
+
 const_value = $10
 	const ITEMAPI_CAN_GET_ITEM ;(item, quantity, page)
 	const ITEMAPI_ADD_ITEM ;(item, quantity, page)
@@ -29,7 +31,7 @@ const_value = $10
 	const ITEMAPI_IS_BAG_EMPTY ;(void)
 	const ITEMAPI_IS_PC_EMPTY ;(void)
 
-	const ITEMAPI_INITIALIZE_ITEM_LISTS ;(void)
+	const ITEMAPI_GET_ITEM_QUANTITIES ;(item, item, item, ..., $00)
 
 	const ITEMAPI_GET_PAGE_LIMITS ;(void) - returns max page, max PC page
 
