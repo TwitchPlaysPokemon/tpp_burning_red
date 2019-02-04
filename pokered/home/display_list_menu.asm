@@ -266,12 +266,19 @@ DisplayListMenuIDLoop::
 PrintListMenuEntries::
 	ld a, [wListMenuID]
 	cp ITEMLISTMENU
-	jr nz, .no_page_title
+	jr nz, .done_page_title
 	ld a, [wCurrentItemList]
 	cp 2
-	jr nc, .no_page_title
+	jr nc, .done_page_title
 	callba PrintItemPageName
-.no_page_title
+	ld a, [wNumItems]
+	ld [wListCount], a
+	ld hl, wMaxMenuItem
+	ld [hl], a
+	cp 2
+	jr c, .done_page_title
+	ld [hl], 2
+.done_page_title
 	coord hl, 5, 3
 	ld b, 9
 	ld c, 14
@@ -439,6 +446,15 @@ PrintListMenuEntries::
 	inc c
 	push bc
 	inc c
+	call GetCurrentPageNumber
+	cp -1
+	jr z, .do_check
+	push hl
+	ld hl, wMenuItemPageToSwap
+	cp [hl]
+	pop hl
+	jr nz, .nextListEntry
+.do_check
 	ld a, [wMenuItemToSwap] ; ID of item chosen for swapping (counts from 1)
 	and a ; is an item being swapped?
 	jr z, .nextListEntry
@@ -466,3 +482,20 @@ PrintListMenuEntries::
 
 ListMenuCancelText::
 	db "CANCEL@"
+
+GetCurrentPageNumber::
+	ld a, [wListMenuID]
+	cp ITEMLISTMENU
+	jr nz, .no_pages
+	ld a, [wCurrentItemList]
+	cp 2
+	jr nc, .no_pages
+	and a
+	ld a, [wCurrentItemPage]
+	ret z
+	ld a, [wCurrentItemPage + 1]
+	ret
+
+.no_pages
+	ld a, -1
+	ret

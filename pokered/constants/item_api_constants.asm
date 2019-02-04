@@ -5,6 +5,9 @@
 ; $03 = error / timeout
 
 const_value = $04
+	const ITEMAPI_LOCK ;(void)
+	const ITEMAPI_UNLOCK ;(key) - key = "InitItemAPI@"
+
 	const ITEMAPI_IS_BAG_EMPTY ;(void)
 
 const_value = $10
@@ -24,8 +27,8 @@ const_value = $10
 	const ITEMAPI_CAN_WITHDRAW ;(item, quantity, pack page, PC page)
 	const ITEMAPI_WITHDRAW ;(item, quantity, pack page, PC page)
 
-	const ITEMAPI_SWAP_ITEMS ;(page, first stack, second stack)
-	const ITEMAPI_SWAP_PC_ITEMS ;(page, first stack, second stack)
+	const ITEMAPI_SWAP_ITEMS ;(first page, first stack, second page, second stack) - false: cannot swap, true: swapped, null: no swap (e.g., same stacks)
+	const ITEMAPI_SWAP_PC_ITEMS ;(first page, first stack, second page, second stack)
 
 	const ITEMAPI_INITIALIZE_ITEM_LISTS ;(void)
 

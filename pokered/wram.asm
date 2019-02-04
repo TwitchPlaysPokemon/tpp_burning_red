@@ -412,10 +412,14 @@ wMenuCursorLocation:: ; cc30
 ; the address of the menu cursor's current location within wTileMap
 	ds 2
 
-	ds 2
+	ds 1
 
-wMenuJoypadPollCount:: ; cc34
+wMenuJoypadPollCount:: ; cc33
 ; how many times should HandleMenuInput poll the joypad state before it returns?
+	ds 1
+
+wMenuItemPageToSwap:: ; cc34
+; page of the menu item to swap (only for item menus)
 	ds 1
 
 wMenuItemToSwap:: ; cc35
