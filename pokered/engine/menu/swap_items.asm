@@ -29,7 +29,7 @@ HandleItemListSwapping:
 	ld b, a
 	ld a, [wListScrollOffset] ; index of top (visible) menu item within the list
 	add b
-	ld [wMenuItemToSwap], a ; ID of item chosen for swapping (counts from 1)
+	ld [wMenuItemToSwap], a
 	ld c, 20
 	call DelayFrames
 	jp DisplayListMenuIDLoop
@@ -40,11 +40,11 @@ HandleItemListSwapping:
 	ld a, [wListScrollOffset]
 	add b
 	ld b, a
-	ld a, [wMenuItemToSwap] ; ID of item chosen for swapping (counts from 1)
+	ld a, [wMenuItemToSwap]
 	cp b ; is the currently selected item the same as the first item to swap?
 	jp z, DisplayListMenuIDLoop ; ignore attempts to swap an item with itself
 	dec a
-	ld [wMenuItemToSwap], a ; ID of item chosen for swapping (counts from 1)
+	ld [wMenuItemToSwap], a
 	ld c, 20
 	call DelayFrames
 	push hl
@@ -64,7 +64,7 @@ HandleItemListSwapping:
 	ld c, a
 	ld b, 0
 	add hl, bc ; hl = address of currently selected item entry
-	ld a, [wMenuItemToSwap] ; ID of item chosen for swapping (counts from 1)
+	ld a, [wMenuItemToSwap]
 	add a
 	add e
 	ld e, a
