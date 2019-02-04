@@ -19,12 +19,22 @@ SECTION "rst 38", ROM0
 ; Hardware interrupts
 SECTION "vblank", ROM0
 	jp VBlank
+
 SECTION "hblank", ROM0
 	rst $38
+
+EnableLCD::
+	ld a, [rLCDC]
+	set rLCDC_ENABLE, a
+	ld [rLCDC], a
+	ret
+
 SECTION "timer",  ROM0
 	jp Timer
+
 SECTION "serial", ROM0
 	jp Serial
+
 SECTION "joypad", ROM0
 	reti
 
@@ -49,12 +59,6 @@ DisableLCD::
 	ld [rLCDC], a
 	ld a, b
 	ld [rIE], a
-	ret
-
-EnableLCD::
-	ld a, [rLCDC]
-	set rLCDC_ENABLE, a
-	ld [rLCDC], a
 	ret
 
 ClearSprites::
