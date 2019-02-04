@@ -363,7 +363,7 @@ StartMenu_Item:
 	call HandleMenuInput
 	call PlaceUnfilledArrowMenuCursor
 	bit BIT_B_BUTTON, a
-	jr nz, ItemMenuLoop
+	jp nz, ItemMenuLoop
 .useOrTossItem ; if the player made the choice to use or toss the item
 	ld a, [wcf91]
 	ld [wd11e], a
