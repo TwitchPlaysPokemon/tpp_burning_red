@@ -107,6 +107,7 @@ MainMenu:
 .pressedA
 	call GBPalWhiteOutWithDelay3
 	call ClearScreen
+	call UnlockItemAPI
 	ld a, PLAYER_DIR_DOWN
 	ld [wPlayerDirection], a
 	ld c, 10
@@ -307,6 +308,7 @@ LinkCanceledText:
 StartNewGame:
 	ld hl, wd732
 	res 1, [hl]
+	call UnlockItemAPI
 	call OakSpeech
 	ld c, 20
 	call DelayFrames
@@ -710,3 +712,16 @@ CheckForPlayerNameInSRAM:
 	ld [MBC1SRamBankingMode], a
 	scf
 	ret
+
+UnlockItemAPI::
+	ld de, .unlock_string
+	ld hl, wItemAPIBuffer
+	call CopyString
+	ld a, ITEMAPI_UNLOCK
+	call ItemAPI
+	ret c
+	jr z, UnlockItemAPI
+	ret
+
+.unlock_string
+	db "InitItemAPI@"

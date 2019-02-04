@@ -3,6 +3,8 @@ SoftReset::
 	call GBPalWhiteOut
 	ld c, 32
 	call DelayFrames
+	ld a, ITEMAPI_LOCK
+	call ItemAPI
 	; fallthrough
 
 Init::
