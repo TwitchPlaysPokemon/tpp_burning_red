@@ -186,8 +186,8 @@ the location of an item stack that has at least the requested quantity of the it
 **Return values:** new page number, page size. (Only returned when the result is null.)
 
 **Effects:** removes items from a specific stack of items in the bag. Note that the stack is identified by its
-position, not by item ID. Note that this call returns true or null depending on whether items remain on the stack
-after removing some or not; if the call returns null, the game may need to relocate the item cursor in the bag after
+position, not by item ID. This call returns true or null depending on whether items remain on the stack after removing
+the requested quantity; if the call returns null, the game may need to relocate the item cursor in the bag after
 removing the items. Therefore, when the call returns null, the new active page number and the number of item stacks in
 that page are returned; the new active page may be the same as the requested one, or any other.
 
