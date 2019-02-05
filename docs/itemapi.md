@@ -269,3 +269,53 @@ units of it, just like the game usually does.
 ### `SWAP_PC_ITEMS`
 
 This call is equivalent to `SWAP_ITEMS`, but for the PC instead of the bag.
+
+### `IS_BAG_EMPTY`
+
+**Arguments:** none.
+
+**Return values:** none.
+
+**Effects:** checks whether the bag is empty.
+
+**Results:**
+
+* **false:** the bag has items in it.
+* **true:** the bag is empty.
+* **null:** invalid call or error; treated as not empty.
+
+### `IS_PC_EMPTY`
+
+This call is equivalent to `IS_BAG_EMPTY`, but for the PC instead of the bag.
+
+### `GET_ITEM_QUANTITIES`
+
+**Arguments:** item ID, item ID, ..., `$00`.
+
+**Return values:** quantity, quantity, ... (Only returned when the result is true.)
+
+**Effects:** checks the quantities in the bag of multiple items at once. Up to 15 item IDs may be given, followed by
+a `$00` byte to terminate the list; values beyond the `$00` must be ignored. If the player does have any of the listed
+items in the bag, the call returns the quantities of each item (in the order given in the call) in the bag; if the
+player holds more than 255 of any item, the API returns 255 for that item instead.
+
+**Results:**
+
+* **false:** none of the requested items were found in the bag.
+* **true:** at least one of the items was found; the quantities of each are returned in the return values.
+* **null:** invalid call or empty list; treated as no items found.
+
+### `GET_PAGE_LIMITS`
+
+**Arguments:** none.
+
+**Return values:** bag page count, PC page count. (Only returned when the result is true.)
+
+**Effects:** gets the number of pages in both inventories, bag and PC. The bag page count must be between 1 and 64,
+and the PC page count must be between 1 and 32.
+
+**Results:**
+
+* **false:** no paged inventories; they are both a single page.
+* **true:** limits returned in the return values.
+* **null:** invalid call or error; the game treats it as a false result.
