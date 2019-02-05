@@ -90,6 +90,8 @@ RemoveItemFromInventory_:
 	ld a, [wItemAPIBuffer + 1]
 	ld [wListCount], a
 	cp 2
-	ret c
+	jr c, .got_new_limit
+	ld a, 2
+.got_new_limit
 	ld [wMaxMenuItem], a
 	ret
