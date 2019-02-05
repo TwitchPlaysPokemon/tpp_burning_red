@@ -83,6 +83,8 @@ The following table lists all API calls. Note that the arguments and return valu
 Note that in the following descriptions, the term "return values" refers to values returned by the API call in
 `wItemAPIBuffer`. The actual boolean result (returned in `wItemAPICommand`) is referred to as "result".
 
+With the exception of the unlocking key for `UNLOCK`, all arguments and return values are one byte long.
+
 ### `LOCK`
 
 **Arguments:** none.
@@ -90,10 +92,71 @@ Note that in the following descriptions, the term "return values" refers to valu
 **Return values:** none.
 
 **Effects:** called by the game when the API should be locked. A locked API must only respond to an `UNLOCK` command
-with the correct key.
+with the correct key and to no other commands.
 
 **Results:**
 
 * **false:** could not lock the API due to an error.
 * **true:** API locked successfully.
 * **null:** no-op call; the API was already locked.
+
+### `UNLOCK`
+
+**Arguments:** unlocking key — the first 12 bytes of `wItemAPIBuffer` must equal the string `InitItemAPI@` (in the
+game's encoding).
+
+**Return values:** none.
+
+**Effects:** called by the game when the API should be unlocked, such as when the game starts. A locked API must only
+respond to an `UNLOCK` command with the correct key (and to no other commands); if the API is already unlocked when
+this function is called, the controller should respond to any call.
+
+**Results:**
+
+* **false:** could not unlock the API due to an error or an incorrect unlocking key.
+* **true:** API unlocked successfully.
+* **null:** no-op call; the API was already unlocked.
+
+### `INITIALIZE_ITEM_LISTS`
+
+**Arguments:** none.
+
+**Return values:** none.
+
+**Effects:** empties out the entire pack and PC; called when a new game starts to initialize the item lists.
+
+**Results:**
+
+* **false:** error when initializing the lists.
+* **true:** lists initialized successfully.
+* **null:** no-op call; the lists were already initialized and empty.
+
+### `CAN_GET_ITEM`
+
+**Arguments:** item ID, quantity, page number.
+
+**Return values:** none.
+
+**Effects:** determines if the player has enough room in their bag to obtain a specific item. If the page number is
+-1, the query is over the whole bag; otherwise, it refers to the specific page indicated in the argument.
+
+**Results:**
+
+* **false:** there is no room for the item.
+* **true:** there is enough room for the item.
+* **null:** obtaining the item will be a no-op (e.g., quantity is zero); this is considered a success.
+
+### `ADD_ITEM`
+
+**Arguments:** item ID, quantity, page number.
+
+**Return values:** none.
+
+**Effects:** adds an item to the bag. The page number indicates to which page it should be added; if it is -1, the
+item should be added wherever there is room for it.
+
+**Results:**
+
+* **false:** failed to add the item to the bag.
+* **true:** the item was added successfully.
+* **null:** no-op call (e.g., quantity was zero); this is treated as a success.
