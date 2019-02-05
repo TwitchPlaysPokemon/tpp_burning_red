@@ -239,8 +239,8 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (SS_ANNE_7                  , 0x00, VERMILION_CITY              ) => (0x0B01, 0x00),
 
         //SS_ANNE_3
-        (SS_ANNE_5                  , 0x00, VERMILION_CITY              ) => (0x0601, 0x01),
-        (SS_ANNE_2                  , 0x07, VERMILION_CITY              ) => (0x0901, 0x00),
+        (SS_ANNE_5                  , 0x00, VERMILION_CITY              ) => (0x0901, 0x00),
+        (SS_ANNE_2                  , 0x07, VERMILION_CITY              ) => (0x0601, 0x01),
 
         //SS_ANNE_4
         (SS_ANNE_10                 , 0x08, VERMILION_CITY              ) => (0x1C01, 0x00),
@@ -276,11 +276,11 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (SS_ANNE_2                  , 0x05, VERMILION_CITY              ) => (0x0601, 0x08),
 
         //SS_ANNE_10
-        (SS_ANNE_4                  , 0x04, VERMILION_CITY              ) => (0x0801, 0x05),
-        (SS_ANNE_4                  , 0x03, VERMILION_CITY              ) => (0x0801, 0x04),
+        (SS_ANNE_4                  , 0x04, VERMILION_CITY              ) => (0x0801, 0x01),
+        (SS_ANNE_4                  , 0x03, VERMILION_CITY              ) => (0x0801, 0x02),
         (SS_ANNE_4                  , 0x02, VERMILION_CITY              ) => (0x0801, 0x03),
-        (SS_ANNE_4                  , 0x01, VERMILION_CITY              ) => (0x0801, 0x02),
-        (SS_ANNE_4                  , 0x00, VERMILION_CITY              ) => (0x0801, 0x01),
+        (SS_ANNE_4                  , 0x01, VERMILION_CITY              ) => (0x0801, 0x04),
+        (SS_ANNE_4                  , 0x00, VERMILION_CITY              ) => (0x0801, 0x05),
 
         //POKEMON_FAN_CLUB
         (VERMILION_CITY             , 0x01, VERMILION_CITY              ) => (0x0503, 0x05),
@@ -1300,8 +1300,8 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x0B01, 0x00) => (SS_ANNE_7                  , 0x00, VERMILION_CITY              ),
 
         //SS_ANNE_3
-        (0x0601, 0x01) => (SS_ANNE_5                  , 0x00, VERMILION_CITY              ),
-        (0x0901, 0x00) => (SS_ANNE_2                  , 0x07, VERMILION_CITY              ),
+        (0x0901, 0x00) => (SS_ANNE_5                  , 0x00, VERMILION_CITY              ),
+        (0x0601, 0x01) => (SS_ANNE_2                  , 0x07, VERMILION_CITY              ),
 
         //SS_ANNE_4
         (0x1C01, 0x00) => (SS_ANNE_10                 , 0x08, VERMILION_CITY              ),
@@ -1337,11 +1337,11 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x0601, 0x08) => (SS_ANNE_2                  , 0x05, VERMILION_CITY              ),
 
         //SS_ANNE_10
-        (0x0801, 0x05) => (SS_ANNE_4                  , 0x04, VERMILION_CITY              ),
-        (0x0801, 0x04) => (SS_ANNE_4                  , 0x03, VERMILION_CITY              ),
+        (0x0801, 0x01) => (SS_ANNE_4                  , 0x04, VERMILION_CITY              ),
+        (0x0801, 0x02) => (SS_ANNE_4                  , 0x03, VERMILION_CITY              ),
         (0x0801, 0x03) => (SS_ANNE_4                  , 0x02, VERMILION_CITY              ),
-        (0x0801, 0x02) => (SS_ANNE_4                  , 0x01, VERMILION_CITY              ),
-        (0x0801, 0x01) => (SS_ANNE_4                  , 0x00, VERMILION_CITY              ),
+        (0x0801, 0x04) => (SS_ANNE_4                  , 0x01, VERMILION_CITY              ),
+        (0x0801, 0x05) => (SS_ANNE_4                  , 0x00, VERMILION_CITY              ),
 
         //POKEMON_FAN_CLUB
         (0x0503, 0x05) => (VERMILION_CITY             , 0x01, VERMILION_CITY              ),
