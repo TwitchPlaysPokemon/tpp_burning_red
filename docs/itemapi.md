@@ -350,9 +350,9 @@ and the PC page count must be between 1 and 64.
 ## Inventory-loading API calls
 
 These calls load the data corresponding to an inventory page in the buffer beginning at `wNumItems`. The buffer begins
-with a single byte containing the number of item stacks in the page, and is followed by that number of pairs of bytes
-containing an item ID and a quantity. The quantity should be between 1 and 99. After all the stacks, a single `$ff`
-byte terminates the list; the remaining values in the buffer are irrelevant.
+with a single byte containing the number of item stacks in the page (which must be between 0 and 60), and is followed
+by that number of pairs of bytes containing an item ID and a quantity. The quantity should be between 1 and 99. After
+all the stacks, a single `$ff` byte terminates the list; the remaining values in the buffer are irrelevant.
 
 An inventory-loading API call occurs when a value with at least one of the top two bits set is written to
 `wItemAPICommand`. Unlike regular API calls, these calls take no arguments and have no return values.
