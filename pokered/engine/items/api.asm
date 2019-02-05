@@ -12,7 +12,7 @@ LoadItemListFromAPI::
 	add a, [hl]
 	call ItemAPI
 	jr c, .no_name
-	ret nz
+	jr nz, .fix_buffer
 	xor a
 	ld hl, wNumItems
 	ld [hli], a
@@ -20,6 +20,28 @@ LoadItemListFromAPI::
 .no_name
 	ld a, "@"
 	ld [wItemAPIBuffer], a
+.fix_buffer
+	ld hl, wNumItems
+	ld a, [hl]
+	cp 61
+	jr c, .count_OK
+	ld a, 60
+.count_OK
+	ld [hli], a
+	add a, a
+	push bc
+	add a, l
+	ld l, a
+	jr nc, .no_carry
+	inc h
+.no_carry
+	ld a, LOW(wItems + ITEM_CAPACITY * 2 + 1)
+	sub l
+	ld c, a
+	ld b, 0
+	ld a, -1
+	call FillMemory
+	pop bc
 	ret
 
 LoadCurrentItemPageLimits::
