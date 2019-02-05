@@ -9,7 +9,14 @@ be informed when the player gains or loses items, deposits them, withdraws them,
 
 ## Basics
 
-Communication with the API uses three locations in memory:
+The modified ROM no longer tracks its own inventory. This means that the program that responds to API calls (hereafter
+the "controller") will have to track all of the data that the game usually tracks on its own. This means tracking both
+the contents of every item slot and their ordering (since the game expects the order of the item pack to not change
+spontaneously while menus are open). Up to 64 pages of items and 32 pages of PC items are supported; each page can
+have a name (up to 12 characters) and up to 60 stacks of items.
+
+The game will issue API calls for any item-related functions that it might need to perform externally, such as getting
+an item or loading the item list. Communication with the API uses three locations in memory:
 
 * `wItemAPICommand`, which is a one-byte buffer that the game writes to make an API call, to which the API should
   write to return a result to the game;
@@ -73,4 +80,20 @@ The following table lists all API calls. Note that the arguments and return valu
 |`$1E`|`GET_ITEM_QUANTITIES`   |item ID, item ID, ..., `$00`                 |quantity, quantity, ...                |
 |`$1F`|`GET_PAGE_LIMITS`       |_(void)_                                     |bag page count, PC page count          |
 
-(WIP)
+Note that in the following descriptions, the term "return values" refers to values returned by the API call in
+`wItemAPIBuffer`. The actual boolean result (returned in `wItemAPICommand`) is referred to as "result".
+
+### `LOCK`
+
+**Arguments:** none.
+
+**Return values:** none.
+
+**Effects:** called by the game when the API should be locked. A locked API must only respond to an `UNLOCK` command
+with the correct key.
+
+**Results:**
+
+* **false:** could not lock the API due to an error.
+* **true:** API locked successfully.
+* **null:** no-op call; the API was already locked.
