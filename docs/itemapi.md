@@ -213,3 +213,59 @@ This call is equivalent to `HAS_ITEM`, but for the PC instead of the bag.
 ### `REMOVE_ITEM_FROM_PC`
 
 This call is equivalent to `REMOVE_ITEM`, but for the PC instead of the bag.
+
+### `DEPOSIT`
+
+**Arguments:** bag page number, bag stack number, quantity.
+
+**Return values:** none.
+
+**Effects:** deposits items from the bag into the PC. The arguments indicate the item page from which the items will
+come; the controller may choose the page where the items will be placed. Note that this function will be called
+_instead_ of `REMOVE_ITEM` and `ADD_ITEM_TO_PC` when items are deposited, and thus should take care of updating the
+respective inventories.
+
+**Results:**
+
+* **false:** could not deposit items (e.g., no room).
+* **true:** items were deposited.
+* **null:** no-op call (e.g., quantity was zero).
+
+### `WITHDRAW`
+
+**Arguments:** PC page number, PC stack number, quantity.
+
+**Return values:** none.
+
+**Effects:** withdraws items from the PC into the bag. The arguments indicate the item page from which the items will
+come; the controller may choose the page where the items will be placed. Note that this function will be called
+_instead_ of `REMOVE_ITEM_FROM_PC` and `ADD_ITEM` when items are withdrawn, and thus should take care of updating the
+respective inventories.
+
+**Results:**
+
+* **false:** could not withdraw items (e.g., no room).
+* **true:** items were withdrawn.
+* **null:** no-op call (e.g., quantity was zero).
+
+### `SWAP_ITEMS`
+
+**Arguments:** source page number, source stack number, destination page number, destination stack number.
+
+**Return values:** none.
+
+**Effects:** attempts to swap two item stacks in the bag. The swap may occur within the same page or across pages; the
+controller should expect both forms. The controller should decide whether the swap goes through or fails; the
+controller may deny the swap at its own discretion (e.g., because the items swapped belong to incompatible pages). If
+the swap succeeds, the controller may merge item stacks that contain the same item and add up to less than one hundred
+units of it, just like the game usually does.
+
+**Results:**
+
+* **false:** the controller refused to swap the items.
+* **true:** the item stacks were swapped.
+* **null:** no-op call (e.g., attempted to swap a stack with itself).
+
+### `SWAP_PC_ITEMS`
+
+This call is equivalent to `SWAP_ITEMS`, but for the PC instead of the bag.
