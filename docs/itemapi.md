@@ -7,6 +7,29 @@ retrieve data about the inventory state.
 on the API in order to perform all inventory-related tasks. The API will have to keep track of the inventory and will
 be informed when the player gains or loses items, deposits them, withdraws them, swaps them, etc.
 
+* [Basics](#basics)
+* [Regular API calls](#regular-api-calls)
+    * [`LOCK`](#lock)
+    * [`UNLOCK`](#unlock)
+    * [`INITIALIZE_ITEM_LISTS`](#initialize_item_lists)
+    * [`CAN_GET_ITEM`](#can_get_item)
+    * [`ADD_ITEM`](#add_item)
+    * [`HAS_ITEM`](#has_item)
+    * [`REMOVE_ITEM`](#remove_item)
+    * [`CAN_GET_PC_ITEM`](#can_get_pc_item)
+    * [`ADD_ITEM_TO_PC`](#add_item_to_pc)
+    * [`HAS_ITEM_IN_PC`](#has_item_in_pc)
+    * [`REMOVE_ITEM_FROM_PC`](#remove_item_from_pc)
+    * [`DEPOSIT`](#deposit)
+    * [`WITHDRAW`](#withdraw)
+    * [`SWAP_ITEMS`](#swap_items)
+    * [`SWAP_PC_ITEMS`](#swap_pc_items)
+    * [`IS_BAG_EMPTY`](#is_bag_empty)
+    * [`IS_PC_EMPTY`](#is_pc_empty)
+    * [`GET_ITEM_QUANTITIES`](#get_item_quantities)
+    * [`GET_PAGE_LIMITS`](#get_page_limits)
+* [Inventory-loading API calls](#inventory-loading-api-calls)
+
 ## Basics
 
 The modified ROM no longer tracks its own inventory. This means that the program that responds to API calls (hereafter
@@ -319,3 +342,9 @@ and the PC page count must be between 1 and 32.
 * **false:** no paged inventories; they are both a single page.
 * **true:** limits returned in the return values.
 * **null:** invalid call or error; the game treats it as a false result.
+
+---
+
+## Inventory-loading API calls
+
+(WIP)
