@@ -292,7 +292,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (CELADON_MANSION_1          , 0x02, CELADON_CITY                ) => (0x070A, 0x05),
         (CELADON_POKECENTER         , 0x00, CELADON_CITY                ) => (0x0C0A, 0x01),
         (CELADON_GYM                , 0x00, CELADON_CITY                ) => (0x100A, 0x01),
-        (GAME_CORNER                , 0x00, CELADON_CITY                ) => (0x0E0A, 0x01),
+        (GAME_CORNER                , 0x00, CELADON_CITY                ) => (0x0E0A, 0x00),
         (CELADON_PRIZE_ROOM         , 0x00, CELADON_CITY                ) => (0x0F0A, 0x01),
         (CELADON_DINER              , 0x00, CELADON_CITY                ) => (0x110A, 0x01),
         (CELADON_HOUSE              , 0x00, CELADON_CITY                ) => (0x120A, 0x01),
@@ -304,26 +304,26 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         //CELADON_MART_1
         (CELADON_CITY               , 0x00, CELADON_CITY                ) => (0x0603, 0x01),
         (CELADON_CITY               , 0x01, CELADON_CITY                ) => (0x0603, 0x02),
-        (CELADON_MART_2             , 0x00, CELADON_CITY                ) => (0x0110, 0x01),
+        (CELADON_MART_2             , 0x00, CELADON_CITY                ) => (0x010A, 0x01),
 
         //CELADON_MART_2
-        (CELADON_MART_1             , 0x04, CELADON_CITY                ) => (0x0010, 0x07),
-        (CELADON_MART_3             , 0x01, CELADON_CITY                ) => (0x0210, 0x01),
+        (CELADON_MART_1             , 0x04, CELADON_CITY                ) => (0x000A, 0x07),
+        (CELADON_MART_3             , 0x01, CELADON_CITY                ) => (0x020A, 0x01),
 
         //CELADON_MART_3
-        (CELADON_MART_4             , 0x00, CELADON_CITY                ) => (0x0310, 0x01),
-        (CELADON_MART_2             , 0x01, CELADON_CITY                ) => (0x0110, 0x02),
+        (CELADON_MART_4             , 0x00, CELADON_CITY                ) => (0x030A, 0x01),
+        (CELADON_MART_2             , 0x01, CELADON_CITY                ) => (0x010A, 0x02),
 
         //CELDAON_MART_4
-        (CELADON_MART_3             , 0x00, CELADON_CITY                ) => (0x0210, 0x02),
-        (CELADON_MART_5             , 0x01, CELADON_CITY                ) => (0x0410, 0x01),
+        (CELADON_MART_3             , 0x00, CELADON_CITY                ) => (0x020A, 0x02),
+        (CELADON_MART_5             , 0x01, CELADON_CITY                ) => (0x040A, 0x01),
 
         //CELADON_MART_5
-        (CELADON_MART_ROOF          , 0x00, CELADON_CITY                ) => (0x0510, 0x00),
-        (CELADON_MART_4             , 0x01, CELADON_CITY                ) => (0x0310, 0x02),
+        (CELADON_MART_ROOF          , 0x00, CELADON_CITY                ) => (0x050A, 0x00),
+        (CELADON_MART_4             , 0x01, CELADON_CITY                ) => (0x030A, 0x02),
 
         //CELADON_MART_ROOF
-        (CELADON_MART_5             , 0x00, CELADON_CITY                ) => (0x0410, 0x02),
+        (CELADON_MART_5             , 0x00, CELADON_CITY                ) => (0x040A, 0x02),
 
         //CELADON_GYM
         (CELADON_CITY               , 0x06, CELADON_CITY                ) => (0x0603, 0x06),
@@ -1353,7 +1353,7 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x070A, 0x05) => (CELADON_MANSION_1          , 0x02, CELADON_CITY                ),
         (0x0C0A, 0x01) => (CELADON_POKECENTER         , 0x00, CELADON_CITY                ),
         (0x100A, 0x01) => (CELADON_GYM                , 0x00, CELADON_CITY                ),
-        (0x0E0A, 0x01) => (GAME_CORNER                , 0x00, CELADON_CITY                ),
+        (0x0E0A, 0x00) => (GAME_CORNER                , 0x00, CELADON_CITY                ),
         (0x0F0A, 0x01) => (CELADON_PRIZE_ROOM         , 0x00, CELADON_CITY                ),
         (0x110A, 0x01) => (CELADON_DINER              , 0x00, CELADON_CITY                ),
         (0x120A, 0x01) => (CELADON_HOUSE              , 0x00, CELADON_CITY                ),
@@ -1365,26 +1365,26 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         //CELADON_MART_1
         (0x0603, 0x01) => (CELADON_CITY               , 0x00, CELADON_CITY                ),
         (0x0603, 0x02) => (CELADON_CITY               , 0x01, CELADON_CITY                ),
-        (0x0110, 0x01) => (CELADON_MART_2             , 0x00, CELADON_CITY                ),
+        (0x010A, 0x01) => (CELADON_MART_2             , 0x00, CELADON_CITY                ),
 
         //CELADON_MART_2
-        (0x0010, 0x07) => (CELADON_MART_1             , 0x04, CELADON_CITY                ),
-        (0x0210, 0x01) => (CELADON_MART_3             , 0x01, CELADON_CITY                ),
+        (0x000A, 0x07) => (CELADON_MART_1             , 0x04, CELADON_CITY                ),
+        (0x020A, 0x01) => (CELADON_MART_3             , 0x01, CELADON_CITY                ),
 
         //CELADON_MART_3
-        (0x0310, 0x01) => (CELADON_MART_4             , 0x00, CELADON_CITY                ),
-        (0x0110, 0x02) => (CELADON_MART_2             , 0x01, CELADON_CITY                ),
+        (0x030A, 0x01) => (CELADON_MART_4             , 0x00, CELADON_CITY                ),
+        (0x010A, 0x02) => (CELADON_MART_2             , 0x01, CELADON_CITY                ),
 
         //CELDAON_MART_4
-        (0x0210, 0x02) => (CELADON_MART_3             , 0x00, CELADON_CITY                ),
-        (0x0410, 0x01) => (CELADON_MART_5             , 0x01, CELADON_CITY                ),
+        (0x020A, 0x02) => (CELADON_MART_3             , 0x00, CELADON_CITY                ),
+        (0x040A, 0x01) => (CELADON_MART_5             , 0x01, CELADON_CITY                ),
 
         //CELADON_MART_5
-        (0x0510, 0x00) => (CELADON_MART_ROOF          , 0x00, CELADON_CITY                ),
-        (0x0310, 0x02) => (CELADON_MART_4             , 0x01, CELADON_CITY                ),
+        (0x050A, 0x00) => (CELADON_MART_ROOF          , 0x00, CELADON_CITY                ),
+        (0x030A, 0x02) => (CELADON_MART_4             , 0x01, CELADON_CITY                ),
 
         //CELADON_MART_ROOF
-        (0x0410, 0x02) => (CELADON_MART_5             , 0x00, CELADON_CITY                ),
+        (0x040A, 0x02) => (CELADON_MART_5             , 0x00, CELADON_CITY                ),
 
         //CELADON_GYM
         (0x0603, 0x06) => (CELADON_CITY               , 0x06, CELADON_CITY                ),
