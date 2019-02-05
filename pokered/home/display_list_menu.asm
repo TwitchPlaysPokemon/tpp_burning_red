@@ -273,6 +273,7 @@ PrintListMenuEntries::
 	callba PrintItemPageName
 	ld a, [wNumItems]
 	ld [wListCount], a
+	call ResetCurrentSelectedItemIfPastCancel
 	ld hl, wMaxMenuItem
 	ld [hl], a
 	cp 2
@@ -498,4 +499,29 @@ GetCurrentPageNumber::
 
 .no_pages
 	ld a, -1
+	ret
+
+ResetCurrentSelectedItemIfPastCancel::
+	; in: a: max items
+	; out: a: max items
+	push af
+	ld l, a
+	inc l
+	ld a, [wListScrollOffset]
+	ld h, a
+	ld a, [wCurrentMenuItem]
+	add a, h
+	jr c, .fix_offsets
+	cp l
+	jr c, .offsets_OK
+.fix_offsets
+	xor a
+	ld [wListScrollOffset], a
+	ld [wCurrentMenuItem], a
+.offsets_OK
+	ld a, [wCurrentMenuItem]
+	ld [wBagSavedMenuItem], a
+	ld a, [wListScrollOffset]
+	ld [wSavedListScrollOffset], a
+	pop af
 	ret
