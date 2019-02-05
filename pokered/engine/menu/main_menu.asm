@@ -714,13 +714,16 @@ CheckForPlayerNameInSRAM:
 	ret
 
 UnlockItemAPI::
+	xor a
+	ld [wItemAPICommand], a ;ensure that the unlock write is a changing write
+.loop
 	ld de, .unlock_string
 	ld hl, wItemAPIBuffer
 	call CopyString
 	ld a, ITEMAPI_UNLOCK
 	call ItemAPI
 	ret c
-	jr z, UnlockItemAPI
+	jr z, .loop
 	ret
 
 .unlock_string
