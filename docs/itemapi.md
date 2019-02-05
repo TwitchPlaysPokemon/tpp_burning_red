@@ -35,7 +35,7 @@ be informed when the player gains or loses items, deposits them, withdraws them,
 The modified ROM no longer tracks its own inventory. This means that the program that responds to API calls (hereafter
 the "controller") will have to track all of the data that the game usually tracks on its own. This means tracking both
 the contents of every item slot and their ordering (since the game expects the order of the item pack to not change
-spontaneously while menus are open). Up to 64 pages of items and 32 pages of PC items are supported; each page can
+spontaneously while menus are open). Up to 128 pages of items and 64 pages of PC items are supported; each page can
 have a name (up to 12 characters) and up to 60 stacks of items.
 
 The game will issue API calls for any item-related functions that it might need to perform externally, such as getting
@@ -79,7 +79,9 @@ RAM or due to loading a dirty save, and random calls due to attempting to intera
 
 ## Regular API calls
 
-The following table lists all API calls. Note that the arguments and return values are passed via `wItemAPIBuffer`.
+The following table lists all API calls. Regular API calls occur when a value with both upper bits clear is written to
+`wItemAPICommand`, provided that said value is no less than four. Note that the arguments and return values are passed
+via `wItemAPIBuffer`.
 
 |Value|Name                    |Arguments                                    |Return values                          |
 |:---:|:-----------------------|:--------------------------------------------|:--------------------------------------|
@@ -109,7 +111,7 @@ Note that in the following descriptions, the term "return values" refers to valu
 With the exception of the unlocking key for `UNLOCK`, all arguments and return values are one byte long.
 
 For functions that refer to specific locations within the inventory, page numbers and stack numbers both start at 0.
-Page numbers may go up to 63 for the bag and 31 for the PC; stack numbers may go up to 59.
+Page numbers may go up to 127 for the bag and 63 for the PC; stack numbers may go up to 59.
 
 ### `LOCK`
 
@@ -334,8 +336,8 @@ player holds more than 255 of any item, the API returns 255 for that item instea
 
 **Return values:** bag page count, PC page count. (Only returned when the result is true.)
 
-**Effects:** gets the number of pages in both inventories, bag and PC. The bag page count must be between 1 and 64,
-and the PC page count must be between 1 and 32.
+**Effects:** gets the number of pages in both inventories, bag and PC. The bag page count must be between 1 and 128,
+and the PC page count must be between 1 and 64.
 
 **Results:**
 
@@ -347,4 +349,27 @@ and the PC page count must be between 1 and 32.
 
 ## Inventory-loading API calls
 
-(WIP)
+These calls load the data corresponding to an inventory page in the buffer beginning at `wNumItems`. The buffer begins
+with a single byte containing the number of item stacks in the page, and is followed by that number of pairs of bytes
+containing an item ID and a quantity. The quantity should be between 1 and 99. After all the stacks, a single `$ff`
+byte terminates the list; the remaining values in the buffer are irrelevant.
+
+An inventory-loading API call occurs when a value with at least one of the top two bits set is written to
+`wItemAPICommand`. Unlike regular API calls, these calls take no arguments and have no return values.
+
+The ID of the API call (that is, the value written to `wItemAPICommand`) determines which page to load. If the top bit
+of the ID is set, the call loads a bag page; the bottom seven bits determine the page number (0-127). Otherwise, if
+the top bit is clear but the following bit (bit 6) is set, the call loads a PC page; the bottom six bits determine the
+page number (0-63) in this case. (If both top bits are clear, the call is not an inventory-loading call.)
+
+The controller must load the inventory page in the buffer beginning at `wNumItems`. Additionally, if the item page has
+a name, the controller can load that name in the buffer at `wItemAPIBuffer`; the name must be written in the game's
+encoding, terminated with a `'@'` (`$50`) character, and it must be at most 12 characters long (not including the
+terminator).
+
+The results of these calls are as follows:
+
+* **false:** failed to load the item page. Nothing was loaded, neither the contents nor the name; the game treats this
+as a blank unnamed page.
+* **true:** both the item page's contents and the page's name were loaded.
+* **null:** the item page's contents were loaded, but the page has no name. Nothing was written to `wItemAPIBuffer`.
