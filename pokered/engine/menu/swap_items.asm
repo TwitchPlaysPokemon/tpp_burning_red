@@ -38,6 +38,7 @@ HandleItemListSwapping:
 	ld c, 20
 	call DelayFrames
 .jump_to_loop
+	callba LoadItemListFromAPI
 	jp DisplayListMenuIDLoop
 
 .swapItems
@@ -51,18 +52,20 @@ HandleItemListSwapping:
 	ld c, a
 	ld a, [wMenuItemToSwap]
 	cp b ; is the currently selected item the same as the first item to swap?
-	jr nz, .do_swap
 	ld a, [wMenuItemPageToSwap]
+	jr nz, .do_swap
 	cp c
 	jr z, .jump_to_loop ; ignore attempts to swap an item with itself
 .do_swap
 	ld hl, wItemAPIBuffer
 	ld [hli], a
 	ld a, [wMenuItemToSwap]
+	dec a
 	ld [hli], a
-	ld a, b
+	ld a, c
 	ld [hli], a
-	ld [hl], c
+	dec b
+	ld [hl], b
 	ld a, [wCurrentItemList]
 	and a
 	ld a, ITEMAPI_SWAP_ITEMS
@@ -75,7 +78,6 @@ HandleItemListSwapping:
 	xor a
 	ld [wListScrollOffset], a
 	ld [wCurrentMenuItem], a
-	callba LoadItemListFromAPI
 .done
 	xor a
 	ld [wMenuItemToSwap], a
