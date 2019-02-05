@@ -85,6 +85,9 @@ Note that in the following descriptions, the term "return values" refers to valu
 
 With the exception of the unlocking key for `UNLOCK`, all arguments and return values are one byte long.
 
+For functions that refer to specific locations within the inventory, page numbers and stack numbers both start at 0.
+Page numbers may go up to 63 for the bag and 31 for the PC; stack numbers may go up to 59.
+
 ### `LOCK`
 
 **Arguments:** none.
@@ -160,3 +163,53 @@ item should be added wherever there is room for it.
 * **false:** failed to add the item to the bag.
 * **true:** the item was added successfully.
 * **null:** no-op call (e.g., quantity was zero); this is treated as a success.
+
+### `HAS_ITEM`
+
+**Arguments:** item ID, quantity.
+
+**Return values:** page number, stack number, quantity. (Only returned when the result is true.)
+
+**Effects:** determines whether the player has a given quantity of a certain item in the bag. If they do, it returns
+the location of an item stack that has at least the requested quantity of the item.
+
+**Results:**
+
+* **false:** the player does not have a stack of the requested item with at least the requested quantity.
+* **true:** a stack with at least the requested quantity of the requested item was found.
+* **null:** nothing to search for; e.g., quantity is zero.
+
+### `REMOVE_ITEM`
+
+**Arguments:** stack number, quantity, page number.
+
+**Return values:** new page number, page size. (Only returned when the result is null.)
+
+**Effects:** removes items from a specific stack of items in the bag. Note that the stack is identified by its
+position, not by item ID. Note that this call returns true or null depending on whether items remain on the stack
+after removing some or not; if the call returns null, the game may need to relocate the item cursor in the bag after
+removing the items. Therefore, when the call returns null, the new active page number and the number of item stacks in
+that page are returned; the new active page may be the same as the requested one, or any other.
+
+**Results:**
+
+* **false:** failed to remove items from the stack.
+* **true:** the items were removed from the stack; this did not empty the stack.
+* **null:** the items were removed from the stack, removing the whole stack. The new active page number and its size
+are returned in the return values.
+
+### `CAN_GET_PC_ITEM`
+
+This call is equivalent to `CAN_GET_ITEM`, but for the PC instead of the bag.
+
+### `ADD_ITEM_TO_PC`
+
+This call is equivalent to `ADD_ITEM`, but for the PC instead of the bag.
+
+### `HAS_ITEM_IN_PC`
+
+This call is equivalent to `HAS_ITEM`, but for the PC instead of the bag.
+
+### `REMOVE_ITEM_FROM_PC`
+
+This call is equivalent to `REMOVE_ITEM`, but for the PC instead of the bag.
