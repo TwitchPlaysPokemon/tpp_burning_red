@@ -87,7 +87,7 @@ _TM21NoRoomText::
 _CeladonGymBattleText2::
 	text "Hey!"
 
-	para "You are not"
+	para "Only real ladies're"
 	line "allowed in here!"
 	done
 
@@ -123,19 +123,21 @@ _CeladonGymAfterBattleText3::
 	done
 
 _CeladonGymBattleText4::
-	text "Aren't you the"
-	line "peeping Tom?"
+	text "Weren't you"
+	line "peeking in here"
+	cont "earlier?"
 	done
 
 _CeladonGymEndBattleText4::
-	text "I'm"
-	line "in shock!"
+	text "You're"
+	line "an eye-opener!"
 	prompt
 
 _CeladonGymAfterBattleText4::
-	text "Oh, you weren't"
-	line "peeping? We get a"
-	cont "lot of gawkers!"
+	text "Oh, you were"
+	line "looking at ERIKA?"
+	cont "You weren't"
+	cont "looking at me?"
 	done
 
 _CeladonGymBattleText5::
@@ -202,7 +204,8 @@ _CeladonGymBattleText8::
 
 	para "You better not"
 	line "underestimate"
-	cont "girl power!"
+	cont "all the nice"
+	cont "ladies here!"
 	done
 
 _CeladonGymEndBattleText8::
