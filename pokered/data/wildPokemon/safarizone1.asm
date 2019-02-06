@@ -1,6 +1,6 @@
 ZoneMons1:
 	db $1E
-	IF DEF(_RED)
+	IF _RED
 		db 24,NIDORAN_M
 		db 26,DODUO
 		db 22,PARAS
@@ -12,7 +12,7 @@ ZoneMons1:
 		db 25,KANGASKHAN
 		db 28,SCYTHER
 	ENDC
-	IF DEF(_BLUE)
+	IF _BLUE
 		db 24,NIDORAN_F
 		db 26,DODUO
 		db 22,PARAS

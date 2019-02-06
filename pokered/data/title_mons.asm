@@ -1,6 +1,6 @@
 TitleMons:
 ; mons on the title screen are randomly chosen from here
-IF DEF(_RED)
+IF _RED
 	db CHARMANDER
 	db SQUIRTLE
 	db BULBASAUR
@@ -18,7 +18,7 @@ IF DEF(_RED)
 	db PONYTA
 	db MAGIKARP
 ENDC
-IF DEF(_GREEN)
+IF _GREEN
 	db BULBASAUR
 	db CHARMANDER
 	db SQUIRTLE
@@ -36,7 +36,7 @@ IF DEF(_GREEN)
 	db PONYTA
 	db MAGIKARP
 ENDC
-IF DEF(_BLUE)
+IF _BLUE
 	db SQUIRTLE
 	db CHARMANDER
 	db BULBASAUR

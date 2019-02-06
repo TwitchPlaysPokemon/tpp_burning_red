@@ -1,6 +1,6 @@
 Route24Mons:
 	db $19
-	IF DEF(_RED)
+	IF _RED
 		db 7,WEEDLE
 		db 8,KAKUNA
 		db 12,PIDGEY
@@ -12,7 +12,7 @@ Route24Mons:
 		db 8,ABRA
 		db 12,ABRA
 	ENDC
-	IF DEF(_BLUE)
+	IF _BLUE
 		db 7,CATERPIE
 		db 8,METAPOD
 		db 12,PIDGEY

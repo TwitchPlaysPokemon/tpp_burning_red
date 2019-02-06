@@ -1,6 +1,6 @@
 MansionMonsB1:
 	db $0A
-	IF DEF(_RED)
+	IF _RED
 		db 33,KOFFING
 		db 31,KOFFING
 		db 35,GROWLITHE
@@ -12,7 +12,7 @@ MansionMonsB1:
 		db 42,WEEZING
 		db 42,MUK
 	ENDC
-	IF DEF(_BLUE)
+	IF _BLUE
 		db 33,GRIMER
 		db 31,GRIMER
 		db 35,VULPIX

@@ -1,6 +1,6 @@
 Route10Mons:
 	db $0F
-	IF DEF(_RED)
+	IF _RED
 		db 16,VOLTORB
 		db 16,SPEAROW
 		db 14,VOLTORB
@@ -12,7 +12,7 @@ Route10Mons:
 		db 13,EKANS
 		db 17,EKANS
 	ENDC
-	IF DEF(_BLUE)
+	IF _BLUE
 		db 16,VOLTORB
 		db 16,SPEAROW
 		db 14,VOLTORB

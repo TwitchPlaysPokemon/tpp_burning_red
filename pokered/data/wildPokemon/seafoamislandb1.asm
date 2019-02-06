@@ -1,6 +1,6 @@
 IslandMonsB1:
 	db $0A
-	IF DEF(_RED)
+	IF _RED
 		db 30,STARYU
 		db 30,HORSEA
 		db 32,SHELLDER
@@ -12,7 +12,7 @@ IslandMonsB1:
 		db 38,DEWGONG
 		db 37,SEADRA
 	ENDC
-	IF DEF(_BLUE)
+	IF _BLUE
 		db 30,SHELLDER
 		db 30,KRABBY
 		db 32,STARYU

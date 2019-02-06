@@ -1,3 +1,4 @@
+INCLUDE "buildflags.asm"
 INCLUDE "charmap.asm"
 
 INCLUDE "constants/text_constants.asm"

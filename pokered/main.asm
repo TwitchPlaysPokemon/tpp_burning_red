@@ -1,3 +1,4 @@
+INCLUDE "buildflags.asm"
 INCLUDE "constants.asm"
 
 NPC_SPRITES_1 EQU $4
@@ -193,7 +194,7 @@ INCLUDE "engine/menu/status_screen.asm"
 INCLUDE "engine/menu/party_menu.asm"
 
 RedPicFront::
-	IF DEF(_GIRL)
+	IF _GIRL
 		INCBIN "pic/trainer/green.pic"
 	ELSE
 		INCBIN "pic/trainer/red.pic"
@@ -216,14 +217,14 @@ INCLUDE "engine/random.asm"
 SECTION "NPC Sprites 2", ROMX ; BANK $05
 
 RedCyclingSprite:
-	IF DEF(_GIRL)
+	IF _GIRL
 		INCBIN "gfx/sprites/cycling_green.2bpp"
 	ELSE
 		INCBIN "gfx/sprites/cycling.2bpp"
 	ENDC
 
 RedSprite:
-	IF DEF(_GIRL)
+	IF _GIRL
 		INCBIN "gfx/sprites/green.2bpp"
 	ELSE
 		INCBIN "gfx/sprites/red.2bpp"
@@ -831,7 +832,7 @@ StarmiePicFront::      INCBIN "pic/bmon/starmie.pic"
 StarmiePicBack::       INCBIN "pic/monback/starmieb.pic"
 
 RedPicBack::
-	IF DEF(_GIRL)
+	IF _GIRL
 		INCBIN "pic/trainer/greenb.pic"
 	ELSE
 		INCBIN "pic/trainer/redb.pic"
@@ -1902,10 +1903,10 @@ SECTION "bank1A", ROMX
 INCLUDE "engine/battle/decrement_pp.asm"
 
 Version_GFX:
-IF DEF(_RED)
+IF _RED
 	INCBIN "gfx/red/redgreenversion.1bpp" ; 10 tiles
 ENDC
-IF DEF(_BLUE)
+IF _BLUE
 	INCBIN "gfx/blue/blueversion.1bpp" ; 8 tiles
 ENDC
 Version_GFXEnd:
@@ -2108,21 +2109,21 @@ INCLUDE "engine/overworld/cut2.asm"
 INCLUDE "engine/overworld/ssanne.asm"
 
 RedFishingTilesFront:
-	IF DEF(_GIRL)
+	IF _GIRL
 		INCBIN "gfx/green_fishing_tile_front.2bpp"
 	ELSE
 		INCBIN "gfx/red_fishing_tile_front.2bpp"
 	ENDC
 
 RedFishingTilesBack:
-	IF DEF(_GIRL)
+	IF _GIRL
 		INCBIN "gfx/green_fishing_tile_back.2bpp"
 	ELSE
 		INCBIN "gfx/red_fishing_tile_back.2bpp"
 	ENDC
 
 RedFishingTilesSide:
-	IF DEF(_GIRL)
+	IF _GIRL
 		INCBIN "gfx/green_fishing_tile_side.2bpp"
 	ELSE
 		INCBIN "gfx/red_fishing_tile_side.2bpp"

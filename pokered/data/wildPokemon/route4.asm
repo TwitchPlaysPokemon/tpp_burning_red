@@ -1,6 +1,6 @@
 Route4Mons:
 	db $14
-	IF DEF(_RED)
+	IF _RED
 		db 10,RATTATA
 		db 10,SPEAROW
 		db 8,RATTATA
@@ -12,7 +12,7 @@ Route4Mons:
 		db 8,EKANS
 		db 12,EKANS
 	ENDC
-	IF DEF(_BLUE)
+	IF _BLUE
 		db 10,RATTATA
 		db 10,SPEAROW
 		db 8,RATTATA

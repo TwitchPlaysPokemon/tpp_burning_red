@@ -1,6 +1,6 @@
 Route8Mons:
 	db $0F
-	IF DEF(_RED)
+	IF _RED
 		db 18,PIDGEY
 		db 18,MANKEY
 		db 17,EKANS
@@ -12,7 +12,7 @@ Route8Mons:
 		db 15,GROWLITHE
 		db 18,GROWLITHE
 	ENDC
-	IF DEF(_BLUE)
+	IF _BLUE
 		db 18,PIDGEY
 		db 18,MEOWTH
 		db 17,SANDSHREW
