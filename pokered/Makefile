@@ -1,8 +1,4 @@
-roms := pokered.gbc pokeblue.gbc
-
-pokered_obj := audio_red.o main_red.o text_red.o wram_red.o
-pokeblue_obj := audio_blue.o main_blue.o text_blue.o wram_blue.o
-
+pokered_obj := audio.o main.o text.o wram.o
 
 ### Build tools
 
@@ -23,9 +19,7 @@ RGBLINK ?= $(RGBDS)rgblink
 .SECONDARY:
 .PHONY: all red blue clean tidy compare tools
 
-all: $(roms)
-red: pokered.gbc
-blue: pokeblue.gbc
+all: pokered.gbc
 
 # For contributors to make sure a change didn't affect the contents of the rom.
 compare: $(roms)
@@ -53,16 +47,12 @@ endif
 
 %.asm: ;
 
-%_red.o: dep = $(shell tools/scan_includes $(@D)/$*.asm)
-$(pokered_obj): %_red.o: %.asm $$(dep)
-	$(RGBASM) -h -o $@ $*.asm
-
-%_blue.o: dep = $(shell tools/scan_includes $(@D)/$*.asm)
-$(pokeblue_obj): %_blue.o: %.asm $$(dep)
+%.o: dep = $(shell tools/scan_includes $(@D)/$*.asm)
+$(pokered_obj): %.o: %.asm $$(dep)
 	$(RGBASM) -h -o $@ $*.asm
 
 pokered_opt  = -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON RED"
-pokeblue_opt = -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON BLUE"
+#pokeblue_opt = -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON BLUE"
 
 %.gbc: $$(%_obj)
 	$(RGBLINK) -d -n $*.sym -l pokered.link -o $@ $^

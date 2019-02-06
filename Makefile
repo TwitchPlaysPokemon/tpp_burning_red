@@ -6,7 +6,7 @@ build:
 	mkdir -p build
 
 pokered:
-	cd pokered && $(MAKE) red
+	cd pokered && $(MAKE)
 	cp pokered/pokered.gbc build/
 	cp pokered/pokered.sym build/
 
