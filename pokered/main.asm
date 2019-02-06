@@ -23,7 +23,6 @@ INCLUDE "engine/black_out.asm"
 
 MewPicFront:: INCBIN "pic/bmon/mew.pic"
 MewPicBack::  INCBIN "pic/monback/mewb.pic"
-INCLUDE "data/baseStats/mew.asm"
 
 INCLUDE "engine/battle/safari_zone.asm"
 
@@ -916,6 +915,9 @@ INCLUDE "engine/game_corner_slots.asm"
 
 
 SECTION "bankE", ROMX
+
+PhanceroPicFront::     INCBIN "pic/bmon/phancero.pic"
+PhanceroPicBack::      INCBIN "pic/monback/phancerob.pic"
 
 INCLUDE "data/moves.asm"
 BaseStats: INCLUDE "data/base_stats.asm"

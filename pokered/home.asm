@@ -722,6 +722,7 @@ UncompressMonSprite::
 ; define (by index number) the bank that a pokemon's image is in
 ; index = Mew, bank 1
 ; index = Kabutops fossil, bank $B
+; index = Phancero, bank $E
 ; index < $1F, bank 9
 ; $1F ≤ index < $4A, bank $A
 ; $4A ≤ index < $74, bank $B
@@ -735,6 +736,10 @@ UncompressMonSprite::
 	ld a, b
 	cp FOSSIL_KABUTOPS
 	ld a, BANK(FossilKabutopsPic)
+	jr z, .GotBank
+	ld a, b
+	cp PHANCERO
+	ld a, BANK(PhanceroPicFront)
 	jr z, .GotBank
 	ld a, b
 	cp TANGELA + 1
