@@ -1,6 +1,12 @@
-; Set the flags to constants for now. Will fix in the next commit.
+; _BUILD_FLAGS values:
+; bit 0: ROM version (0: Red, 1: Blue)
+; bit 1: player gender (0: boy, 1: girl)
 
-_RED EQU 1
-_BLUE EQU 0
-_GREEN EQU 0
-_GIRL EQU 0
+IF !DEF(_BUILD_FLAGS)
+_BUILD_FLAGS EQU 0
+ENDC
+
+_RED EQU (_BUILD_FLAGS & 1) == 0
+_BLUE EQU (_BUILD_FLAGS & 1) == 1
+_GREEN EQU 0 ;we don't build Green
+_GIRL EQU (_BUILD_FLAGS & 2) == 2

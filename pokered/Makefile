@@ -10,28 +10,27 @@ RGBFIX  ?= $(RGBDS)rgbfix
 RGBGFX  ?= $(RGBDS)rgbgfx
 RGBLINK ?= $(RGBDS)rgblink
 
-
 ### Build targets
 
 .SUFFIXES:
 .SECONDEXPANSION:
 .PRECIOUS:
 .SECONDARY:
-.PHONY: all red blue clean tidy compare tools
+.PHONY: all clean tidy tools
 
-all: pokered.gbc
+roms := pokered.gbc
 
-# For contributors to make sure a change didn't affect the contents of the rom.
-compare: $(roms)
-	@$(MD5) roms.md5
+ROMFLAGS := 0
+
+all: $(roms)
 
 clean:
-	rm -f $(roms) $(pokered_obj) $(pokeblue_obj) $(roms:.gbc=.sym)
+	rm -f $(roms) $(pokered_obj) $(roms:.gbc=.sym)
 	find . \( -iname '*.1bpp' -o -iname '*.2bpp' -o -iname '*.pic' \) -exec rm {} +
 	$(MAKE) clean -C tools/
 
 tidy:
-	rm -f $(roms) $(pokered_obj) $(pokeblue_obj) $(roms:.gbc=.sym)
+	rm -f $(roms) $(pokered_obj) $(roms:.gbc=.sym)
 	$(MAKE) clean -C tools/
 
 tools:
@@ -48,16 +47,19 @@ endif
 %.asm: ;
 
 %.o: dep = $(shell tools/scan_includes $(@D)/$*.asm)
-$(pokered_obj): %.o: %.asm $$(dep)
+%.o: %.asm $$(dep)
 	$(RGBASM) -h -o $@ $*.asm
 
-pokered_opt  = -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON RED"
-#pokeblue_opt = -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON BLUE"
+ifeq (1,$(shell echo $$((1 & $(ROMFLAGS)))))
+pokered_opt := -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON BLUE"
+else
+pokered_opt := -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON RED"
+endif
 
-%.gbc: $$(%_obj)
-	$(RGBLINK) -d -n $*.sym -l pokered.link -o $@ $^
-	$(RGBFIX) $($*_opt) $@
-	sort $*.sym -o $*.sym
+pokered.gbc: $(pokered_obj)
+	$(RGBLINK) -d -n pokered.sym -l pokered.link -o $@ $^
+	$(RGBFIX) $(pokered_opt) $@
+	sort pokered.sym -o pokered.sym
 
 
 ### Misc file-specific graphics rules
