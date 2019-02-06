@@ -216,18 +216,18 @@ INCLUDE "engine/random.asm"
 SECTION "NPC Sprites 2", ROMX ; BANK $05
 
 RedCyclingSprite:
- 	IF DEF(_GIRL)
- 		INCBIN "gfx/sprites/cycling_green.2bpp"
- 	ELSE
- 		INCBIN "gfx/sprites/cycling.2bpp"
- 	ENDC
+	IF DEF(_GIRL)
+		INCBIN "gfx/sprites/cycling_green.2bpp"
+	ELSE
+		INCBIN "gfx/sprites/cycling.2bpp"
+	ENDC
 
-RedSprite:       
- 	IF DEF(_GIRL)
- 		INCBIN "gfx/sprites/green.2bpp"
- 	ELSE
- 		INCBIN "gfx/sprites/red.2bpp"
- 	ENDC
+RedSprite:
+	IF DEF(_GIRL)
+		INCBIN "gfx/sprites/green.2bpp"
+	ELSE
+		INCBIN "gfx/sprites/red.2bpp"
+	ENDC
 
 BlueSprite:           INCBIN "gfx/sprites/blue.2bpp"
 OakSprite:            INCBIN "gfx/sprites/oak.2bpp"
@@ -830,12 +830,12 @@ PidgeotPicBack::       INCBIN "pic/monback/pidgeotb.pic"
 StarmiePicFront::      INCBIN "pic/bmon/starmie.pic"
 StarmiePicBack::       INCBIN "pic/monback/starmieb.pic"
 
-RedPicBack:: 
- 	IF DEF(_GIRL)
- 		INCBIN "pic/trainer/greenb.pic"
- 	ELSE
- 		INCBIN "pic/trainer/redb.pic"
- 	ENDC
+RedPicBack::
+	IF DEF(_GIRL)
+		INCBIN "pic/trainer/greenb.pic"
+	ELSE
+		INCBIN "pic/trainer/redb.pic"
+	ENDC
 
 OldManPic::            INCBIN "pic/trainer/oldman.pic"
 
@@ -2107,26 +2107,26 @@ INCLUDE "engine/overworld/cut2.asm"
 
 INCLUDE "engine/overworld/ssanne.asm"
 
-RedFishingTilesFront: 
+RedFishingTilesFront:
 	IF DEF(_GIRL)
 		INCBIN "gfx/green_fishing_tile_front.2bpp"
- 	ELSE
- 		INCBIN "gfx/red_fishing_tile_front.2bpp"
- 	ENDC
-	 
-RedFishingTilesBack: 
- 	IF DEF(_GIRL)
- 		INCBIN "gfx/green_fishing_tile_back.2bpp"
- 	ELSE
- 		INCBIN "gfx/red_fishing_tile_back.2bpp"
- 	ENDC
+	ELSE
+		INCBIN "gfx/red_fishing_tile_front.2bpp"
+	ENDC
 
-RedFishingTilesSide:  
- 	IF DEF(_GIRL)
- 		INCBIN "gfx/green_fishing_tile_side.2bpp"
- 	ELSE
- 		INCBIN "gfx/red_fishing_tile_side.2bpp"
- 	ENDC
+RedFishingTilesBack:
+	IF DEF(_GIRL)
+		INCBIN "gfx/green_fishing_tile_back.2bpp"
+	ELSE
+		INCBIN "gfx/red_fishing_tile_back.2bpp"
+	ENDC
+
+RedFishingTilesSide:
+	IF DEF(_GIRL)
+		INCBIN "gfx/green_fishing_tile_side.2bpp"
+	ELSE
+		INCBIN "gfx/red_fishing_tile_side.2bpp"
+	ENDC
 
 RedFishingRodTiles:   INCBIN "gfx/red_fishingrod_tiles.2bpp"
 
