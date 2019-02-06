@@ -48,7 +48,7 @@ endif
 
 %.o: dep = $(shell tools/scan_includes $(@D)/$*.asm)
 %.o: %.asm $$(dep)
-	$(RGBASM) -h -o $@ $*.asm
+	$(RGBASM) -h -D_BUILD_FLAGS=$(ROMFLAGS) -o $@ $*.asm
 
 ifeq (1,$(shell echo $$((1 & $(ROMFLAGS)))))
 pokered_opt := -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON BLUE"

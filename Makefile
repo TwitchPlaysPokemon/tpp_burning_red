@@ -6,9 +6,7 @@ build:
 	mkdir -p build
 
 pokered:
-	cd pokered && $(MAKE)
-	cp pokered/pokered.gbc build/
-	cp pokered/pokered.sym build/
+	./pokered.sh
 
 clean:
 	rm -rf build
