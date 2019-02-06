@@ -188,12 +188,21 @@ DisplayIntroNameTextBox:
 	db "NAME@"
 
 IF DEF(_RED)
+IF DEF(_GIRL)
+DefaultNamesPlayer:
+	db   "NEW NAME"
+	next "GREEN"
+	next "LEAF"
+	next "JODI"
+	db   "@"
+ELSE
 DefaultNamesPlayer:
 	db   "NEW NAME"
 	next "RED"
 	next "ASH"
 	next "JACK"
 	db   "@"
+ENDC
 
 DefaultNamesRival:
 	db   "NEW NAME"
@@ -204,12 +213,21 @@ DefaultNamesRival:
 ENDC
 
 IF DEF(_BLUE)
+IF DEF(_GIRL)
+DefaultNamesPlayer:
+	db   "NEW NAME"
+	next "GREEN"
+	next "AMANDA"
+	next "PAULA"
+	db   "@"
+ELSE
 DefaultNamesPlayer:
 	db   "NEW NAME"
 	next "BLUE"
 	next "GARY"
 	next "JOHN"
 	db   "@"
+ENDC
 
 DefaultNamesRival:
 	db   "NEW NAME"
@@ -244,11 +262,19 @@ GetDefaultName:
 	jp CopyData
 
 IF DEF(_RED)
+IF DEF(_GIRL)
+DefaultNamesPlayerList:
+	db "NEW NAME@"
+	db "GREEN@"
+	db "LEAF@"
+	db "JODI@"
+ELSE
 DefaultNamesPlayerList:
 	db "NEW NAME@"
 	db "RED@"
 	db "ASH@"
 	db "JACK@"
+ENDC
 DefaultNamesRivalList:
 	db "NEW NAME@"
 	db "BLUE@"
@@ -256,11 +282,19 @@ DefaultNamesRivalList:
 	db "JOHN@"
 ENDC
 IF DEF(_BLUE)
+IF DEF(_GIRL)
+DefaultNamesPlayerList:
+	db "NEW NAME@"
+	db "GREEN@"
+	db "AMANDA@"
+	db "PAULA@"
+ELSE
 DefaultNamesPlayerList:
 	db "NEW NAME@"
 	db "BLUE@"
 	db "GARY@"
 	db "JOHN@"
+ENDC
 DefaultNamesRivalList:
 	db "NEW NAME@"
 	db "RED@"

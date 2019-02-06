@@ -482,7 +482,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (MANSION_1                  , 0x01, CINNABAR_ISLAND             ) => (0x3B01, 0x01),
         (CINNABAR_GYM               , 0x00, CINNABAR_ISLAND             ) => (0x000C, 0x01),
         (CINNABAR_LAB_1             , 0x00, CINNABAR_ISLAND             ) => (0x010C, 0x01),
-        (CINNABAR_POKECENTER        , 0x00, CINNABAR_ISLAND             ) => (0x050C, 0x01),
+        (CINNABAR_POKECENTER        , 0x00, CINNABAR_ISLAND             ) => (0x050C, 0x00),
         (CINNABAR_MART              , 0x00, CINNABAR_ISLAND             ) => (0x070C, 0x01),
 
         //CINNABAR_POKECENTER
@@ -1490,6 +1490,7 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x4101, 0x06) => (SAFARI_ZONE_NORTH          , 0x06, FUCHSIA_CITY                ),
         (0x4101, 0x07) => (SAFARI_ZONE_NORTH          , 0x07, FUCHSIA_CITY                ),
         (0x3F01, 0x09) => (SAFARI_ZONE_CENTER         , 0x06, FUCHSIA_CITY                ),
+        (0x3F01, 0x0A) => (SAFARI_ZONE_CENTER         , 0x06, FUCHSIA_CITY                ),
         (0x4401, 0x01) => (SAFARI_ZONE_REST_HOUSE_3   , 0x00, FUCHSIA_CITY                ),
 
         //SAFARI_ZONE_NORTH
@@ -1543,7 +1544,7 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x3B01, 0x01) => (MANSION_1                  , 0x01, CINNABAR_ISLAND             ),
         (0x000C, 0x01) => (CINNABAR_GYM               , 0x00, CINNABAR_ISLAND             ),
         (0x010C, 0x01) => (CINNABAR_LAB_1             , 0x00, CINNABAR_ISLAND             ),
-        (0x050C, 0x01) => (CINNABAR_POKECENTER        , 0x00, CINNABAR_ISLAND             ),
+        (0x050C, 0x00) => (CINNABAR_POKECENTER        , 0x00, CINNABAR_ISLAND             ),
         (0x070C, 0x01) => (CINNABAR_MART              , 0x00, CINNABAR_ISLAND             ),
 
         //CINNABAR_POKECENTER
