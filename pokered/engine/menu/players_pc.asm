@@ -103,10 +103,17 @@ ENDC
 .loop
 	ld hl, WhatToDepositText
 	call PrintText
+IF _ITEMAPI
 	ld a, LOW(wNumItems)
 	ld [wListPointer], a
 	ld a, HIGH(wNumItems)
 	ld [wListPointer + 1], a
+ELSE
+	ld a, LOW(wNumBagItems)
+	ld [wListPointer], a
+	ld a, HIGH(wNumBagItems)
+	ld [wListPointer + 1], a
+ENDC
 	xor a
 	ld [wPrintItemPrices], a
 IF _ITEMAPI
@@ -248,7 +255,7 @@ IF _ITEMAPI
 	jr c, .loop
 	jr z, .loop
 ELSE
-	ld a, [wNumItems]
+	ld a, [wNumBoxItems]
 	and a
 	jr nz, .loop
 ENDC

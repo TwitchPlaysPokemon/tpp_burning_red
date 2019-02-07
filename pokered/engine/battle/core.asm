@@ -2302,12 +2302,17 @@ OldManItemList:
 
 DisplayPlayerBag:
 	; get the pointer to player's bag when in a normal battle
+IF _ITEMAPI
 	ld a, LOW(wNumItems)
 	ld [wListPointer], a
 	ld a, HIGH(wNumItems)
 	ld [wListPointer + 1], a
-IF _ITEMAPI
 	xor a
+ELSE
+	ld a, LOW(wNumBagItems)
+	ld [wListPointer], a
+	ld a, HIGH(wNumBagItems)
+	ld [wListPointer + 1], a
 ENDC
 	; fallthrough
 
