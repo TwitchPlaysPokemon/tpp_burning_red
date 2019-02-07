@@ -12,9 +12,9 @@ AddItemToInventory_:
 	push hl
 	ld a, h
 	and a
-	ld a, [hl]
-	jr nz, .got_page
 	ld a, -1
+	jr z, .got_page
+	ld a, [hl]
 .got_page
 	ld hl, wItemAPIBuffer + 2
 	ld [hld], a

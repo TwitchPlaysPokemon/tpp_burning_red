@@ -46,7 +46,9 @@ DisplayPokemartDialogue_:
 
 	ld a, ITEMAPI_IS_BAG_EMPTY
 	call ItemAPI
+	jr c, .not_empty
 	jp nz, .bagEmpty
+.not_empty
 	ld hl, PokemonSellingGreetingText
 	call PrintText
 	call SaveScreenTilesToBuffer1 ; save screen
