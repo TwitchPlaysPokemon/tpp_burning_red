@@ -83,6 +83,10 @@ ExitPlayerPC:
 	ret
 
 PlayerPCDeposit:
+	xor a
+	ld [wCurrentMenuItem], a
+	ld [wListScrollOffset], a
+	ld [wCurrentItemPage], a
 	ld a, ITEMAPI_IS_BAG_EMPTY
 	call ItemAPI
 	jr c, .loop
@@ -139,6 +143,10 @@ PlayerPCDeposit:
 	jr .loop
 
 PlayerPCWithdraw:
+	xor a
+	ld [wCurrentMenuItem], a
+	ld [wListScrollOffset], a
+	ld [wCurrentPCItemPage], a
 	ld a, ITEMAPI_IS_PC_EMPTY
 	call ItemAPI
 	jr c, .loop
