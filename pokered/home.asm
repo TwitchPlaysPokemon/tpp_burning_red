@@ -1319,7 +1319,8 @@ AddAmountSoldToMoney::
 
 ; function to remove an item (in varying quantities) from the player's bag or PC box
 ; INPUT:
-; hl = address of page number: wCurrentItemPage, wCurrentPCItemPage (specific pages)
+; (no item API) hl = address of inventory (either wNumBagItems or wNumBoxItems)
+; (item API)    hl = address of page number: wCurrentItemPage, wCurrentPCItemPage (specific pages)
 ; [wWhichPokemon] = index (within the inventory) of the item to remove
 ; [wItemQuantity] = quantity to remove
 RemoveItemFromInventory::
@@ -1336,7 +1337,9 @@ RemoveItemFromInventory::
 
 ; function to add an item (in varying quantities) to the player's bag or PC box
 ; INPUT:
-; hl = address of page number: wCurrentItemPage, wCurrentPCItemPage (specific pages), LOW(wCurrentItemPage), LOW(wCurrentPCItemPage) (any page)
+; (no item API) hl = address of inventory (either wNumBagItems or wNumBoxItems)
+; (item API)    hl = address of page number: wCurrentItemPage, wCurrentPCItemPage (specific pages),
+;                                            LOW(wCurrentItemPage), LOW(wCurrentPCItemPage) (any page)
 ; [wcf91] = item ID
 ; [wItemQuantity] = item quantity
 ; sets carry flag if successful, unsets carry flag if unsuccessful
@@ -1701,7 +1704,8 @@ UseItem::
 
 ; confirms the item toss and then tosses the item
 ; INPUT:
-; hl = address of page number (wCurrentItemPage or wCurrentPCItemPage)
+; (no item API) hl = address of inventory (either wNumBagItems or wNumBoxItems)
+; (item API)    hl = address of page number (wCurrentItemPage or wCurrentPCItemPage)
 ; [wcf91] = item ID
 ; [wWhichPokemon] = index of item within inventory
 ; [wItemQuantity] = quantity to toss
@@ -3931,7 +3935,11 @@ GiveItem::
 	ld [wcf91], a
 	ld a, c
 	ld [wItemQuantity], a
+IF _ITEMAPI
 	ld hl, LOW(wCurrentItemPage)
+ELSE
+	ld hl, wNumBagItems
+ENDC
 	call AddItemToInventory
 	ret nc
 	call GetItemName
@@ -3963,9 +3971,7 @@ Random::
 	pop hl
 	ret
 
-
 INCLUDE "home/predef.asm"
-
 
 UpdateCinnabarGymGateTileBlocks::
 	jpba UpdateCinnabarGymGateTileBlocks_
