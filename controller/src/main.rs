@@ -1,5 +1,3 @@
-#![feature(plugin)]
-#![plugin(phf_macros)]
 #![allow(clippy::cast_lossless)]
 
 extern crate phf;
@@ -32,8 +30,9 @@ fn main() {
     let bizhawk = bizhawk::Bizhawk::new(5337);
 
     let warp_enable = Arc::new(Mutex::new(false));
+    let system_enable = Arc::new(Mutex::new(false));
 
-    let mut gfx = GfxSystem::new(Arc::clone(&warp_enable));
+    let mut gfx = GfxSystem::new(Arc::clone(&warp_enable), Arc::clone(&system_enable));
 
     thread::Builder::new()
         .name("Gui".to_string())
@@ -42,33 +41,33 @@ fn main() {
         })
         .expect("error: failed to start gui");
 
-    let mut game_state = GameState::from_file(&bizhawk).unwrap();
+    let mut game_state = GameState::from_file().unwrap();
 
-    game_state.get_current_game(&bizhawk);
-    game_state.collect_mapstate(&bizhawk);
+    game_state.get_current_game();
+    game_state.collect_mapstate();
 
     // Frame timing
     let mut current_frame = bizhawk.framecount().unwrap();
 
     loop { 
-        if game_state.enabled {
+        if game_state.enabled || *system_enable.lock().unwrap() {
             if let Ok(frame) = bizhawk.framecount() {
                 if current_frame != frame {
                     current_frame = frame;
                     //println!("{:?}", frame);
-                    game_state.check_for_transition(&bizhawk, current_frame, Arc::clone(&warp_enable));
+                    game_state.check_for_transition(current_frame, Arc::clone(&warp_enable));
                 }
             }
         } else if game_state.game == gamestate::Game::FIRERED {
+            game_state.collect_mapstate();
             // Keep the system disabled until we get oaks parcel 0x015D
             if LittleEndian::read_u16(&bizhawk.read_slice_custom("*03005008+3b8/2".to_string(), 0x02).unwrap()) == 0x015D { // if first slot is oaks parcel
                 println!("Enabling system");
-                game_state.collect_mapstate(&bizhawk);
-                game_state.read_trainer_data(&bizhawk);
+                game_state.read_trainer_data();
                 game_state.enabled = true;
             }
         } else {
-            game_state.collect_mapstate(&bizhawk);
+            game_state.collect_mapstate();
         }
         std::thread::sleep(POLL_DELAY);
     }

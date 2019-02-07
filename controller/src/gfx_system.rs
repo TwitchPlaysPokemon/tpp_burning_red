@@ -14,7 +14,7 @@ use std::thread;
 use self::ButtonType::*;
 
 const WINDOW_WIDTH: u32 = 200;
-const WINDOW_HEIGHT: u32 = 50;
+const WINDOW_HEIGHT: u32 = 90;
 
 const SH_SIZE: i32 = 2; // button shadow size
 
@@ -62,7 +62,8 @@ pub enum Alignment {
 }
 
 enum ButtonType {
-    WarpToggle
+    WarpToggle,
+    SystemToggle
 }
 
 struct Button<'a> {
@@ -92,12 +93,14 @@ impl<'a> Button<'a> {
 
 pub struct GfxSystem {
     warp_enable: Arc<Mutex<bool>>,
+    system_enable: Arc<Mutex<bool>>,
 }
 
 impl GfxSystem {
-    pub fn new(warp_enable: Arc<Mutex<bool>>) -> GfxSystem {
+    pub fn new(warp_enable: Arc<Mutex<bool>>, system_enable: Arc<Mutex<bool>>,) -> GfxSystem {
         GfxSystem {
-            warp_enable
+            warp_enable,
+            system_enable
         }
     }
 
@@ -209,6 +212,15 @@ impl GfxSystem {
                                     pressed: false,
                                     button_type: WarpToggle,
                                     state: false
+                                },
+                                Button {
+                                    rect: rect!(90,50,100,30),
+                                    color: pixels::Color::RGB(0x60, 0x60, 0x60),
+                                    text_color: COLOR_RED,
+                                    text: "Disabled",
+                                    pressed: false,
+                                    button_type: SystemToggle,
+                                    state: false
                                 }];
 
         let window = video_subsystem
@@ -237,6 +249,13 @@ impl GfxSystem {
                          "Warps: ",
                          COLOR_WHITE,
                          rect!(0,10,100,30),
+                         Alignment::Center);
+        
+        self.render_text(&font,
+                        &mut canvas,
+                         "System: ",
+                         COLOR_WHITE,
+                         rect!(0,50,100,30),
                          Alignment::Center);
 
         for i in &button_vec {
@@ -268,6 +287,24 @@ impl GfxSystem {
                                                 canvas.box_(b.x() as i16 - 4, b.y() as i16  - 4, b.x2() as i16  - b.x() as i16  + 4, b.y2() as i16  - b.y() as i16  + 4, COLOR_BG).ok();
                                             } else {
                                                 println!("Warps Enabled");
+                                                *enable = true;
+                                                b.state = true;
+                                                b.text = "Enabled";
+                                                b.text_color = COLOR_GREEN;
+                                            }
+                                        }
+                                    },
+                                    SystemToggle => {
+                                        if let Ok(mut enable) = self.system_enable.lock() {
+                                            if b.state {
+                                                println!("System Disabled");
+                                                *enable = false;
+                                                b.state = false;
+                                                b.text = "Disabled";
+                                                b.text_color = COLOR_RED;
+                                                canvas.box_(b.x() as i16 - 4, b.y() as i16  - 4, b.x2() as i16  - b.x() as i16  + 4, b.y2() as i16  - b.y() as i16  + 4, COLOR_BG).ok();
+                                            } else {
+                                                println!("System Enabled");
                                                 *enable = true;
                                                 b.state = true;
                                                 b.text = "Enabled";

@@ -26,8 +26,6 @@ pub struct GameState {
     pub first_warp: bool
 }
 
-
-
 impl GameState {
     pub fn new() -> GameState {
         GameState {
@@ -48,44 +46,51 @@ impl GameState {
         }
     }
 
-    pub fn from_file(bizhawk: &Bizhawk) -> std::io::Result<GameState> {
+    pub fn from_file() -> std::io::Result<GameState> {
         if let Ok(f) = File::open("GameState") {
             println!("GameState found, loading from disk.\n");
             Ok(bincode::deserialize_from(f).unwrap())
         } else {
             println!("No existing GameState found, using default.\n");
             let mut default = GameState::new();
-            default.get_current_game(bizhawk);
-            default.read_trainer_data(bizhawk);
-            default.collect_mapstate(bizhawk);
+            default.get_current_game();
+            default.read_trainer_data();
+            default.collect_mapstate();
             Ok(default)
         }
     }
 
-    pub fn delay_frames(&mut self, bizhawk: &Bizhawk, frames: u32, rewind: bool) {
+    pub fn delay_frames(&mut self, frames: u32, rewind: bool, paused: bool) {
+        let start_delay = BIZHAWK.framecount().unwrap();
 
-        let start_delay = bizhawk.framecount().unwrap();
-
+        if rewind { BIZHAWK.toggle_rewind(true).unwrap(); }
+        if paused {
+            BIZHAWK.play().unwrap();
+        }
         if rewind {
-            while start_delay - bizhawk.framecount().unwrap() < frames {
+            while start_delay - BIZHAWK.framecount().unwrap() < frames {
                 std::thread::sleep(POLL_DELAY);
-            }; // wait 60 frames*/
+            }
+            BIZHAWK.toggle_rewind(false).unwrap();
         } else {
-            while bizhawk.framecount().unwrap() - start_delay < frames {
+            while BIZHAWK.framecount().unwrap() - start_delay < frames {
                 std::thread::sleep(POLL_DELAY);
-            }; // wait 60 frames*/
+            }
+        }
+        if paused {
+            BIZHAWK.pause().unwrap();
         }
     }
 
-    pub fn save_state(&mut self) -> std::io::Result<()> {
+    pub fn save_state(&self) -> std::io::Result<()> {
         //println!("Saving GameState to disk.\n");
         let f = File::create("GameState")?;
         bincode::serialize_into(f, self).unwrap();
         Ok(())
     }
 
-    pub fn get_current_game(&mut self, bizhawk: &Bizhawk) {
-        self.game = if let Ok(name) = bizhawk.get_rom_name() {
+    pub fn get_current_game(&mut self) {
+        self.game = if let Ok(name) = BIZHAWK.get_rom_name() {
             match name.as_str() {
                 "Pokemon - Red Version (USA, Europe)" => Game::RED,
                 "firered" => Game::FIRERED,
@@ -96,12 +101,12 @@ impl GameState {
         };
     }
 
-    pub fn collect_mapstate(&mut self, bizhawk: &Bizhawk) {
+    pub fn collect_mapstate(&mut self) {
         match self.game {
             Game::RED => {
                 self.map_state = MapState {
-                    previous_map: bizhawk.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16,
-                    previous_warp: bizhawk.read_u8(MemRegion::WRAM, 0x142F).unwrap(),
+                    previous_map: BIZHAWK.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16,
+                    previous_warp: BIZHAWK.read_u8(MemRegion::WRAM, 0x142F).unwrap(),
                     previous_lastmap: 0,
                     map_checked: true,
                     last_change: 0
@@ -109,9 +114,9 @@ impl GameState {
             },
             Game::FIRERED => {
                 self.map_state = MapState {
-                    previous_map: bizhawk.read_u16(MemRegion::EWRAM, 0x0003_1DBC).unwrap(),
-                    previous_warp: bizhawk.read_u8(MemRegion::EWRAM, 0x0003_1DBE).unwrap(),
-                    previous_lastmap: bizhawk.read_u32(MemRegion::EWRAM, 0x0003_1DB4).unwrap(),
+                    previous_map: BIZHAWK.read_u16(MemRegion::EWRAM, 0x0003_1DBC).unwrap(),
+                    previous_warp: BIZHAWK.read_u8(MemRegion::EWRAM, 0x0003_1DBE).unwrap(),
+                    previous_lastmap: BIZHAWK.read_u32(MemRegion::EWRAM, 0x0003_1DB4).unwrap(),
                     map_checked: true,
                     last_change: 0
                 }
@@ -120,75 +125,75 @@ impl GameState {
     }
 
     // send the player back through the warp they just came from
-    pub fn warp_rebound(&mut self, bizhawk: &Bizhawk, map: u16, warp: u8, last_map: u8) {
-        bizhawk.pause().unwrap();
+    pub fn warp_rebound(&mut self, map: u16, warp: u8, last_map: u8) {
+        BIZHAWK.pause().unwrap();
         match &self.game {
             Game::FIRERED => { 
 
-                bizhawk.toggle_rewind(true).unwrap();
-                bizhawk.play().unwrap();
-                //bizhawk.unthrottle(0).unwrap();
+                BIZHAWK.toggle_rewind(true).unwrap();
+                BIZHAWK.play().unwrap();
+                //BIZHAWK.unthrottle(0).unwrap();
 
                 let mut entered_menu = false;
-                let start_rewind = bizhawk.framecount().unwrap();
+                let start_rewind = BIZHAWK.framecount().unwrap();
 
                 loop {
-                    let map_data = bizhawk.read_slice(MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
-                    let xy = bizhawk.read_slice(MemRegion::IWRAM, 0x0000_0014, 0x4).unwrap();
+                    let map_data = BIZHAWK.read_slice(MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
+                    let xy = BIZHAWK.read_slice(MemRegion::IWRAM, 0x0000_0014, 0x4).unwrap();
                     if xy[0] == 0x00 && xy[2] == 0x00 {entered_menu = true;}
                     if (LittleEndian::read_u16(&map_data[0x0C..0x0E]) != map || map_data[0x0E] != warp) && 
                         xy[0] % 0x10 == 0x00 && 
                         xy[2] % 0x10 == 0x08 && 
-                        start_rewind - bizhawk.framecount().unwrap() > 10 {
+                        start_rewind - BIZHAWK.framecount().unwrap() > 10 {
 
                         if entered_menu {
-                            self.delay_frames(bizhawk, 30, true);
+                            self.delay_frames(30, true, false);
                         }
                         break;
 
                     }
                     std::thread::sleep(POLL_DELAY);
                 }
-                bizhawk.pause().unwrap();
+                BIZHAWK.pause().unwrap();
 
-                bizhawk.toggle_rewind(false).unwrap();
-                //bizhawk.throttle().unwrap();
+                BIZHAWK.toggle_rewind(false).unwrap();
+                //BIZHAWK.throttle().unwrap();
 
-                let map_data = bizhawk.read_slice(MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
+                let map_data = BIZHAWK.read_slice(MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
 
                 self.map_state.previous_lastmap = LittleEndian::read_u32(&map_data[0x04..0x08]);
                 self.map_state.previous_map = LittleEndian::read_u16(&map_data[0x0C..0x0E]);
                 self.map_state.previous_warp = map_data[0x0E];
 
-                bizhawk.play().unwrap();
+                BIZHAWK.play().unwrap();
             },
             Game::RED => {
-                bizhawk.write_u8(MemRegion::WRAM, 0x1365, last_map).unwrap(); // lastmap
-                bizhawk.write_u8(MemRegion::WRAM, 0x142F, warp).unwrap(); // destination warp
-                bizhawk.write_u8(MemRegion::HRAM, 0x000B, map as u8).unwrap(); // map
-                bizhawk.write_u8(MemRegion::WRAM, 0x135E, map as u8).unwrap(); // map
+                BIZHAWK.write_u8(MemRegion::WRAM, 0x1365, last_map).unwrap(); // lastmap
+                BIZHAWK.write_u8(MemRegion::WRAM, 0x142F, warp).unwrap(); // destination warp
+                BIZHAWK.write_u8(MemRegion::HRAM, 0x000B, map as u8).unwrap(); // map
+                BIZHAWK.write_u8(MemRegion::WRAM, 0x135E, map as u8).unwrap(); // map
 
-                bizhawk.play().unwrap();
+                BIZHAWK.play().unwrap();
 
-                self.map_state.previous_map = bizhawk.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16;
-                self.map_state.previous_warp = bizhawk.read_u8(MemRegion::WRAM, 0x142F).unwrap();
+                self.map_state.previous_map = BIZHAWK.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16;
+                self.map_state.previous_warp = BIZHAWK.read_u8(MemRegion::WRAM, 0x142F).unwrap();
 
-                self.map_state.last_change = bizhawk.framecount().unwrap();
+                self.map_state.last_change = BIZHAWK.framecount().unwrap();
 
                 //println!("--DONE\n");
             }
         }
     }
 
-    pub fn handle_map_change(&mut self, bizhawk: &Bizhawk, map: u16, warp: u8, last_map: u8, warp_enable: Arc<Mutex<bool>>) {
+    pub fn handle_map_change(&mut self, map: u16, warp: u8, last_map: u8, warp_enable: Arc<Mutex<bool>>) {
 
-        bizhawk.pause().unwrap();
+        BIZHAWK.pause().unwrap();
 
         //println!("--Reading party");
 
-        self.read_party(bizhawk);
+        self.read_party();
 
-        self.read_misc(bizhawk);
+        self.read_misc();
 
         let warp_enable = warp_enable.lock().unwrap();
 
@@ -198,123 +203,120 @@ impl GameState {
                     println!("Supported map, starting transition to FIRE RED map: {:04x}, warp: {:02x}", map, warp);
                     //println!("--Loading FIRE RED ROM");
 
-                    bizhawk.load_rom("firered.gba").unwrap();
-                    bizhawk.load_state("firered_warp").unwrap();
+                    BIZHAWK.load_rom("firered.gba").unwrap();
+                    BIZHAWK.load_state("firered_warp").unwrap();
 
                     self.game = Game::FIRERED;
 
-                    self.write_trainer_data(bizhawk);
+                    self.write_trainer_data();
 
-                    self.write_party(bizhawk);
+                    self.write_party();
 
-                    self.write_misc(bizhawk);
+                    self.write_misc();
 
-                    bizhawk.write_u16(MemRegion::EWRAM, 0x0003_1DBC, map).unwrap();
-                    bizhawk.write_u8(MemRegion::EWRAM, 0x0003_1DBE, warp).unwrap();
+                    BIZHAWK.write_u16(MemRegion::EWRAM, 0x0003_1DBC, map).unwrap();
+                    BIZHAWK.write_u8(MemRegion::EWRAM, 0x0003_1DBE, warp).unwrap();
 
-                    bizhawk.frameadvance().unwrap();
+                    BIZHAWK.frameadvance().unwrap();
 
-                    bizhawk.write_u32(MemRegion::EWRAM, 0x0003_1DB4, 0xFFFF_FFFF).unwrap();
+                    BIZHAWK.write_u32(MemRegion::EWRAM, 0x0003_1DB4, 0xFFFF_FFFF).unwrap();
+
+                    //let mut map_state = self.map_state.lock().unwrap();
 
                     self.map_state.previous_lastmap = 0xFFFF_FFFF;
 
-                    bizhawk.play().unwrap();
+                    BIZHAWK.play().unwrap();
 
                     self.map_state.previous_map = map;
                     self.map_state.previous_warp = warp; 
 
-                    self.map_state.last_change = bizhawk.framecount().unwrap();
+                    self.map_state.last_change = BIZHAWK.framecount().unwrap();
 
                     //println!("--DONE\n");
                 },
                 Game::FIRERED => {
-                    bizhawk.mute().unwrap();
+                    BIZHAWK.mute().unwrap();
                     println!("Supported map, starting transition to RED map: {:02x}, warp: {:02x}, Lastmap {:02x}", map, warp, last_map);
 
-                    //println!("--Loading RED ROM");
-
-                    bizhawk.load_rom("red.gbc").unwrap();
+                    BIZHAWK.load_rom("red.gbc").unwrap();
                     if self.first_warp {
-                        bizhawk.load_state("red_default").unwrap();
+                        BIZHAWK.load_state("red_default").unwrap();
                         self.first_warp = false;
                         println!("first warp");
                     } else {
-                        bizhawk.load_state("red_warp").unwrap();
+                        BIZHAWK.load_state("red_warp").unwrap();
                     }
 
                     self.game = Game::RED;
 
-                    let start_warp = bizhawk.framecount().unwrap();
+                    let start_warp = BIZHAWK.framecount().unwrap();
 
-                    self.write_trainer_data(bizhawk);
+                    self.write_trainer_data();
 
-                    self.write_party(bizhawk);
+                    self.write_party();
 
-                    self.write_misc(bizhawk);
+                    self.write_misc();
 
-                    bizhawk.write_u8(MemRegion::WRAM, 0x1365, last_map).unwrap(); // lastmap
-                    bizhawk.write_u8(MemRegion::WRAM, 0x142F, warp).unwrap(); // destination warp
-                    bizhawk.write_u8(MemRegion::HRAM, 0x000B, map as u8).unwrap(); // map
-                    bizhawk.write_u8(MemRegion::WRAM, 0x135E, map as u8).unwrap(); // map
+                    BIZHAWK.write_u8(MemRegion::WRAM, 0x142F, warp).unwrap(); // destination warp
+                    BIZHAWK.write_u8(MemRegion::HRAM, 0x000B, map as u8).unwrap(); // map
+                    BIZHAWK.write_u8(MemRegion::WRAM, 0x135E, map as u8).unwrap(); // map
+                    BIZHAWK.write_u8(MemRegion::WRAM, 0x1367, 0x16).unwrap(); // tileset id
 
-                    bizhawk.stop_drawing().unwrap();
-                    bizhawk.clear_screen(0x00000000).unwrap();
-                    bizhawk.play().unwrap();
-                    bizhawk.unthrottle(0).unwrap();
+                    BIZHAWK.stop_drawing().unwrap();
+                    BIZHAWK.clear_screen(0x00000000).unwrap();
+                    BIZHAWK.play().unwrap();
+                    BIZHAWK.unthrottle(0).unwrap();
                     
-                    while bizhawk.framecount().unwrap() - start_warp < 240 {
-                        bizhawk.write_u8(MemRegion::WRAM, 0x0002, 0x01).unwrap(); // Music
+                    while BIZHAWK.framecount().unwrap() - start_warp < 240 {
+                        BIZHAWK.write_u8(MemRegion::WRAM, 0x0002, 0x01).unwrap(); // Music
                         std::thread::sleep(POLL_DELAY);
                     }; // wait 240 frames
 
-                    bizhawk.throttle().unwrap();
-                    bizhawk.start_drawing().unwrap();
+                    BIZHAWK.throttle().unwrap();
+                    BIZHAWK.start_drawing().unwrap();
 
-                    let current_music = bizhawk.read_u8(MemRegion::WRAM, 0x0FCA).unwrap(); // map
-                    bizhawk.write_slice(MemRegion::WRAM, 0x0fC7, &[current_music, 0x00, 0x00]).unwrap();
+                    let current_music = BIZHAWK.read_u8(MemRegion::WRAM, 0x0FCA).unwrap(); // music
+                    BIZHAWK.write_slice(MemRegion::WRAM, 0x0fC7, &[current_music, 0x00, 0x00]).unwrap();
+                    BIZHAWK.write_u8(MemRegion::WRAM, 0x1365, last_map).unwrap(); // lastmap
 
-                    bizhawk.unmute().unwrap();
+                    BIZHAWK.unmute().unwrap();
 
-                    self.map_state.previous_map = bizhawk.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16;
-                    self.map_state.previous_warp = bizhawk.read_u8(MemRegion::WRAM, 0x142F).unwrap();
+                    self.map_state.previous_map = BIZHAWK.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16;
+                    self.map_state.previous_warp = BIZHAWK.read_u8(MemRegion::WRAM, 0x142F).unwrap();
 
-                    self.map_state.last_change = bizhawk.framecount().unwrap();
-
-                    //println!("--DONE\n");
+                    self.map_state.last_change = BIZHAWK.framecount().unwrap();
                 }
             }
         } else {
-            bizhawk.play().unwrap();
+            BIZHAWK.play().unwrap();
         }
     }
 
-    pub fn check_for_transition(&mut self, bizhawk: &Bizhawk, mut current_frame: u32, warp_enable: Arc<Mutex<bool>>) {
+    pub fn check_for_transition(&mut self, mut current_frame: u32, warp_enable: Arc<Mutex<bool>>) {
         match self.game {
             Game::RED => {
-                let map_data = bizhawk.read_slice(MemRegion::WRAM, 0x1350, 0xFF).unwrap();
+                let map_data = BIZHAWK.read_slice(MemRegion::WRAM, 0x1350, 0xFF).unwrap();
                 let last_map = map_data[0x15];
                 let current_map = map_data[0x0E];
                 let current_warp = map_data[0xDF];
                 
-                if current_map as u16 != self.map_state.previous_map || (current_warp != self.map_state.previous_warp) {
-                    self.map_state.last_change = bizhawk.framecount().unwrap();
+                if current_map as u16 != self.map_state.previous_map || current_warp != self.map_state.previous_warp {
+                    BIZHAWK.pause().unwrap();
+                    BIZHAWK.save_state("red_warp").unwrap();
+                    BIZHAWK.play().unwrap();
+
+                    self.map_state.last_change = BIZHAWK.framecount().unwrap();
                     current_frame = self.map_state.last_change; //  Needed in case the emulator is unthrottled
                     self.map_state.previous_map = current_map as u16;
                     self.map_state.previous_warp = current_warp;
                     self.map_state.map_checked = false;
-                    // If we might be warping, save the state
-                    if RED_FIRERED_WARP_MAP.get(&(current_map, current_warp, last_map)).is_some() {
-                        bizhawk.pause().unwrap(); 
-                        bizhawk.save_state("red_warp").unwrap();
-                        self.save_state().unwrap();
-                    }
-                    bizhawk.play().unwrap();
                 }
 
                 if !self.map_state.map_checked && current_frame - self.map_state.last_change > 18 {
                     if current_warp != 0xFF {println!("Map change detected, Map: {:02x}, Warp: {:02x}, Lastmap {:02x}", current_map, current_warp, last_map)};
                     if let Some(destination) = RED_FIRERED_WARP_MAP.get(&(current_map, current_warp, last_map)) {
-                        self.handle_map_change(&bizhawk, destination.0, destination.1, 0, warp_enable);
+                        self.save_state().unwrap();
+                        self.handle_map_change(destination.0, destination.1, 0, warp_enable);
                     } else if current_warp != 0xFF {
                         println!("Map unknown or not supported.");
                     }
@@ -323,11 +325,11 @@ impl GameState {
                 }
 
                 if current_warp != 0xFF && current_frame - self.map_state.last_change > 120 {
-                    bizhawk.write_u8(MemRegion::WRAM, 0x142F, 0xFF).unwrap();
+                    BIZHAWK.write_u8(MemRegion::WRAM, 0x142F, 0xFF).unwrap();
                 }
             },
             Game::FIRERED => {
-                let map_data = bizhawk.read_slice(MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
+                let map_data = BIZHAWK.read_slice(MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
                 let current_map = LittleEndian::read_u16(&map_data[0x0C..0x0E]);
                 let current_lastmap = LittleEndian::read_u32(&map_data[0x04..0x08]);
                 let current_warp = map_data[0x0E];
@@ -336,16 +338,16 @@ impl GameState {
                     self.map_state.previous_lastmap = current_lastmap;
                     println!("Map change detected, Map: {:04x}, Warp: {:02x}", current_map, current_warp);
                     if let Some(destination) = FIRERED_RED_WARP_MAP.get(&(current_map, current_warp)) {
-                        bizhawk.pause().unwrap();
-                        bizhawk.framerewind().unwrap();
-                        bizhawk.save_state("firered_warp").unwrap();
+                        BIZHAWK.pause().unwrap();
+                        BIZHAWK.framerewind().unwrap();
+                        BIZHAWK.save_state("firered_warp").unwrap();
                         self.save_state().unwrap();
-                        //self.warp_rebound(&bizhawk, current_map, current_warp, 0x00);
-                        self.handle_map_change(&bizhawk, destination.0 as u16, destination.1, destination.2, warp_enable);
+                        //self.warp_rebound(&BIZHAWK, current_map, current_warp, 0x00);
+                        self.handle_map_change(destination.0 as u16, destination.1, destination.2, warp_enable);
                     } else {
-                        bizhawk.play().unwrap();
+                        BIZHAWK.play().unwrap();
                         println!("Map unknown or not supported.");
-                        //self.warp_rebound(&bizhawk, current_map, current_warp, 0x00);
+                        //self.warp_rebound(&BIZHAWK, current_map, current_warp, 0x00);
                     }
                     self.map_state.map_checked = true;
                 } else {
@@ -355,14 +357,14 @@ impl GameState {
         }
     }
 
-    pub fn read_party(&mut self, bizhawk: &Bizhawk) {
+    pub fn read_party(&mut self) {
         match &self.game {
             Game::RED => {
-                let party_count = bizhawk.read_u8(MemRegion::WRAM, 0x1163).unwrap() as u32;
+                let party_count = BIZHAWK.read_u8(MemRegion::WRAM, 0x1163).unwrap() as u32;
                 for i in 0..6 {
                     if i < party_count {
-                        let pk1 = &bizhawk.read_slice(MemRegion::WRAM, 0x116B + (44*i), 44).unwrap();
-                        let nickname = &bizhawk.read_slice(MemRegion::WRAM, 0x12B5 + (11*i), 11).unwrap();
+                        let pk1 = &BIZHAWK.read_slice(MemRegion::WRAM, 0x116B + (44*i), 44).unwrap();
+                        let nickname = &BIZHAWK.read_slice(MemRegion::WRAM, 0x12B5 + (11*i), 11).unwrap();
 
                         let mut uid = get_uid(RED_FIRERED_SPECIES[pk1[0x00] as usize], pk1[0x07]);
 
@@ -393,10 +395,10 @@ impl GameState {
             },
             Game::FIRERED => {
                 for i in 0..6 {
-                    if bizhawk.read_u16(MemRegion::EWRAM, 0x0002_4284 + 100*i).unwrap() == 0 && bizhawk.read_u16(MemRegion::EWRAM, 0x0002_4284 + 100*i + 4).unwrap() == 0 {
+                    if BIZHAWK.read_u16(MemRegion::EWRAM, 0x0002_4284 + 100*i).unwrap() == 0 && BIZHAWK.read_u16(MemRegion::EWRAM, 0x0002_4284 + 100*i + 4).unwrap() == 0 {
                         self.party_uids[i as usize] = 0x0000;
                     } else {
-                        let pk3 = &bizhawk.read_slice(MemRegion::EWRAM, 0x0002_4284 + 100*i, 100).unwrap();
+                        let pk3 = &BIZHAWK.read_slice(MemRegion::EWRAM, 0x0002_4284 + 100*i, 100).unwrap();
                         let mut decrypted_pk3 = pk3.clone();
                         decrypt_unshuffle_pk3(&mut decrypted_pk3);
 
@@ -432,12 +434,12 @@ impl GameState {
         }
     }
 
-    pub fn write_party(&mut self, bizhawk: &Bizhawk) {
+    pub fn write_party(&mut self) {
         match &self.game {
             Game::RED => {
                 let mut slot = 0;
                 let mut count = 0;
-                let mut data = bizhawk.read_slice(MemRegion::WRAM, 0x1160, 0x1A0).unwrap();
+                let mut data = BIZHAWK.read_slice(MemRegion::WRAM, 0x1160, 0x1A0).unwrap();
                 for i in &self.party_uids {
                     if *i == 0x0000 {
                         data[0x04 + slot] = 0xFF;
@@ -457,17 +459,17 @@ impl GameState {
                     }
                 }
                 data[0x03] = count as u8;
-                bizhawk.write_slice(MemRegion::WRAM, 0x1160, &data).unwrap();
+                BIZHAWK.write_slice(MemRegion::WRAM, 0x1160, &data).unwrap();
             },
             Game::FIRERED => {
                 let mut slot = 0;
                 for i in &self.party_uids {
                     if *i == 0x0000 {
-                        bizhawk.write_slice(MemRegion::EWRAM, 0x0002_4284 + (slot*100), &[0;100]).unwrap();
+                        BIZHAWK.write_slice(MemRegion::EWRAM, 0x0002_4284 + (slot*100), &[0;100]).unwrap();
                         break;
                     } else {
                         let pokemon = &self.pokemon_list.get(i).unwrap();
-                        bizhawk.write_slice(MemRegion::EWRAM, 0x0002_4284 + (slot*100), &pokemon.get_encrypted_pk3().unwrap()).unwrap();
+                        BIZHAWK.write_slice(MemRegion::EWRAM, 0x0002_4284 + (slot*100), &pokemon.get_encrypted_pk3().unwrap()).unwrap();
                         slot += 1;
                     }
                 }
@@ -475,18 +477,18 @@ impl GameState {
         }
     }
 
-    pub fn read_trainer_data(&mut self, bizhawk: &Bizhawk) {
+    pub fn read_trainer_data(&mut self) {
         match &self.game {
             Game::RED => {
-                self.trainer = TrainerInfo::from_gen1(bizhawk.read_u16_be(MemRegion::WRAM, 0x1359).unwrap(),
-                                                      &bizhawk.read_slice(MemRegion::WRAM, 0x1158, 0x07).unwrap(),
-                                                      &bizhawk.read_slice(MemRegion::WRAM, 0x134A, 0x07).unwrap());
+                self.trainer = TrainerInfo::from_gen1(BIZHAWK.read_u16_be(MemRegion::WRAM, 0x1359).unwrap(),
+                                                      &BIZHAWK.read_slice(MemRegion::WRAM, 0x1158, 0x08).unwrap(),
+                                                      &BIZHAWK.read_slice(MemRegion::WRAM, 0x134A, 0x08).unwrap());
             },
             Game::FIRERED => {
-                /*let pointer = bizhawk.read_u32(MemRegion::IWRAM, 0x0300500C).unwrap();
-                let data = bizhawk.read_slice(MemRegion::EWRAM, pointer & 0x00FFFFFF, 0x0F).unwrap();*/
-                let data = bizhawk.read_slice_custom("*0300500C/F".to_string(), 0x0F).unwrap();
-                let rival_name = bizhawk.read_slice_custom("*03005008+3A4C/8".to_string(), 0x08).unwrap();
+                /*let pointer = BIZHAWK.read_u32(MemRegion::IWRAM, 0x0300500C).unwrap();
+                let data = BIZHAWK.read_slice(MemRegion::EWRAM, pointer & 0x00FFFFFF, 0x0F).unwrap();*/
+                let data = BIZHAWK.read_slice_custom("*0300500C/F".to_string(), 0x0F).unwrap();
+                let rival_name = BIZHAWK.read_slice_custom("*03005008+3A4C/8".to_string(), 0x08).unwrap();
                 self.trainer = TrainerInfo::from_gen3(LittleEndian::read_u16(&data[0x0A..0x0C]),
                                                       LittleEndian::read_u16(&data[0x0C..0x0E]),
                                                       &data[0x00..0x08],
@@ -495,79 +497,79 @@ impl GameState {
         }
     }
 
-    pub fn write_trainer_data(&mut self, bizhawk: &Bizhawk) {
+    pub fn write_trainer_data(&mut self) {
         match &self.game {
             Game::RED => {
-                bizhawk.write_u16_be(MemRegion::WRAM, 0x1359, self.trainer.tid).unwrap();
-                bizhawk.write_slice(MemRegion::WRAM, 0x1158, &self.trainer.gen_1_name).unwrap();
-                bizhawk.write_slice(MemRegion::WRAM, 0x134A, &self.trainer.gen_1_rival_name).unwrap();
+                BIZHAWK.write_u16_be(MemRegion::WRAM, 0x1359, self.trainer.tid).unwrap();
+                BIZHAWK.write_slice(MemRegion::WRAM, 0x1158, &self.trainer.gen_1_name).unwrap();
+                BIZHAWK.write_slice(MemRegion::WRAM, 0x134A, &self.trainer.gen_1_rival_name).unwrap();
             },
             Game::FIRERED => {
-                let pointer1 = bizhawk.read_u32(MemRegion::IWRAM, 0x500C).unwrap() & 0x00FFFFFF;
-                let pointer2 = bizhawk.read_u32(MemRegion::IWRAM, 0x5008).unwrap() & 0x00FFFFFF;
+                let pointer1 = BIZHAWK.read_u32(MemRegion::IWRAM, 0x500C).unwrap() & 0x00FFFFFF;
+                let pointer2 = BIZHAWK.read_u32(MemRegion::IWRAM, 0x5008).unwrap() & 0x00FFFFFF;
 
-                bizhawk.write_u16(MemRegion::EWRAM, pointer1 + 0x0A, self.trainer.tid).unwrap();
-                bizhawk.write_u16(MemRegion::EWRAM, pointer1 + 0x0C, self.trainer.sid).unwrap();
-                bizhawk.write_slice(MemRegion::EWRAM, pointer1 + 0x00, &self.trainer.gen_3_name).unwrap();
-                bizhawk.write_slice(MemRegion::EWRAM, pointer2 + 0x3A4C, &self.trainer.gen_3_rival_name).unwrap();
+                BIZHAWK.write_u16(MemRegion::EWRAM, pointer1 + 0x0A, self.trainer.tid).unwrap();
+                BIZHAWK.write_u16(MemRegion::EWRAM, pointer1 + 0x0C, self.trainer.sid).unwrap();
+                BIZHAWK.write_slice(MemRegion::EWRAM, pointer1 + 0x00, &self.trainer.gen_3_name).unwrap();
+                BIZHAWK.write_slice(MemRegion::EWRAM, pointer2 + 0x3A4C, &self.trainer.gen_3_rival_name).unwrap();
             }
         }
     }
 
-    pub fn read_misc(&mut self, bizhawk: &Bizhawk) {
+    pub fn read_misc(&mut self) {
         match &self.game {
             Game::RED => {
-                let options_byte = bizhawk.read_u8(MemRegion::WRAM, 0x1355).unwrap();
+                let options_byte = BIZHAWK.read_u8(MemRegion::WRAM, 0x1355).unwrap();
 
                 self.options.text_speed = options_byte & 0x0F;
                 self.options.animations = options_byte & 0x80 == 0x00;
                 self.options.switching = options_byte & 0x40 == 0x00;
                 
-                self.money = u32::from_str_radix(&format!("{:06x}", bizhawk.read_u32_be(MemRegion::WRAM, 0x1347).unwrap() >> 8), 10).unwrap_or(0); // BCD
+                self.money = u32::from_str_radix(&format!("{:06x}", BIZHAWK.read_u32_be(MemRegion::WRAM, 0x1347).unwrap() >> 8), 10).unwrap_or(0); // BCD
 
-                self.owned.copy_from_slice(&bizhawk.read_slice(MemRegion::WRAM, 0x12f7, 19).unwrap());
-                self.seen.copy_from_slice(&bizhawk.read_slice(MemRegion::WRAM, 0x130a, 19).unwrap());
+                self.owned.copy_from_slice(&BIZHAWK.read_slice(MemRegion::WRAM, 0x12f7, 19).unwrap());
+                self.seen.copy_from_slice(&BIZHAWK.read_slice(MemRegion::WRAM, 0x130a, 19).unwrap());
             },
             Game::FIRERED => {
-                let options_word = LittleEndian::read_u16(&bizhawk.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap());
+                let options_word = LittleEndian::read_u16(&BIZHAWK.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap());
 
                 self.options.text_speed = ((0x03 - (options_word & 0x0003) as u8) * 2) - 1; // convert to red text speed
                 self.options.animations = options_word & 0x0400 == 0x0000;
                 self.options.switching = options_word & 0x0200 == 0x0000;
 
-                let key = LittleEndian::read_u32(&bizhawk.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap());
-                self.money = LittleEndian::read_u32(&bizhawk.read_slice_custom("*03005008+290/4".to_string(), 0x04).unwrap()) ^ key;
+                let key = LittleEndian::read_u32(&BIZHAWK.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap());
+                self.money = LittleEndian::read_u32(&BIZHAWK.read_slice_custom("*03005008+290/4".to_string(), 0x04).unwrap()) ^ key;
 
-                self.owned.copy_from_slice(&bizhawk.read_slice_custom("*0300500C+28/13".to_string(), 19).unwrap());
-                self.seen.copy_from_slice(&bizhawk.read_slice_custom("*0300500C+5C/13".to_string(), 19).unwrap());
+                self.owned.copy_from_slice(&BIZHAWK.read_slice_custom("*0300500C+28/13".to_string(), 19).unwrap());
+                self.seen.copy_from_slice(&BIZHAWK.read_slice_custom("*0300500C+5C/13".to_string(), 19).unwrap());
             }
         }
     }
 
-    pub fn write_misc(&mut self, bizhawk: &Bizhawk) {
+    pub fn write_misc(&mut self) {
         match &self.game {
             Game::RED => {
                 let options_byte = (self.options.text_speed & 0x0F) | 
                                    (if self.options.animations { 0x00 } else { 0x80 }) |
                                    (if self.options.switching { 0x00 } else { 0x40 });
 
-                bizhawk.write_u8(MemRegion::WRAM, 0x1355, options_byte).unwrap();
+                BIZHAWK.write_u8(MemRegion::WRAM, 0x1355, options_byte).unwrap();
 
                 let mut money_vec = vec![0;3];
 
                 LittleEndian::write_u24(&mut money_vec, u32::from_str_radix(&format!("{:06}", self.money), 16).unwrap());
 
-                bizhawk.write_slice(MemRegion::WRAM, 0x1347, &money_vec).unwrap(); // BCD
+                BIZHAWK.write_slice(MemRegion::WRAM, 0x1347, &money_vec).unwrap(); // BCD
 
-                bizhawk.write_slice(MemRegion::WRAM, 0x12f7, &self.owned).unwrap();
-                bizhawk.write_slice(MemRegion::WRAM, 0x130a, &self.seen).unwrap();
+                BIZHAWK.write_slice(MemRegion::WRAM, 0x12f7, &self.owned).unwrap();
+                BIZHAWK.write_slice(MemRegion::WRAM, 0x130a, &self.seen).unwrap();
             },
             Game::FIRERED => {
-                let pointer1 = bizhawk.read_u32(MemRegion::IWRAM, 0x500C).unwrap() & 0x00FFFFFF;
-                let pointer2 = bizhawk.read_u32(MemRegion::IWRAM, 0x5008).unwrap() & 0x00FFFFFF;
+                let pointer1 = BIZHAWK.read_u32(MemRegion::IWRAM, 0x500C).unwrap() & 0x00FFFFFF;
+                let pointer2 = BIZHAWK.read_u32(MemRegion::IWRAM, 0x5008).unwrap() & 0x00FFFFFF;
 
                 // get the byte with the options we change from the game masked off
-                let mut options_word = LittleEndian::read_u16(&bizhawk.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap()) & 0xF9FC;
+                let mut options_word = LittleEndian::read_u16(&BIZHAWK.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap()) & 0xF9FC;
 
                 // apply our options
                 options_word |= ((0x03 - ((self.options.text_speed as u16 + 1) / 2)) & 0x0003) | 
@@ -575,27 +577,27 @@ impl GameState {
                                 (if self.options.switching { 0x0000 } else { 0x0200 });
 
                 // write it back
-                bizhawk.write_u16(MemRegion::EWRAM, pointer1 + 0x14, options_word).unwrap();
+                BIZHAWK.write_u16(MemRegion::EWRAM, pointer1 + 0x14, options_word).unwrap();
 
-                let key = LittleEndian::read_u32(&bizhawk.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap());
+                let key = LittleEndian::read_u32(&BIZHAWK.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap());
 
-                bizhawk.write_u32(MemRegion::EWRAM, pointer2 + 0x290, self.money ^ key).unwrap();
+                BIZHAWK.write_u32(MemRegion::EWRAM, pointer2 + 0x290, self.money ^ key).unwrap();
 
-                bizhawk.write_slice(MemRegion::EWRAM, pointer1 + 0x28, &self.owned).unwrap();
-                bizhawk.write_slice(MemRegion::EWRAM, pointer1 + 0x5C, &self.seen).unwrap();
+                BIZHAWK.write_slice(MemRegion::EWRAM, pointer1 + 0x28, &self.owned).unwrap();
+                BIZHAWK.write_slice(MemRegion::EWRAM, pointer1 + 0x5C, &self.seen).unwrap();
             }
         }
     }
 
-    pub fn read_items(&mut self, bizhawk: &Bizhawk) {
+    pub fn read_items(&mut self) {
         match &self.game {
             Game::RED => {
                 // Dont use this function
             },
             Game::FIRERED => {
-                let key = LittleEndian::read_u32(&bizhawk.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap()) as u16;
+                let key = LittleEndian::read_u32(&BIZHAWK.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap()) as u16;
 
-                let mut item_memory = bizhawk.read_slice_custom("*03005008+310/2E8".to_string(), 0x2E8).unwrap();
+                let mut item_memory = BIZHAWK.read_slice_custom("*03005008+310/2E8".to_string(), 0x2E8).unwrap();
 
                 // Decrypt
                 for i in 0..(item_memory.len() / 0x04) {
@@ -644,7 +646,7 @@ impl GameState {
         }
     }
 
-    pub fn write_items(&mut self, bizhawk: &Bizhawk) {
+    pub fn write_items(&mut self) {
         match &self.game {
             Game::RED => {
                 // Dont use this function
@@ -656,7 +658,7 @@ impl GameState {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Default)]
 pub struct MapState {
     previous_map: u16,
     previous_warp: u8,
@@ -760,7 +762,7 @@ impl TrainerInfo {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Default)]
 pub struct Bag {
     pub general: BTreeMap<u16, u16>, // ID, Count
     pub key: BTreeMap<u16, u16>,
