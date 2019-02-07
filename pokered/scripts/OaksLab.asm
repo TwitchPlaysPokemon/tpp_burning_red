@@ -650,6 +650,8 @@ OaksLabScript17:
 OaksLabScript18:
 	ret
 
+IF _ITEMAPI
+
 OaksLabScript_RemoveParcel:
 	ld hl, wItemAPIBuffer + 1
 	ld a, 1
@@ -667,6 +669,30 @@ OaksLabScript_RemoveParcel:
 	ld a, 1
 	ld [wItemQuantity], a
 	jp RemoveItemFromInventory
+
+ELSE
+
+OaksLabScript_RemoveParcel:
+	ld hl, wBagItems
+	ld bc, 0
+.loop
+	ld a, [hli]
+	cp $ff
+	ret z
+	cp OAKS_PARCEL
+	jr z, .foundParcel
+	inc hl
+	inc c
+	jr .loop
+.foundParcel
+	ld hl, wNumBagItems
+	ld a, c
+	ld [wWhichPokemon], a
+	ld a, 1
+	ld [wItemQuantity], a
+	jp RemoveItemFromInventory
+
+ENDC
 
 OaksLabScript_1d02b:
 	ld a, $7c
