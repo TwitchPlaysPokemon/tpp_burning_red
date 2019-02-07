@@ -12,7 +12,9 @@ INCLUDE "constants/pokemon_constants.asm"
 INCLUDE "constants/pokedex_constants.asm"
 INCLUDE "constants/trainer_constants.asm"
 INCLUDE "constants/item_constants.asm"
+IF _ITEMAPI
 INCLUDE "constants/item_api_constants.asm"
+ENDC
 INCLUDE "constants/type_constants.asm"
 INCLUDE "constants/move_constants.asm"
 INCLUDE "constants/move_animation_constants.asm"
