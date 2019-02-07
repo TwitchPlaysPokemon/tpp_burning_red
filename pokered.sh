@@ -1,9 +1,15 @@
 #!/bin/bash
 
-for (( flags = 0 ; flags < 4; flags = flags + 1 )); do
+NUM_ROMS=8
+
+for (( flags = 0 ; flags < NUM_ROMS ; flags = flags + 1 )); do
   pushd pokered
   make clean
   make ROMFLAGS=$flags
+  rv=$?
+  if [ $rv -ne 0 ]; then
+  	exit $rv
+  fi
   cp pokered.gbc ../build/pokered$flags.gbc
   cp pokered.sym ../build/pokered$flags.sym
   popd
