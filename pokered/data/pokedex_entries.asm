@@ -154,7 +154,7 @@ PokedexEntryPointers:
 	dw BulbasaurDexEntry
 	dw VenusaurDexEntry
 	dw TentacruelDexEntry
-	dw MissingNoDexEntry
+	dw PhanceroDexEntry
 	dw GoldeenDexEntry
 	dw SeakingDexEntry
 	dw MissingNoDexEntry
@@ -1089,6 +1089,13 @@ TentacruelDexEntry:
 	db 5,3
 	dw 1210
 	TX_FAR _TentacruelDexEntry
+	db "@"
+
+PhanceroDexEntry:
+	db "GLITCHBIRD@"
+	db 4,9
+	dw 1032
+	TX_FAR _PhanceroDexEntry
 	db "@"
 
 GoldeenDexEntry:

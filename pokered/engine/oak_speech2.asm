@@ -187,8 +187,8 @@ DisplayIntroNameTextBox:
 .namestring
 	db "NAME@"
 
-IF DEF(_RED)
-IF DEF(_GIRL)
+IF _RED
+IF _GIRL
 DefaultNamesPlayer:
 	db   "NEW NAME"
 	next "GREEN"
@@ -212,8 +212,8 @@ DefaultNamesRival:
 	db   "@"
 ENDC
 
-IF DEF(_BLUE)
-IF DEF(_GIRL)
+IF _BLUE
+IF _GIRL
 DefaultNamesPlayer:
 	db   "NEW NAME"
 	next "GREEN"
@@ -261,8 +261,8 @@ GetDefaultName:
 	ld bc, $14
 	jp CopyData
 
-IF DEF(_RED)
-IF DEF(_GIRL)
+IF _RED
+IF _GIRL
 DefaultNamesPlayerList:
 	db "NEW NAME@"
 	db "GREEN@"
@@ -281,8 +281,8 @@ DefaultNamesRivalList:
 	db "GARY@"
 	db "JOHN@"
 ENDC
-IF DEF(_BLUE)
-IF DEF(_GIRL)
+IF _BLUE
+IF _GIRL
 DefaultNamesPlayerList:
 	db "NEW NAME@"
 	db "GREEN@"

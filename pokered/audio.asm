@@ -1,3 +1,4 @@
+INCLUDE "buildflags.asm"
 INCLUDE "constants.asm"
 
 

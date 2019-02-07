@@ -1,6 +1,6 @@
 Route22Mons:
 	db $19
-	IF DEF(_RED)
+	IF _RED
 		db 3,RATTATA
 		db 3,NIDORAN_M
 		db 4,RATTATA
@@ -12,7 +12,7 @@ Route22Mons:
 		db 3,NIDORAN_F
 		db 4,NIDORAN_F
 	ENDC
-	IF DEF(_BLUE)
+	IF _BLUE
 		db 3,RATTATA
 		db 3,NIDORAN_F
 		db 4,RATTATA

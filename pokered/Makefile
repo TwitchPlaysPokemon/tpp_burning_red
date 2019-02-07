@@ -1,8 +1,4 @@
-roms := pokered.gbc pokeblue.gbc
-
-pokered_obj := audio_red.o main_red.o text_red.o wram_red.o
-pokeblue_obj := audio_blue.o main_blue.o text_blue.o wram_blue.o
-
+pokered_obj := audio.o main.o text.o wram.o
 
 ### Build tools
 
@@ -14,30 +10,27 @@ RGBFIX  ?= $(RGBDS)rgbfix
 RGBGFX  ?= $(RGBDS)rgbgfx
 RGBLINK ?= $(RGBDS)rgblink
 
-
 ### Build targets
 
 .SUFFIXES:
 .SECONDEXPANSION:
 .PRECIOUS:
 .SECONDARY:
-.PHONY: all red blue clean tidy compare tools
+.PHONY: all clean tidy tools
+
+roms := pokered.gbc
+
+ROMFLAGS := 0
 
 all: $(roms)
-red: pokered.gbc
-blue: pokeblue.gbc
-
-# For contributors to make sure a change didn't affect the contents of the rom.
-compare: $(roms)
-	@$(MD5) roms.md5
 
 clean:
-	rm -f $(roms) $(pokered_obj) $(pokeblue_obj) $(roms:.gbc=.sym)
+	rm -f $(roms) $(pokered_obj) $(roms:.gbc=.sym)
 	find . \( -iname '*.1bpp' -o -iname '*.2bpp' -o -iname '*.pic' \) -exec rm {} +
 	$(MAKE) clean -C tools/
 
 tidy:
-	rm -f $(roms) $(pokered_obj) $(pokeblue_obj) $(roms:.gbc=.sym)
+	rm -f $(roms) $(pokered_obj) $(roms:.gbc=.sym)
 	$(MAKE) clean -C tools/
 
 tools:
@@ -53,21 +46,20 @@ endif
 
 %.asm: ;
 
-%_red.o: dep = $(shell tools/scan_includes $(@D)/$*.asm)
-$(pokered_obj): %_red.o: %.asm $$(dep)
-	$(RGBASM) -D _RED -h -o $@ $*.asm
+%.o: dep = $(shell tools/scan_includes $(@D)/$*.asm)
+%.o: %.asm $$(dep)
+	$(RGBASM) -h -D_BUILD_FLAGS=$(ROMFLAGS) -o $@ $*.asm
 
-%_blue.o: dep = $(shell tools/scan_includes $(@D)/$*.asm)
-$(pokeblue_obj): %_blue.o: %.asm $$(dep)
-	$(RGBASM) -D _BLUE -h -o $@ $*.asm
+ifeq (1,$(shell echo $$((1 & $(ROMFLAGS)))))
+pokered_opt := -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON BLUE"
+else
+pokered_opt := -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON RED"
+endif
 
-pokered_opt  = -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON RED"
-pokeblue_opt = -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON BLUE"
-
-%.gbc: $$(%_obj)
-	$(RGBLINK) -d -n $*.sym -l pokered.link -o $@ $^
-	$(RGBFIX) $($*_opt) $@
-	sort $*.sym -o $*.sym
+pokered.gbc: $(pokered_obj)
+	$(RGBLINK) -d -n pokered.sym -l pokered.link -o $@ $^
+	$(RGBFIX) $(pokered_opt) $@
+	sort pokered.sym -o pokered.sym
 
 
 ### Misc file-specific graphics rules

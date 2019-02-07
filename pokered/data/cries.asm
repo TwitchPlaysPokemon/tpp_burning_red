@@ -155,7 +155,7 @@ CryData:
 	db $0F, $80, $01; Bulbasaur
 	db $0F, $00, $C0; Venusaur
 	db $1A, $EE, $FF; Tentacruel
-	db $00, $00, $00; MissingNo.
+	db $00, $00, $00; Phancero
 	db $16, $80, $40; Goldeen
 	db $16, $10, $FF; Seaking
 	db $00, $00, $00; MissingNo.

@@ -155,7 +155,7 @@ const_value = 1
 	const BULBASAUR    ; $99
 	const VENUSAUR     ; $9A
 	const TENTACRUEL   ; $9B
-	const MISSINGNO_9C ; $9C
+	const PHANCERO     ; $9C
 	const GOLDEEN      ; $9D
 	const SEAKING      ; $9E
 	const MISSINGNO_9F ; $9F

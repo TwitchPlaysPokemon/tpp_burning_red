@@ -1,6 +1,6 @@
 ZoneMons3:
 	db $1E
-	IF DEF(_RED)
+	IF _RED
 		db 25,NIDORAN_M
 		db 26,DODUO
 		db 23,VENONAT
@@ -12,7 +12,7 @@ ZoneMons3:
 		db 26,TAUROS
 		db 28,KANGASKHAN
 	ENDC
-	IF DEF(_BLUE)
+	IF _BLUE
 		db 25,NIDORAN_F
 		db 26,DODUO
 		db 23,VENONAT

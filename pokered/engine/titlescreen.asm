@@ -117,10 +117,10 @@ DisplayTitleScreen:
 	call SaveScreenTilesToBuffer2
 	call LoadScreenTilesFromBuffer2
 	call EnableLCD
-IF DEF(_RED)
+IF _RED
 	ld a, CHARMANDER ; which Pokemon to show first on the title screen
 ENDC
-IF DEF(_BLUE)
+IF _BLUE
 	ld a, SQUIRTLE ; which Pokemon to show first on the title screen
 ENDC
 
@@ -392,10 +392,10 @@ PrintGameVersionOnTitleScreen:
 
 ; these point to special tiles specifically loaded for that purpose and are not usual text
 VersionOnTitleScreenText:
-IF DEF(_RED)
+IF _RED
 	db $60,$61,$7F,$65,$66,$67,$68,$69,"@" ; "Red Version"
 ENDC
-IF DEF(_BLUE)
+IF _BLUE
 	db $61,$62,$63,$64,$65,$66,$67,$68,"@" ; "Blue Version"
 ENDC
 

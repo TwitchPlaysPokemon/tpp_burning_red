@@ -1,6 +1,6 @@
 ForestMons:
 	db $08
-	IF DEF(_RED)
+	IF _RED
 		db 4,WEEDLE
 		db 5,KAKUNA
 		db 3,WEEDLE
@@ -10,7 +10,7 @@ ForestMons:
 		db 4,METAPOD
 		db 3,CATERPIE
 	ENDC
-	IF DEF(_BLUE)
+	IF _BLUE
 		db 4,CATERPIE
 		db 5,METAPOD
 		db 3,CATERPIE

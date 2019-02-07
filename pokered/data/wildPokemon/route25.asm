@@ -1,6 +1,6 @@
 Route25Mons:
 	db $0F
-	IF DEF(_RED)
+	IF _RED
 		db 8,WEEDLE
 		db 9,KAKUNA
 		db 13,PIDGEY
@@ -12,7 +12,7 @@ Route25Mons:
 		db 7,METAPOD
 		db 8,CATERPIE
 	ENDC
-	IF DEF(_BLUE)
+	IF _BLUE
 		db 8,CATERPIE
 		db 9,METAPOD
 		db 13,PIDGEY

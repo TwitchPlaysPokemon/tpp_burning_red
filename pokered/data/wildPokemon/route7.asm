@@ -1,6 +1,6 @@
 Route7Mons:
 	db $0F
-	IF DEF(_RED)
+	IF _RED
 		db 19,PIDGEY
 		db 19,ODDISH
 		db 17,MANKEY
@@ -12,7 +12,7 @@ Route7Mons:
 		db 19,MANKEY
 		db 20,MANKEY
 	ENDC
-	IF DEF(_BLUE)
+	IF _BLUE
 		db 19,PIDGEY
 		db 19,BELLSPROUT
 		db 17,MEOWTH

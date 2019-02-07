@@ -1278,6 +1278,16 @@ _TentacruelDexEntry::
 	next "immobilize prey"
 	dex
 
+_PhanceroDexEntry::
+	text "A lost bird that"
+	next "creates illusions"
+	next "to protect itself."
+
+	page "Has only been seen"
+	next "during unusual"
+	next "circumstances"
+	dex
+
 _GoldeenDexEntry::
 	text "Its tail fin"
 	next "billows like an"

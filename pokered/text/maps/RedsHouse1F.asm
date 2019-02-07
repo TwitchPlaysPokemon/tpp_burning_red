@@ -1,6 +1,6 @@
 _MomWakeUpText::
 	text "MOM: Right."
-	IF DEF(_GIRL)
+	IF _GIRL
 		line "All girls dream"
 		cont "of traveling."
 	ELSE
@@ -30,7 +30,7 @@ _MomHealText2::
 
 _StandByMeText::
 	text "There's a movie"
-	IF DEF(_GIRL)
+	IF _GIRL
 		line "on TV. A girl"
 		cont "with her hair in"
 		cont "pigtails is walk-"
