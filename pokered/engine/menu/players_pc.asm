@@ -187,10 +187,17 @@ ENDC
 .loop
 	ld hl, WhatToWithdrawText
 	call PrintText
+IF _ITEMAPI
 	ld a, LOW(wNumItems)
 	ld [wListPointer], a
 	ld a, HIGH(wNumItems)
 	ld [wListPointer + 1], a
+ELSE
+	ld a, LOW(wNumBoxItems)
+	ld [wListPointer], a
+	ld a, HIGH(wNumBoxItems)
+	ld [wListPointer + 1], a
+ENDC
 	xor a
 	ld [wPrintItemPrices], a
 IF _ITEMAPI
@@ -265,10 +272,17 @@ ENDC
 .loop
 	ld hl, WhatToTossText
 	call PrintText
+IF _ITEMAPI
 	ld a, LOW(wNumItems)
 	ld [wListPointer], a
 	ld a, HIGH(wNumItems)
 	ld [wListPointer + 1], a
+ELSE
+	ld a, LOW(wNumBoxItems)
+	ld [wListPointer], a
+	ld a, HIGH(wNumBoxItems)
+	ld [wListPointer + 1], a
+ENDC
 	xor a
 	ld [wPrintItemPrices], a
 IF _ITEMAPI
