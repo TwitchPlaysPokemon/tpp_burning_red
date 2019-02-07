@@ -86,11 +86,17 @@ PlayerPCDeposit:
 	xor a
 	ld [wCurrentMenuItem], a
 	ld [wListScrollOffset], a
+IF _ITEMAPI
 	ld [wCurrentItemPage], a
 	ld a, ITEMAPI_IS_BAG_EMPTY
 	call ItemAPI
 	jr c, .loop
 	jr z, .loop
+ELSE
+	ld a, [wNumBagItems]
+	and a
+	jr nz, .loop
+ENDC
 	ld hl, NothingToDepositText
 	call PrintText
 	jp PlayerPCMenu
@@ -103,7 +109,9 @@ PlayerPCDeposit:
 	ld [wListPointer + 1], a
 	xor a
 	ld [wPrintItemPrices], a
+IF _ITEMAPI
 	ld [wCurrentItemList], a
+ENDC
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
 	call DisplayListMenuID
@@ -182,6 +190,7 @@ PlayerPCWithdraw:
 	cp $ff
 	jr z, .loop
 .next
+IF _ITEMAPI
 	ld hl, wItemAPIBuffer
 	ld a, [wCurrentPCItemPage]
 	ld [hli], a
@@ -194,6 +203,14 @@ PlayerPCWithdraw:
 	jr c, .loop
 	ld hl, CantCarryMoreText
 	jr z, .done
+ELSE
+	ld hl, wNumBagItems
+	call AddItemToInventory
+	ld hl, CantCarryMoreText
+	jr nc, .done
+	ld hl, wNumBoxItems
+	call RemoveItemFromInventory
+ENDC
 	call WaitForSoundToFinish
 	ld a, SFX_WITHDRAW_DEPOSIT
 	call PlaySound
@@ -204,10 +221,20 @@ PlayerPCWithdraw:
 	jr .loop
 
 PlayerPCToss:
+	xor a
+	ld [wCurrentMenuItem], a
+	ld [wListScrollOffset], a
+IF _ITEMAPI
+	ld [wCurrentPCItemPage], a
 	ld a, ITEMAPI_IS_PC_EMPTY
 	call ItemAPI
 	jr c, .loop
 	jr z, .loop
+ELSE
+	ld a, [wNumItems]
+	and a
+	jr nz, .loop
+ENDC
 	ld hl, NothingStoredText
 	call PrintText
 	jp PlayerPCMenu
@@ -220,13 +247,19 @@ PlayerPCToss:
 	ld [wListPointer + 1], a
 	xor a
 	ld [wPrintItemPrices], a
+IF _ITEMAPI
 	inc a
 	ld [wCurrentItemList], a
+ENDC
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
+	push hl
 	call DisplayListMenuID
+	pop hl
 	jp c, PlayerPCMenu
+	push hl
 	call IsKeyItem
+	pop hl
 	ld a, 1
 	ld [wItemQuantity], a
 	ld a, [wIsKeyItem]
@@ -244,7 +277,9 @@ PlayerPCToss:
 	cp $ff
 	jr z, .loop
 .next
+IF _ITEMAPI
 	ld hl, wCurrentPCItemPage
+ENDC
 	call TossItem ; disallows tossing key items
 	jr .loop
 
