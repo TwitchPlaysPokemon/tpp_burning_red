@@ -1969,7 +1969,9 @@ INCLUDE "engine/in_game_trades.asm"
 INCLUDE "engine/palettes.asm"
 INCLUDE "engine/save.asm"
 INCLUDE "engine/print_number.asm"
+IF _ITEMAPI
 INCLUDE "engine/items/api.asm"
+ENDC
 
 
 SECTION "bank1D", ROMX

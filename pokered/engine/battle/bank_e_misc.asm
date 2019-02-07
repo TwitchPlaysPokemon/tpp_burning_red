@@ -77,15 +77,21 @@ InitList:
 .notMonster
 	cp INIT_BAG_ITEM_LIST
 	jr nz, .notBag
+IF _ITEMAPI
 	xor a
 	ld [wCurrentItemList], a
 	ld hl, wNumItems
+ELSE
+	ld hl, wNumBagItems
+ENDC
 	ld de, ItemNames
 	ld a, ITEM_NAME
 	jr .done
 .notBag
+IF _ITEMAPI
 	ld a, 2
 	ld [wCurrentItemList], a
+ENDC
 	ld hl, wItemList
 	ld de, ItemNames
 	ld a, ITEM_NAME
