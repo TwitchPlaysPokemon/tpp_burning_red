@@ -129,6 +129,7 @@ ENDC
 	cp $ff
 	jr z, .loop
 .next
+IF _ITEMAPI
 	ld hl, wItemAPIBuffer
 	ld a, [wCurrentItemPage]
 	ld [hli], a
@@ -141,6 +142,14 @@ ENDC
 	jr c, .loop
 	ld hl, NoRoomToStoreText
 	jr z, .done
+ELSE
+	ld hl, wNumBoxItems
+	call AddItemToInventory
+	ld hl, NoRoomToStoreText
+	jr nc, .done
+	ld hl, wNumBagItems
+	call RemoveItemFromInventory
+ENDC
 	call WaitForSoundToFinish
 	ld a, SFX_WITHDRAW_DEPOSIT
 	call PlaySound
@@ -154,11 +163,17 @@ PlayerPCWithdraw:
 	xor a
 	ld [wCurrentMenuItem], a
 	ld [wListScrollOffset], a
+IF _ITEMAPI
 	ld [wCurrentPCItemPage], a
 	ld a, ITEMAPI_IS_PC_EMPTY
 	call ItemAPI
 	jr c, .loop
 	jr z, .loop
+ELSE
+	ld a, [wNumBoxItems]
+	and a
+	jr nz, .loop
+ENDC
 	ld hl, NothingStoredText
 	call PrintText
 	jp PlayerPCMenu
@@ -171,8 +186,10 @@ PlayerPCWithdraw:
 	ld [wListPointer + 1], a
 	xor a
 	ld [wPrintItemPrices], a
+IF _ITEMAPI
 	inc a
 	ld [wCurrentItemList], a
+ENDC
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
 	call DisplayListMenuID
