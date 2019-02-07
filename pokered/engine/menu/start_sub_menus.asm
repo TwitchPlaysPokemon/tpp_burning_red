@@ -307,7 +307,11 @@ StartMenu_Item:
 	call PrintText
 	jr .exitMenu
 .notInCableClubRoom
+IF _ITEMAPI
 	ld bc, wNumItems
+ELSE
+	ld bc, wNumBagItems
+ENDC
 	ld hl, wListPointer
 	ld a, c
 	ld [hli], a
@@ -318,8 +322,10 @@ StartMenu_Item:
 	ld [wListMenuID], a
 	ld a, [wBagSavedMenuItem]
 	ld [wCurrentMenuItem], a
+IF _ITEMAPI
 	xor a
 	ld [wCurrentItemList], a
+ENDC
 	call DisplayListMenuID
 	ld a, [wCurrentMenuItem]
 	ld [wBagSavedMenuItem], a
@@ -434,7 +440,11 @@ StartMenu_Item:
 	inc a
 	jr z, .tossZeroItems
 .skipAskingQuantity
+IF _ITEMAPI
 	ld hl, wCurrentItemPage
+ELSE
+	ld hl, wNumBagItems
+ENDC
 	call TossItem
 .tossZeroItems
 	jp ItemMenuLoop

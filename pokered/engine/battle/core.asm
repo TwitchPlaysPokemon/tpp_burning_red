@@ -2290,7 +2290,9 @@ BagWasSelected:
 	ld [wListPointer], a
 	ld a, HIGH(OldManItemList)
 	ld [wListPointer + 1], a
+IF _ITEMAPI
 	ld a, 2
+ENDC
 	jr DisplayBagMenu
 
 OldManItemList:
@@ -2304,10 +2306,15 @@ DisplayPlayerBag:
 	ld [wListPointer], a
 	ld a, HIGH(wNumItems)
 	ld [wListPointer + 1], a
+IF _ITEMAPI
 	xor a
+ENDC
+	; fallthrough
 
 DisplayBagMenu:
+IF _ITEMAPI
 	ld [wCurrentItemList], a
+ENDC
 	xor a
 	ld [wPrintItemPrices], a
 	ld a, ITEMLISTMENU

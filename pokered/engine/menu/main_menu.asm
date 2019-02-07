@@ -105,6 +105,7 @@ MainMenu:
 	jp nz, .mainMenuLoop ; pressed B
 	jr .inputLoop
 .pressedA
+IF _ITEMAPI
 	call UnlockItemAPI
 .retry
 	ld a, ITEMAPI_LOAD
@@ -112,6 +113,7 @@ MainMenu:
 	jr c, .loaded_items
 	jr z, .retry
 .loaded_items
+ENDC
 	call GBPalWhiteOutWithDelay3
 	call ClearScreen
 	ld a, PLAYER_DIR_DOWN
@@ -314,7 +316,9 @@ LinkCanceledText:
 StartNewGame:
 	ld hl, wd732
 	res 1, [hl]
+IF _ITEMAPI
 	call UnlockItemAPI
+ENDC
 	call OakSpeech
 	ld c, 20
 	call DelayFrames
@@ -719,6 +723,8 @@ CheckForPlayerNameInSRAM:
 	scf
 	ret
 
+IF _ITEMAPI
+
 UnlockItemAPI::
 	xor a
 	ld [wItemAPICommand], a ;ensure that the unlock write is a changing write
@@ -734,3 +740,5 @@ UnlockItemAPI::
 
 .unlock_string
 	db "InitItemAPI@"
+
+ENDC
