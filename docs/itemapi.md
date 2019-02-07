@@ -12,6 +12,9 @@ be informed when the player gains or loses items, deposits them, withdraws them,
     * [`LOCK`](#lock)
     * [`UNLOCK`](#unlock)
     * [`INITIALIZE_ITEM_LISTS`](#initialize_item_lists)
+    * [`ERASE_SAVED_DATA`](#erase-saved-data)
+    * [`SAVE`](#save)
+    * [`LOAD`](#load)
     * [`CAN_GET_ITEM`](#can_get_item)
     * [`ADD_ITEM`](#add_item)
     * [`HAS_ITEM`](#has_item)
@@ -88,6 +91,9 @@ via `wItemAPIBuffer`.
 |`$04`|`LOCK`                  |_(void)_                                     |_(none)_                               |
 |`$05`|`UNLOCK`                |_(unlocking key)_                            |_(none)_                               |
 |`$06`|`INITIALIZE_ITEM_LISTS` |_(void)_                                     |_(none)_                               |
+|`$07`|`ERASE_SAVED_DATA`      |_(void)_                                     |_(none)_                               |
+|`$08`|`SAVE`                  |_(void)_                                     |_(none)_                               |
+|`$09`|`LOAD`                  |_(void)_                                     |_(none)_                               |
 |`$10`|`CAN_GET_ITEM`          |item ID, quantity, page #                    |_(none)_                               |
 |`$11`|`ADD_ITEM`              |item ID, quantity, page #                    |_(none)_                               |
 |`$12`|`HAS_ITEM`              |item ID, quantity                            |page #, index #, quantity              |
@@ -158,6 +164,52 @@ this function is called, the controller should respond to any call.
 * **false:** error when initializing the lists.
 * **true:** lists initialized successfully.
 * **null:** no-op call; the lists were already initialized and empty.
+
+### `ERASE_SAVED_DATA`
+
+**Arguments:** none.
+
+**Return values:** none.
+
+**Effects:** erases saved item data. Note that this doesn't affect the current inventory data; it only affects saved
+data (i.e., what would go into a savefile).
+
+**Results:**
+
+* **false:** could not erase saved data.
+* **true:** saved data erased successfully.
+* **null:** no-op call; there was no saved data.
+
+### `SAVE`
+
+**Arguments:** none.
+
+**Return values:** none.
+
+**Effects:** saves the current item data. The controller should keep track of this data separately, as if it was part
+of the game's savefile.
+
+**Results:**
+
+* **false:** could not save item data.
+* **true:** item data saved successfully.
+* **null:** no-op call; there was nothing to save.
+
+### `LOAD`
+
+**Arguments:** none.
+
+**Return values:** none.
+
+**Effects:** loads the currently saved item data, as if it was being loaded from a savefile. The controller should
+keep track of saved data separately, as if it was part of the game's savefile; this API call loads that data into the
+actual inventories.
+
+**Results:**
+
+* **false:** could not load item data.
+* **true:** item data loaded successfully.
+* **null:** no-op call; there was nothing to load.
 
 ### `CAN_GET_ITEM`
 
