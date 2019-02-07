@@ -152,6 +152,11 @@ SaveSAV:
 	call SaveSAVConfirm
 	and a
 	ret nz
+.retry_items
+	ld a, ITEMAPI_ERASE_SAVED_DATA
+	call ItemAPI
+	jr c, .save
+	jr z, .retry_items
 .save
 	call SaveSAVtoSRAM
 	coord hl, 1, 13
@@ -274,6 +279,12 @@ SaveSAVtoSRAM2:
 SaveSAVtoSRAM:
 	ld a, $2
 	ld [wSaveFileStatus], a
+.retry
+	ld a, ITEMAPI_SAVE
+	call ItemAPI
+	jr c, .saved_items
+	jr z, .retry
+.saved_items
 	call SaveSAVtoSRAM0
 	call SaveSAVtoSRAM1
 	jp SaveSAVtoSRAM2

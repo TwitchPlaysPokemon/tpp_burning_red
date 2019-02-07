@@ -105,9 +105,15 @@ MainMenu:
 	jp nz, .mainMenuLoop ; pressed B
 	jr .inputLoop
 .pressedA
+	call UnlockItemAPI
+.retry
+	ld a, ITEMAPI_LOAD
+	call ItemAPI
+	jr c, .loaded_items
+	jr z, .retry
+.loaded_items
 	call GBPalWhiteOutWithDelay3
 	call ClearScreen
-	call UnlockItemAPI
 	ld a, PLAYER_DIR_DOWN
 	ld [wPlayerDirection], a
 	ld c, 10

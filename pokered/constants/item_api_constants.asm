@@ -9,6 +9,10 @@ const_value = $04
 	const ITEMAPI_UNLOCK ;(key) - key = "InitItemAPI@"
 
 	const ITEMAPI_INITIALIZE_ITEM_LISTS ;(void)
+	const ITEMAPI_ERASE_SAVED_DATA ;(void)
+
+	const ITEMAPI_SAVE ;(void)
+	const ITEMAPI_LOAD ;(void)
 
 const_value = $10
 	const ITEMAPI_CAN_GET_ITEM ;(item, quantity, page)
