@@ -55,14 +55,20 @@ DisplayPokemartDialogue_:
 	ld a, MONEY_BOX
 	ld [wTextBoxID], a
 	call DisplayTextBoxID ; draw money text box
+IF _ITEMAPI
 	ld hl, wNumItems
+ELSE
+	ld hl, wNumBagItems
+ENDC
 	ld a, l
 	ld [wListPointer], a
 	ld a, h
 	ld [wListPointer + 1], a
 	xor a
 	ld [wPrintItemPrices], a
+IF _ITEMAPI
 	ld [wCurrentItemList], a
+ENDC
 	ld [wCurrentMenuItem], a
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
@@ -108,7 +114,11 @@ DisplayPokemartDialogue_:
 	ld [wBoughtOrSoldItemInMart], a
 .skipSettingFlag1
 	call AddAmountSoldToMoney
+IF _ITEMAPI
 	ld hl, wCurrentItemPage
+ELSE
+	ld hl, wNumBagItems
+ENDC
 	call RemoveItemFromInventory
 	jp .sellMenuLoop
 .unsellableItem
@@ -147,7 +157,9 @@ DisplayPokemartDialogue_:
 	ld [wPrintItemPrices], a
 	inc a ; a = 2 (PRICEDITEMLISTMENU)
 	ld [wListMenuID], a
+IF _ITEMAPI
 	ld [wCurrentItemList], a
+ENDC
 	call DisplayListMenuID
 	jr c, .returnToMainPokemartMenu ; if the player closed the menu
 	ld a, 99
@@ -181,7 +193,11 @@ DisplayPokemartDialogue_:
 .buyItem
 	call .isThereEnoughMoney
 	jr c, .notEnoughMoney
+IF _ITEMAPI
 	ld hl, LOW(wCurrentItemPage)
+ELSE
+	ld hl, wNumBagItems
+ENDC
 	call AddItemToInventory
 	jr nc, .bagFull
 	call SubtractAmountPaidFromMoney
