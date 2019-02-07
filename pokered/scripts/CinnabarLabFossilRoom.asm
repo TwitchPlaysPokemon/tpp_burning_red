@@ -5,6 +5,18 @@ CinnabarLabFossilRoom_TextPointers:
 	dw Lab4Text1
 	dw Lab4Text2
 
+IF _ITEMAPI
+
+Lab4Script_GetFossilsInBag:
+; construct a list of all fossils in the player's bag
+	push bc
+	ld de, FossilsList
+	callba GetFilteredItemList
+	pop bc
+	ret
+
+ELSE
+
 Lab4Script_GetFossilsInBag:
 ; construct a list of all fossils in the player's bag
 	xor a
@@ -39,6 +51,8 @@ Lab4Script_GetFossilsInBag:
 	ld a, $ff
 	ld [de], a
 	ret
+
+ENDC
 
 FossilsList:
 	db DOME_FOSSIL

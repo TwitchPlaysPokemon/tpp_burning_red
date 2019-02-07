@@ -2286,11 +2286,13 @@ BagWasSelected:
 	ld a, [wBattleType]
 	dec a ; is it the old man tutorial?
 	jr nz, DisplayPlayerBag ; no, it is a normal battle
-	ld hl, OldManItemList
-	ld a, l
+	ld a, LOW(OldManItemList)
 	ld [wListPointer], a
-	ld a, h
+	ld a, HIGH(OldManItemList)
 	ld [wListPointer + 1], a
+IF _ITEMAPI
+	ld a, 2
+ENDC
 	jr DisplayBagMenu
 
 OldManItemList:
@@ -2300,13 +2302,24 @@ OldManItemList:
 
 DisplayPlayerBag:
 	; get the pointer to player's bag when in a normal battle
-	ld hl, wNumBagItems
-	ld a, l
+IF _ITEMAPI
+	ld a, LOW(wNumItems)
 	ld [wListPointer], a
-	ld a, h
+	ld a, HIGH(wNumItems)
 	ld [wListPointer + 1], a
+	xor a
+ELSE
+	ld a, LOW(wNumBagItems)
+	ld [wListPointer], a
+	ld a, HIGH(wNumBagItems)
+	ld [wListPointer + 1], a
+ENDC
+	; fallthrough
 
 DisplayBagMenu:
+IF _ITEMAPI
+	ld [wCurrentItemList], a
+ENDC
 	xor a
 	ld [wPrintItemPrices], a
 	ld a, ITEMLISTMENU

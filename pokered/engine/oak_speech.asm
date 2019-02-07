@@ -42,7 +42,11 @@ OakSpeech:
 	call LoadTextBoxTilePatterns
 	call SetDefaultNames
 	predef InitPlayerData2
+IF _ITEMAPI
+	ld hl, LOW(wCurrentPCItemPage)
+ELSE
 	ld hl, wNumBoxItems
+ENDC
 	ld a, POTION
 	ld [wcf91], a
 	ld a, 1

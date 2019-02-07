@@ -1,6 +1,18 @@
 CeladonMartRoof_Script:
 	jp EnableAutoTextBoxDrawing
 
+IF _ITEMAPI
+
+CeladonMartRoofScript_GetDrinksInBag:
+; construct a list of all drinks in the player's bag
+	push bc
+	ld de, CeladonMartRoofDrinkList
+	callba GetFilteredItemList
+	pop bc
+	ret
+
+ELSE
+
 CeladonMartRoofScript_GetDrinksInBag:
 ; construct a list of all drinks in the player's bag
 	xor a
@@ -33,6 +45,8 @@ CeladonMartRoofScript_GetDrinksInBag:
 	ld a, $ff
 	ld [de], a
 	ret
+
+ENDC
 
 CeladonMartRoofDrinkList:
 	db FRESH_WATER

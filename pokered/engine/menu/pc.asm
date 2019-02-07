@@ -114,6 +114,28 @@ AccessedMyPCText:
 	TX_FAR _AccessedMyPCText
 	db "@"
 
+IF _ITEMAPI
+
+; removes one of the specified item ID [hItemToRemoveID] from bag (if existent)
+RemoveItemByID:
+	ld a, [hItemToRemoveID]
+	ld hl, wItemAPIBuffer
+	ld [hli], a
+	ld [hl], 1
+	ld a, ITEMAPI_HAS_ITEM
+	call ItemAPI
+	ret c
+	ret z
+	ld a, [hld]
+	ld [wWhichPokemon], a
+	ld a, 1
+	ld [wItemQuantity], a
+	ld a, [hl]
+	call UpdateCurrentItemPage
+	jp RemoveItemFromInventory
+
+ELSE
+
 ; removes one of the specified item ID [hItemToRemoveID] from bag (if existent)
 RemoveItemByID:
 	ld hl, wBagItems
@@ -133,9 +155,11 @@ RemoveItemByID:
 	ld [hItemToRemoveIndex], a
 	jr .loop
 .foundItem
-	ld a, $1
+	ld a, 1
 	ld [wItemQuantity], a
 	ld a, [hItemToRemoveIndex]
 	ld [wWhichPokemon], a
 	ld hl, wNumBagItems
 	jp RemoveItemFromInventory
+
+ENDC

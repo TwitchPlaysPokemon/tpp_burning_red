@@ -19,12 +19,22 @@ SECTION "rst 38", ROM0
 ; Hardware interrupts
 SECTION "vblank", ROM0
 	jp VBlank
+
 SECTION "hblank", ROM0
 	rst $38
+
+EnableLCD::
+	ld a, [rLCDC]
+	set rLCDC_ENABLE, a
+	ld [rLCDC], a
+	ret
+
 SECTION "timer",  ROM0
 	jp Timer
+
 SECTION "serial", ROM0
 	jp Serial
+
 SECTION "joypad", ROM0
 	reti
 
@@ -51,12 +61,6 @@ DisableLCD::
 	ld [rIE], a
 	ret
 
-EnableLCD::
-	ld a, [rLCDC]
-	set rLCDC_ENABLE, a
-	ld [rLCDC], a
-	ret
-
 ClearSprites::
 	xor a
 	ld hl, wOAMBuffer
@@ -81,6 +85,9 @@ HideSprites::
 
 INCLUDE "home/copy.asm"
 
+IF _ITEMAPI
+INCLUDE "home/item_api.asm"
+ENDC
 
 SECTION "Entry", ROM0
 
@@ -250,16 +257,6 @@ DrawHPBar::
 ; wMonHeader = base address of base stats
 LoadMonData::
 	jpab LoadMonData_
-
-OverwritewMoves::
-; Write c to [wMoves + b]. Unused.
-	ld hl, wMoves
-	ld e, b
-	ld d, 0
-	add hl, de
-	ld a, c
-	ld [hl], a
-	ret
 
 LoadFlippedFrontSpriteByMonIndex::
 	ld a, 1
@@ -536,15 +533,6 @@ PrintLevelCommon::
 	ld de, wd11e
 	ld b, LEFT_ALIGN | 1 ; 1 byte
 	jp PrintNumber
-
-GetwMoves::
-; Unused. Returns the move at index a from wMoves in a
-	ld hl, wMoves
-	ld c, a
-	ld b, 0
-	add hl, bc
-	ld a, [hl]
-	ret
 
 ; copies the base stat data of a pokemon to wMonHeader
 ; INPUT:
@@ -1331,7 +1319,8 @@ AddAmountSoldToMoney::
 
 ; function to remove an item (in varying quantities) from the player's bag or PC box
 ; INPUT:
-; HL = address of inventory (either wNumBagItems or wNumBoxItems)
+; (no item API) hl = address of inventory (either wNumBagItems or wNumBoxItems)
+; (item API)    hl = address of page number: wCurrentItemPage, wCurrentPCItemPage (specific pages)
 ; [wWhichPokemon] = index (within the inventory) of the item to remove
 ; [wItemQuantity] = quantity to remove
 RemoveItemFromInventory::
@@ -1348,7 +1337,9 @@ RemoveItemFromInventory::
 
 ; function to add an item (in varying quantities) to the player's bag or PC box
 ; INPUT:
-; HL = address of inventory (either wNumBagItems or wNumBoxItems)
+; (no item API) hl = address of inventory (either wNumBagItems or wNumBoxItems)
+; (item API)    hl = address of page number: wCurrentItemPage, wCurrentPCItemPage (specific pages),
+;                                            LOW(wCurrentItemPage), LOW(wCurrentPCItemPage) (any page)
 ; [wcf91] = item ID
 ; [wItemQuantity] = item quantity
 ; sets carry flag if successful, unsets carry flag if unsuccessful
@@ -1367,199 +1358,11 @@ AddItemToInventory::
 	pop bc
 	ret
 
-; INPUT:
-; [wListMenuID] = list menu ID
-; [wListPointer] = address of the list (2 bytes)
-DisplayListMenuID::
-	xor a
-	ld [H_AUTOBGTRANSFERENABLED], a ; disable auto-transfer
-	ld a, 1
-	ld [hJoy7], a ; joypad state update flag
-	ld a, [wBattleType]
-	and a ; is it the Old Man battle?
-	jr nz, .specialBattleType
-	ld a, $01 ; hardcoded bank
-	jr .bankswitch
-.specialBattleType ; Old Man battle
-	ld a, BANK(DisplayBattleMenu)
-.bankswitch
-	call BankswitchHome
-	ld hl, wd730
-	set 6, [hl] ; turn off letter printing delay
-	xor a
-	ld [wMenuItemToSwap], a ; 0 means no item is currently being swapped
-	ld [wListCount], a
-	ld a, [wListPointer]
-	ld l, a
-	ld a, [wListPointer + 1]
-	ld h, a ; hl = address of the list
-	ld a, [hl] ; the first byte is the number of entries in the list
-	ld [wListCount], a
-	ld a, LIST_MENU_BOX
-	ld [wTextBoxID], a
-	call DisplayTextBoxID ; draw the menu text box
-	call UpdateSprites ; disable sprites behind the text box
-; the code up to .skipMovingSprites appears to be useless
-	coord hl, 4, 2 ; coordinates of upper left corner of menu text box
-	lb de, 9, 14 ; height and width of menu text box
-	ld a, [wListMenuID]
-	and a ; is it a PC pokemon list?
-	jr nz, .skipMovingSprites
-	call UpdateSprites
-.skipMovingSprites
-	ld a, 1 ; max menu item ID is 1 if the list has less than 2 entries
-	ld [wMenuWatchMovingOutOfBounds], a
-	ld a, [wListCount]
-	cp 2 ; does the list have less than 2 entries?
-	jr c, .setMenuVariables
-	ld a, 2 ; max menu item ID is 2 if the list has at least 2 entries
-.setMenuVariables
-	ld [wMaxMenuItem], a
-	ld a, 4
-	ld [wTopMenuItemY], a
-	ld a, 5
-	ld [wTopMenuItemX], a
-	ld a, A_BUTTON | B_BUTTON | SELECT
-	ld [wMenuWatchedKeys], a
-	ld c, 10
-	call DelayFrames
-
-DisplayListMenuIDLoop::
-	xor a
-	ld [H_AUTOBGTRANSFERENABLED], a ; disable transfer
-	call PrintListMenuEntries
-	ld a, 1
-	ld [H_AUTOBGTRANSFERENABLED], a ; enable transfer
-	call Delay3
-	ld a, [wBattleType]
-	and a ; is it the Old Man battle?
-	jr z, .notOldManBattle
-.oldManBattle
-	ld a, "▶"
-	Coorda 5, 4 ; place menu cursor in front of first menu entry
-	ld c, 80
-	call DelayFrames
-	xor a
-	ld [wCurrentMenuItem], a
-	coord hl, 5, 4
-	ld a, l
-	ld [wMenuCursorLocation], a
-	ld a, h
-	ld [wMenuCursorLocation + 1], a
-	jr .buttonAPressed
-.notOldManBattle
-	call LoadGBPal
-	call HandleMenuInput
-	push af
-	call PlaceMenuCursor
-	pop af
-	bit 0, a ; was the A button pressed?
-	jp z, .checkOtherKeys
-.buttonAPressed
-	ld a, [wCurrentMenuItem]
-	call PlaceUnfilledArrowMenuCursor
-
-; pointless because both values are overwritten before they are read
-	ld a, $01
-	ld [wMenuExitMethod], a
-	ld [wChosenMenuItem], a
-
-	xor a
-	ld [wMenuWatchMovingOutOfBounds], a
-	ld a, [wCurrentMenuItem]
-	ld c, a
-	ld a, [wListScrollOffset]
-	add c
-	ld c, a
-	ld a, [wListCount]
-	and a ; is the list empty?
-	jp z, ExitListMenu ; if so, exit the menu
-	dec a
-	cp c ; did the player select Cancel?
-	jp c, ExitListMenu ; if so, exit the menu
-	ld a, c
-	ld [wWhichPokemon], a
-	ld a, [wListMenuID]
-	cp ITEMLISTMENU
-	jr nz, .skipMultiplying
-; if it's an item menu
-	sla c ; item entries are 2 bytes long, so multiply by 2
-.skipMultiplying
-	ld a, [wListPointer]
-	ld l, a
-	ld a, [wListPointer + 1]
-	ld h, a
-	inc hl ; hl = beginning of list entries
-	ld b, 0
-	add hl, bc
-	ld a, [hl]
-	ld [wcf91], a
-	ld a, [wListMenuID]
-	and a ; is it a PC pokemon list?
-	jr z, .pokemonList
-	push hl
-	call GetItemPrice
-	pop hl
-	ld a, [wListMenuID]
-	cp ITEMLISTMENU
-	jr nz, .skipGettingQuantity
-; if it's an item menu
-	inc hl
-	ld a, [hl] ; a = item quantity
-	ld [wMaxItemQuantity], a
-.skipGettingQuantity
-	ld a, [wcf91]
-	ld [wd0b5], a
-	ld a, BANK(ItemNames)
-	ld [wPredefBank], a
-	call GetName
-	jr .storeChosenEntry
-.pokemonList
-	ld hl, wPartyCount
-	ld a, [wListPointer]
-	cp l ; is it a list of party pokemon or box pokemon?
-	ld hl, wPartyMonNicks
-	jr z, .getPokemonName
-	ld hl, wBoxMonNicks ; box pokemon names
-.getPokemonName
-	ld a, [wWhichPokemon]
-	call GetPartyMonName
-.storeChosenEntry ; store the menu entry that the player chose and return
-	ld de, wcd6d
-	call CopyStringToCF4B ; copy name to wcf4b
-	ld a, CHOSE_MENU_ITEM
-	ld [wMenuExitMethod], a
-	ld a, [wCurrentMenuItem]
-	ld [wChosenMenuItem], a
-	xor a
-	ld [hJoy7], a ; joypad state update flag
-	ld hl, wd730
-	res 6, [hl] ; turn on letter printing delay
-	jp BankswitchBack
-.checkOtherKeys ; check B, SELECT, Up, and Down keys
-	bit 1, a ; was the B button pressed?
-	jp nz, ExitListMenu ; if so, exit the menu
-	bit 2, a ; was the select button pressed?
-	jp nz, HandleItemListSwapping ; if so, allow the player to swap menu entries
-	ld b, a
-	bit 7, b ; was Down pressed?
-	ld hl, wListScrollOffset
-	jr z, .upPressed
-.downPressed
-	ld a, [hl]
-	add 3
-	ld b, a
-	ld a, [wListCount]
-	cp b ; will going down scroll past the Cancel button?
-	jp c, DisplayListMenuIDLoop
-	inc [hl] ; if not, go down
-	jp DisplayListMenuIDLoop
-.upPressed
-	ld a, [hl]
-	and a
-	jp z, DisplayListMenuIDLoop
-	dec [hl]
-	jp DisplayListMenuIDLoop
+IF _ITEMAPI
+INCLUDE "home/display_list_menu_api.asm"
+ELSE
+INCLUDE "home/display_list_menu.asm"
+ENDC
 
 DisplayChooseQuantityMenu::
 ; text box dimensions/coordinates for just quantity
@@ -1701,198 +1504,6 @@ ExitListMenu::
 	ld [wMenuItemToSwap], a ; 0 means no item is currently being swapped
 	scf
 	ret
-
-PrintListMenuEntries::
-	coord hl, 5, 3
-	ld b, 9
-	ld c, 14
-	call ClearScreenArea
-	ld a, [wListPointer]
-	ld e, a
-	ld a, [wListPointer + 1]
-	ld d, a
-	inc de ; de = beginning of list entries
-	ld a, [wListScrollOffset]
-	ld c, a
-	ld a, [wListMenuID]
-	cp ITEMLISTMENU
-	ld a, c
-	jr nz, .skipMultiplying
-; if it's an item menu
-; item entries are 2 bytes long, so multiply by 2
-	sla a
-	sla c
-.skipMultiplying
-	add e
-	ld e, a
-	jr nc, .noCarry
-	inc d
-.noCarry
-	coord hl, 6, 4 ; coordinates of first list entry name
-	ld b, 4 ; print 4 names
-.loop
-	ld a, b
-	ld [wWhichPokemon], a
-	ld a, [de]
-	ld [wd11e], a
-	cp $ff
-	jp z, .printCancelMenuItem
-	push bc
-	push de
-	push hl
-	push hl
-	push de
-	ld a, [wListMenuID]
-	and a
-	jr z, .pokemonPCMenu
-	cp MOVESLISTMENU
-	jr z, .movesMenu
-.itemMenu
-	call GetItemName
-	jr .placeNameString
-.pokemonPCMenu
-	push hl
-	ld hl, wPartyCount
-	ld a, [wListPointer]
-	cp l ; is it a list of party pokemon or box pokemon?
-	ld hl, wPartyMonNicks
-	jr z, .getPokemonName
-	ld hl, wBoxMonNicks ; box pokemon names
-.getPokemonName
-	ld a, [wWhichPokemon]
-	ld b, a
-	ld a, 4
-	sub b
-	ld b, a
-	ld a, [wListScrollOffset]
-	add b
-	call GetPartyMonName
-	pop hl
-	jr .placeNameString
-.movesMenu
-	call GetMoveName
-.placeNameString
-	call PlaceString
-	pop de
-	pop hl
-	ld a, [wPrintItemPrices]
-	and a ; should prices be printed?
-	jr z, .skipPrintingItemPrice
-.printItemPrice
-	push hl
-	ld a, [de]
-	ld de, ItemPrices
-	ld [wcf91], a
-	call GetItemPrice ; get price
-	pop hl
-	ld bc, SCREEN_WIDTH + 5 ; 1 row down and 5 columns right
-	add hl, bc
-	ld c, $a3 ; no leading zeroes, right-aligned, print currency symbol, 3 bytes
-	call PrintBCDNumber
-.skipPrintingItemPrice
-	ld a, [wListMenuID]
-	and a
-	jr nz, .skipPrintingPokemonLevel
-.printPokemonLevel
-	ld a, [wd11e]
-	push af
-	push hl
-	ld hl, wPartyCount
-	ld a, [wListPointer]
-	cp l ; is it a list of party pokemon or box pokemon?
-	ld a, PLAYER_PARTY_DATA
-	jr z, .next
-	ld a, BOX_DATA
-.next
-	ld [wMonDataLocation], a
-	ld hl, wWhichPokemon
-	ld a, [hl]
-	ld b, a
-	ld a, $04
-	sub b
-	ld b, a
-	ld a, [wListScrollOffset]
-	add b
-	ld [hl], a
-	call LoadMonData
-	ld a, [wMonDataLocation]
-	and a ; is it a list of party pokemon or box pokemon?
-	jr z, .skipCopyingLevel
-.copyLevel
-	ld a, [wLoadedMonBoxLevel]
-	ld [wLoadedMonLevel], a
-.skipCopyingLevel
-	pop hl
-	ld bc, $001c
-	add hl, bc
-	call PrintLevel
-	pop af
-	ld [wd11e], a
-.skipPrintingPokemonLevel
-	pop hl
-	pop de
-	inc de
-	ld a, [wListMenuID]
-	cp ITEMLISTMENU
-	jr nz, .nextListEntry
-.printItemQuantity
-	ld a, [wd11e]
-	ld [wcf91], a
-	call IsKeyItem ; check if item is unsellable
-	ld a, [wIsKeyItem]
-	and a ; is the item unsellable?
-	jr nz, .skipPrintingItemQuantity ; if so, don't print the quantity
-	push hl
-	ld bc, SCREEN_WIDTH + 8 ; 1 row down and 8 columns right
-	add hl, bc
-	ld a, "×"
-	ld [hli], a
-	ld a, [wd11e]
-	push af
-	ld a, [de]
-	ld [wMaxItemQuantity], a
-	push de
-	ld de, wd11e
-	ld [de], a
-	lb bc, 1, 2
-	call PrintNumber
-	pop de
-	pop af
-	ld [wd11e], a
-	pop hl
-.skipPrintingItemQuantity
-	inc de
-	pop bc
-	inc c
-	push bc
-	inc c
-	ld a, [wMenuItemToSwap] ; ID of item chosen for swapping (counts from 1)
-	and a ; is an item being swapped?
-	jr z, .nextListEntry
-	sla a
-	cp c ; is it this item?
-	jr nz, .nextListEntry
-	dec hl
-	ld a, $ec ; unfilled right arrow menu cursor to indicate an item being swapped
-	ld [hli], a
-.nextListEntry
-	ld bc, 2 * SCREEN_WIDTH ; 2 rows
-	add hl, bc
-	pop bc
-	inc c
-	dec b
-	jp nz, .loop
-	ld bc, -8
-	add hl, bc
-	ld a, "▼"
-	ld [hl], a
-	ret
-.printCancelMenuItem
-	ld de, ListMenuCancelText
-	jp PlaceString
-
-ListMenuCancelText::
-	db "CANCEL@"
 
 GetMonName::
 	push hl
@@ -2093,7 +1704,8 @@ UseItem::
 
 ; confirms the item toss and then tosses the item
 ; INPUT:
-; hl = address of inventory (either wNumBagItems or wNumBoxItems)
+; (no item API) hl = address of inventory (either wNumBagItems or wNumBoxItems)
+; (item API)    hl = address of page number (wCurrentItemPage or wCurrentPCItemPage)
 ; [wcf91] = item ID
 ; [wWhichPokemon] = index of item within inventory
 ; [wItemQuantity] = quantity to toss
@@ -2580,17 +2192,6 @@ TrainerEndBattleText::
 	call TextCommandProcessor
 	jp TextScriptEnd
 
-; only engage withe trainer if the player is not already
-; engaged with another trainer
-; XXX unused?
-CheckIfAlreadyEngaged::
-	ld a, [wFlags_0xcd60]
-	bit 0, a
-	ret nz
-	call EngageMapTrainer
-	xor a
-	ret
-
 PlayTrainerMusic::
 	ld a, [wEngagedTrainerClass]
 	cp OPP_SONY1
@@ -3003,13 +2604,6 @@ YesNoChoicePokeCenter::
 	coord hl, 11, 6
 	lb bc, 8, 12
 	jr DisplayYesNoChoice
-
-WideYesNoChoice:: ; unused
-	call SaveScreenTilesToBuffer1
-	ld a, WIDE_YES_NO_MENU
-	ld [wTwoOptionMenuID], a
-	coord hl, 12, 7
-	lb bc, 8, 13
 
 DisplayYesNoChoice::
 	ld a, TWO_OPTION_MENU
@@ -4189,225 +3783,17 @@ PrintText_NoCreatingTextBox::
 	coord bc, 1, 14
 	jp TextCommandProcessor
 
-
 PrintNumber::
-; Print the c-digit, b-byte value at de.
-; Allows 2 to 7 digits. For 1-digit numbers, add
-; the value to char "0" instead of calling PrintNumber.
-; Flags LEADING_ZEROES and LEFT_ALIGN can be given
-; in bits 7 and 6 of b respectively.
-	push bc
-	xor a
-	ld [H_PASTLEADINGZEROES], a
-	ld [H_NUMTOPRINT], a
-	ld [H_NUMTOPRINT + 1], a
-	ld a, b
-	and $f
-	cp 1
-	jr z, .byte
-	cp 2
-	jr z, .word
-.long
-	ld a, [de]
-	ld [H_NUMTOPRINT], a
-	inc de
-	ld a, [de]
-	ld [H_NUMTOPRINT + 1], a
-	inc de
-	ld a, [de]
-	ld [H_NUMTOPRINT + 2], a
-	jr .start
-
-.word
-	ld a, [de]
-	ld [H_NUMTOPRINT + 1], a
-	inc de
-	ld a, [de]
-	ld [H_NUMTOPRINT + 2], a
-	jr .start
-
-.byte
-	ld a, [de]
-	ld [H_NUMTOPRINT + 2], a
-
-.start
-	push de
-
-	ld d, b
-	ld a, c
-	ld b, a
-	xor a
-	ld c, a
-	ld a, b
-
-	cp 2
-	jr z, .tens
-	cp 3
-	jr z, .hundreds
-	cp 4
-	jr z, .thousands
-	cp 5
-	jr z, .ten_thousands
-	cp 6
-	jr z, .hundred_thousands
-
-print_digit: macro
-
-if (\1) / $10000
-	ld a, \1 / $10000 % $100
-else	xor a
-endc
-	ld [H_POWEROFTEN + 0], a
-
-if (\1) / $100
-	ld a, \1 / $100   % $100
-else	xor a
-endc
-	ld [H_POWEROFTEN + 1], a
-
-	ld a, \1 / $1     % $100
-	ld [H_POWEROFTEN + 2], a
-
-	call .PrintDigit
-	call .NextDigit
-endm
-
-.millions          print_digit 1000000
-.hundred_thousands print_digit 100000
-.ten_thousands     print_digit 10000
-.thousands         print_digit 1000
-.hundreds          print_digit 100
-
-.tens
-	ld c, 0
-	ld a, [H_NUMTOPRINT + 2]
-.mod
-	cp 10
-	jr c, .ok
-	sub 10
-	inc c
-	jr .mod
-.ok
-
-	ld b, a
-	ld a, [H_PASTLEADINGZEROES]
-	or c
-	ld [H_PASTLEADINGZEROES], a
-	jr nz, .past
-	call .PrintLeadingZero
-	jr .next
-.past
-	ld a, "0"
-	add c
-	ld [hl], a
-.next
-
-	call .NextDigit
-.ones
-	ld a, "0"
-	add b
-	ld [hli], a
-	pop de
-	dec de
-	pop bc
+	ld a, [H_LOADEDROMBANK]
+	push af
+	ld a, BANK(PrintNumber_)
+	ld [H_LOADEDROMBANK], a
+	ld [MBC1RomBank], a
+	call PrintNumber_
+	pop af
+	ld [H_LOADEDROMBANK], a
+	ld [MBC1RomBank], a
 	ret
-
-.PrintDigit:
-; Divide by the current decimal place.
-; Print the quotient, and keep the modulus.
-	ld c, 0
-.loop
-	ld a, [H_POWEROFTEN]
-	ld b, a
-	ld a, [H_NUMTOPRINT]
-	ld [H_SAVEDNUMTOPRINT], a
-	cp b
-	jr c, .underflow0
-	sub b
-	ld [H_NUMTOPRINT], a
-	ld a, [H_POWEROFTEN + 1]
-	ld b, a
-	ld a, [H_NUMTOPRINT + 1]
-	ld [H_SAVEDNUMTOPRINT + 1], a
-	cp b
-	jr nc, .noborrow1
-
-	ld a, [H_NUMTOPRINT]
-	or 0
-	jr z, .underflow1
-	dec a
-	ld [H_NUMTOPRINT], a
-	ld a, [H_NUMTOPRINT + 1]
-.noborrow1
-
-	sub b
-	ld [H_NUMTOPRINT + 1], a
-	ld a, [H_POWEROFTEN + 2]
-	ld b, a
-	ld a, [H_NUMTOPRINT + 2]
-	ld [H_SAVEDNUMTOPRINT + 2], a
-	cp b
-	jr nc, .noborrow2
-
-	ld a, [H_NUMTOPRINT + 1]
-	and a
-	jr nz, .borrowed
-
-	ld a, [H_NUMTOPRINT]
-	and a
-	jr z, .underflow2
-	dec a
-	ld [H_NUMTOPRINT], a
-	xor a
-.borrowed
-
-	dec a
-	ld [H_NUMTOPRINT + 1], a
-	ld a, [H_NUMTOPRINT + 2]
-.noborrow2
-	sub b
-	ld [H_NUMTOPRINT + 2], a
-	inc c
-	jr .loop
-
-.underflow2
-	ld a, [H_SAVEDNUMTOPRINT + 1]
-	ld [H_NUMTOPRINT + 1], a
-.underflow1
-	ld a, [H_SAVEDNUMTOPRINT]
-	ld [H_NUMTOPRINT], a
-.underflow0
-	ld a, [H_PASTLEADINGZEROES]
-	or c
-	jr z, .PrintLeadingZero
-
-	ld a, "0"
-	add c
-	ld [hl], a
-	ld [H_PASTLEADINGZEROES], a
-	ret
-
-.PrintLeadingZero:
-	bit BIT_LEADING_ZEROES, d
-	ret z
-	ld [hl], "0"
-	ret
-
-.NextDigit:
-; Increment unless the number is left-aligned,
-; leading zeroes are not printed, and no digits
-; have been printed yet.
-	bit BIT_LEADING_ZEROES, d
-	jr nz, .inc
-	bit BIT_LEFT_ALIGN, d
-	jr z, .inc
-	ld a, [H_PASTLEADINGZEROES]
-	and a
-	ret z
-.inc
-	inc hl
-	ret
-
 
 CallFunctionInTable::
 ; Call function a in jumptable hl.
@@ -4549,7 +3935,11 @@ GiveItem::
 	ld [wcf91], a
 	ld a, c
 	ld [wItemQuantity], a
+IF _ITEMAPI
+	ld hl, LOW(wCurrentItemPage)
+ELSE
 	ld hl, wNumBagItems
+ENDC
 	call AddItemToInventory
 	ret nc
 	call GetItemName
@@ -4581,9 +3971,7 @@ Random::
 	pop hl
 	ret
 
-
 INCLUDE "home/predef.asm"
-
 
 UpdateCinnabarGymGateTileBlocks::
 	jpba UpdateCinnabarGymGateTileBlocks_

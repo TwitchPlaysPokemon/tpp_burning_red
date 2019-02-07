@@ -44,9 +44,17 @@ DisplayPokemartDialogue_:
 	ld [wInitListType], a
 	callab InitList
 
+IF _ITEMAPI
+	ld a, ITEMAPI_IS_BAG_EMPTY
+	call ItemAPI
+	jr c, .not_empty
+	jp nz, .bagEmpty
+.not_empty
+ELSE
 	ld a, [wNumBagItems]
 	and a
 	jp z, .bagEmpty
+ENDC
 	ld hl, PokemonSellingGreetingText
 	call PrintText
 	call SaveScreenTilesToBuffer1 ; save screen
@@ -55,13 +63,20 @@ DisplayPokemartDialogue_:
 	ld a, MONEY_BOX
 	ld [wTextBoxID], a
 	call DisplayTextBoxID ; draw money text box
+IF _ITEMAPI
+	ld hl, wNumItems
+ELSE
 	ld hl, wNumBagItems
+ENDC
 	ld a, l
 	ld [wListPointer], a
 	ld a, h
 	ld [wListPointer + 1], a
 	xor a
 	ld [wPrintItemPrices], a
+IF _ITEMAPI
+	ld [wCurrentItemList], a
+ENDC
 	ld [wCurrentMenuItem], a
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
@@ -107,7 +122,11 @@ DisplayPokemartDialogue_:
 	ld [wBoughtOrSoldItemInMart], a
 .skipSettingFlag1
 	call AddAmountSoldToMoney
+IF _ITEMAPI
+	ld hl, wCurrentItemPage
+ELSE
 	ld hl, wNumBagItems
+ENDC
 	call RemoveItemFromInventory
 	jp .sellMenuLoop
 .unsellableItem
@@ -136,10 +155,9 @@ DisplayPokemartDialogue_:
 	ld a, MONEY_BOX
 	ld [wTextBoxID], a
 	call DisplayTextBoxID
-	ld hl, wItemList
-	ld a, l
+	ld a, LOW(wItemList)
 	ld [wListPointer], a
-	ld a, h
+	ld a, HIGH(wItemList)
 	ld [wListPointer + 1], a
 	xor a
 	ld [wCurrentMenuItem], a
@@ -147,6 +165,9 @@ DisplayPokemartDialogue_:
 	ld [wPrintItemPrices], a
 	inc a ; a = 2 (PRICEDITEMLISTMENU)
 	ld [wListMenuID], a
+IF _ITEMAPI
+	ld [wCurrentItemList], a
+ENDC
 	call DisplayListMenuID
 	jr c, .returnToMainPokemartMenu ; if the player closed the menu
 	ld a, 99
@@ -180,7 +201,11 @@ DisplayPokemartDialogue_:
 .buyItem
 	call .isThereEnoughMoney
 	jr c, .notEnoughMoney
+IF _ITEMAPI
+	ld hl, LOW(wCurrentItemPage)
+ELSE
 	ld hl, wNumBagItems
+ENDC
 	call AddItemToInventory
 	jr nc, .bagFull
 	call SubtractAmountPaidFromMoney

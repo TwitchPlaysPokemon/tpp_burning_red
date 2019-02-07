@@ -61,7 +61,11 @@ INCLUDE "engine/oak_speech2.asm"
 
 INCLUDE "engine/subtract_paid_money.asm"
 
+IF _ITEMAPI
+INCLUDE "engine/menu/swap_items_api.asm"
+ELSE
 INCLUDE "engine/menu/swap_items.asm"
+ENDC
 
 INCLUDE "engine/overworld/pokemart.asm"
 
@@ -105,7 +109,11 @@ INCLUDE "data/hide_show_data.asm"
 
 INCLUDE "engine/overworld/field_move_messages.asm"
 
+IF _ITEMAPI
+INCLUDE "engine/items/inventory_api.asm"
+ELSE
 INCLUDE "engine/items/inventory.asm"
+ENDC
 
 INCLUDE "engine/overworld/wild_mons.asm"
 
@@ -123,7 +131,11 @@ INCLUDE "engine/flag_action.asm"
 INCLUDE "engine/heal_party.asm"
 INCLUDE "engine/bcd.asm"
 INCLUDE "engine/init_player_data.asm"
+IF _ITEMAPI
+INCLUDE "engine/get_bag_item_quantity_api.asm"
+ELSE
 INCLUDE "engine/get_bag_item_quantity.asm"
+ENDC
 INCLUDE "engine/pathfinding.asm"
 INCLUDE "engine/hp_bar.asm"
 INCLUDE "engine/hidden_object_functions3.asm"
@@ -1968,6 +1980,10 @@ INCLUDE "engine/mon_party_sprites.asm"
 INCLUDE "engine/in_game_trades.asm"
 INCLUDE "engine/palettes.asm"
 INCLUDE "engine/save.asm"
+INCLUDE "engine/print_number.asm"
+IF _ITEMAPI
+INCLUDE "engine/items/api.asm"
+ENDC
 
 
 SECTION "bank1D", ROMX

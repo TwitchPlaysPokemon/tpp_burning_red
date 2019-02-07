@@ -23,8 +23,7 @@ PlayerPCMenu:
 	set 5, [hl]
 	call LoadScreenTilesFromBuffer2
 	coord hl, 0, 0
-	ld b, $8
-	ld c, $e
+	lb bc, 8, 14
 	call TextBoxBorder
 	call UpdateSprites
 	coord hl, 2, 2
@@ -87,22 +86,39 @@ PlayerPCDeposit:
 	xor a
 	ld [wCurrentMenuItem], a
 	ld [wListScrollOffset], a
+IF _ITEMAPI
+	ld [wCurrentItemPage], a
+	ld a, ITEMAPI_IS_BAG_EMPTY
+	call ItemAPI
+	jr c, .loop
+	jr z, .loop
+ELSE
 	ld a, [wNumBagItems]
 	and a
 	jr nz, .loop
+ENDC
 	ld hl, NothingToDepositText
 	call PrintText
 	jp PlayerPCMenu
 .loop
 	ld hl, WhatToDepositText
 	call PrintText
-	ld hl, wNumBagItems
-	ld a, l
+IF _ITEMAPI
+	ld a, LOW(wNumItems)
 	ld [wListPointer], a
-	ld a, h
+	ld a, HIGH(wNumItems)
 	ld [wListPointer + 1], a
+ELSE
+	ld a, LOW(wNumBagItems)
+	ld [wListPointer], a
+	ld a, HIGH(wNumBagItems)
+	ld [wListPointer + 1], a
+ENDC
 	xor a
 	ld [wPrintItemPrices], a
+IF _ITEMAPI
+	ld [wCurrentItemList], a
+ENDC
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
 	call DisplayListMenuID
@@ -118,45 +134,76 @@ PlayerPCDeposit:
 	call PrintText
 	call DisplayChooseQuantityMenu
 	cp $ff
-	jp z, .loop
+	jr z, .loop
 .next
+IF _ITEMAPI
+	ld hl, wItemAPIBuffer
+	ld a, [wCurrentItemPage]
+	ld [hli], a
+	ld a, [wWhichPokemon]
+	ld [hli], a
+	ld a, [wItemQuantity]
+	ld [hl], a
+	ld a, ITEMAPI_DEPOSIT
+	call ItemAPI
+	jr c, .loop
+	ld hl, NoRoomToStoreText
+	jr z, .done
+ELSE
 	ld hl, wNumBoxItems
 	call AddItemToInventory
-	jr c, .roomAvailable
 	ld hl, NoRoomToStoreText
-	call PrintText
-	jp .loop
-.roomAvailable
+	jr nc, .done
 	ld hl, wNumBagItems
 	call RemoveItemFromInventory
+ENDC
 	call WaitForSoundToFinish
 	ld a, SFX_WITHDRAW_DEPOSIT
 	call PlaySound
 	call WaitForSoundToFinish
 	ld hl, ItemWasStoredText
+.done
 	call PrintText
-	jp .loop
+	jr .loop
 
 PlayerPCWithdraw:
 	xor a
 	ld [wCurrentMenuItem], a
 	ld [wListScrollOffset], a
+IF _ITEMAPI
+	ld [wCurrentPCItemPage], a
+	ld a, ITEMAPI_IS_PC_EMPTY
+	call ItemAPI
+	jr c, .loop
+	jr z, .loop
+ELSE
 	ld a, [wNumBoxItems]
 	and a
 	jr nz, .loop
+ENDC
 	ld hl, NothingStoredText
 	call PrintText
 	jp PlayerPCMenu
 .loop
 	ld hl, WhatToWithdrawText
 	call PrintText
-	ld hl, wNumBoxItems
-	ld a, l
+IF _ITEMAPI
+	ld a, LOW(wNumItems)
 	ld [wListPointer], a
-	ld a, h
+	ld a, HIGH(wNumItems)
 	ld [wListPointer + 1], a
+ELSE
+	ld a, LOW(wNumBoxItems)
+	ld [wListPointer], a
+	ld a, HIGH(wNumBoxItems)
+	ld [wListPointer + 1], a
+ENDC
 	xor a
 	ld [wPrintItemPrices], a
+IF _ITEMAPI
+	inc a
+	ld [wCurrentItemList], a
+ENDC
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
 	call DisplayListMenuID
@@ -172,45 +219,76 @@ PlayerPCWithdraw:
 	call PrintText
 	call DisplayChooseQuantityMenu
 	cp $ff
-	jp z, .loop
+	jr z, .loop
 .next
+IF _ITEMAPI
+	ld hl, wItemAPIBuffer
+	ld a, [wCurrentPCItemPage]
+	ld [hli], a
+	ld a, [wWhichPokemon]
+	ld [hli], a
+	ld a, [wItemQuantity]
+	ld [hl], a
+	ld a, ITEMAPI_WITHDRAW
+	call ItemAPI
+	jr c, .loop
+	ld hl, CantCarryMoreText
+	jr z, .done
+ELSE
 	ld hl, wNumBagItems
 	call AddItemToInventory
-	jr c, .roomAvailable
 	ld hl, CantCarryMoreText
-	call PrintText
-	jp .loop
-.roomAvailable
+	jr nc, .done
 	ld hl, wNumBoxItems
 	call RemoveItemFromInventory
+ENDC
 	call WaitForSoundToFinish
 	ld a, SFX_WITHDRAW_DEPOSIT
 	call PlaySound
 	call WaitForSoundToFinish
 	ld hl, WithdrewItemText
+.done
 	call PrintText
-	jp .loop
+	jr .loop
 
 PlayerPCToss:
 	xor a
 	ld [wCurrentMenuItem], a
 	ld [wListScrollOffset], a
+IF _ITEMAPI
+	ld [wCurrentPCItemPage], a
+	ld a, ITEMAPI_IS_PC_EMPTY
+	call ItemAPI
+	jr c, .loop
+	jr z, .loop
+ELSE
 	ld a, [wNumBoxItems]
 	and a
 	jr nz, .loop
+ENDC
 	ld hl, NothingStoredText
 	call PrintText
 	jp PlayerPCMenu
 .loop
 	ld hl, WhatToTossText
 	call PrintText
-	ld hl, wNumBoxItems
-	ld a, l
+IF _ITEMAPI
+	ld a, LOW(wNumItems)
 	ld [wListPointer], a
-	ld a, h
+	ld a, HIGH(wNumItems)
 	ld [wListPointer + 1], a
+ELSE
+	ld a, LOW(wNumBoxItems)
+	ld [wListPointer], a
+	ld a, HIGH(wNumBoxItems)
+	ld [wListPointer + 1], a
+ENDC
 	xor a
 	ld [wPrintItemPrices], a
+IF _ITEMAPI
+	inc a
+	ld [wCurrentItemList], a
+ENDC
 	ld a, ITEMLISTMENU
 	ld [wListMenuID], a
 	push hl
@@ -235,10 +313,13 @@ PlayerPCToss:
 	call DisplayChooseQuantityMenu
 	pop hl
 	cp $ff
-	jp z, .loop
+	jr z, .loop
 .next
+IF _ITEMAPI
+	ld hl, wCurrentPCItemPage
+ENDC
 	call TossItem ; disallows tossing key items
-	jp .loop
+	jr .loop
 
 PlayersPCMenuEntries:
 	db   "WITHDRAW ITEM"
