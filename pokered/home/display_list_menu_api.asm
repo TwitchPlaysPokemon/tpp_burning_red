@@ -24,6 +24,14 @@ DisplayListMenuID::
 	ld l, a
 	ld a, [wListPointer + 1]
 	ld h, a ; hl = address of the list
+	ld a, [wListMenuID]
+	cp ITEMLISTMENU
+	jr nz, .no_API_loads
+	push hl
+	callba LoadCurrentItemPageLimits
+	callba LoadItemListFromAPI
+	pop hl
+.no_API_loads
 	ld a, [hl] ; the first byte is the number of entries in the list
 	ld [wListCount], a
 	ld a, LIST_MENU_BOX
@@ -50,7 +58,17 @@ DisplayListMenuID::
 	ld [wTopMenuItemY], a
 	ld a, 5
 	ld [wTopMenuItemX], a
+	ld a, [wListMenuID]
+	cp ITEMLISTMENU
+	jr nz, .regular_watched_keys
+	ld a, [wCurrentItemList]
+	cp 2
+	jr nc, .regular_watched_keys
+	ld a, A_BUTTON | B_BUTTON | SELECT | D_LEFT | D_RIGHT
+	jr .got_watched_keys
+.regular_watched_keys
 	ld a, A_BUTTON | B_BUTTON | SELECT
+.got_watched_keys
 	ld [wMenuWatchedKeys], a
 	ld c, 10
 	call DelayFrames
@@ -84,7 +102,7 @@ DisplayListMenuIDLoop::
 	push af
 	call PlaceMenuCursor
 	pop af
-	bit 0, a ; was the A button pressed?
+	bit BIT_A_BUTTON, a
 	jp z, .checkOtherKeys
 .buttonAPressed
 	ld a, [wCurrentMenuItem]
@@ -167,32 +185,101 @@ DisplayListMenuIDLoop::
 	ld hl, wd730
 	res 6, [hl] ; turn on letter printing delay
 	jp BankswitchBack
-.checkOtherKeys ; check B, SELECT, Up, and Down keys
-	bit 1, a ; was the B button pressed?
+.checkOtherKeys ; check B, SELECT and directional keys
+	bit BIT_B_BUTTON, a
 	jp nz, ExitListMenu ; if so, exit the menu
-	bit 2, a ; was the select button pressed?
+	bit BIT_SELECT, a
 	jp nz, HandleItemListSwapping ; if so, allow the player to swap menu entries
 	ld b, a
-	bit 7, b ; was Down pressed?
+	bit BIT_D_UP, b
 	ld hl, wListScrollOffset
-	jr z, .upPressed
+	jr nz, .upPressed
+	bit BIT_D_DOWN, b
+	jr z, .check_left_right
 .downPressed
 	ld a, [hl]
 	add 3
 	ld b, a
 	ld a, [wListCount]
 	cp b ; will going down scroll past the Cancel button?
-	jp c, DisplayListMenuIDLoop
+	jr c, .jump_to_loop
 	inc [hl] ; if not, go down
-	jp DisplayListMenuIDLoop
+	jr .jump_to_loop
 .upPressed
 	ld a, [hl]
 	and a
-	jp z, DisplayListMenuIDLoop
+	jr z, .jump_to_loop
 	dec [hl]
+.jump_to_loop
 	jp DisplayListMenuIDLoop
 
+.check_left_right
+	ld a, [wListMenuID]
+	cp ITEMLISTMENU
+	jr nz, .jump_to_loop
+	ld a, [wCurrentItemPageLimit]
+	ld c, a
+	cp 2
+	jr c, .jump_to_loop
+	ld a, [wCurrentItemList]
+	cp 2
+	jr nc, .jump_to_loop
+	and a
+	ld hl, wCurrentItemPage
+	jr z, .got_page_pointer
+	inc hl
+.got_page_pointer
+	bit BIT_D_LEFT, b
+	jr nz, .left
+	; right
+	ld a, [hl]
+	inc a
+	cp c
+	jr c, .got_new_page
+	xor a
+	jr .got_new_page
+.left
+	ld a, [hl]
+	and a
+	jr nz, .got_previous_page
+	ld a, c
+.got_previous_page
+	dec a
+.got_new_page
+	ld [hl], a
+	ld c, a
+	callba LoadItemListFromAPI
+	xor a
+	ld [wListScrollOffset], a
+	ld [wCurrentMenuItem], a
+	ld [wBagSavedMenuItem], a
+	ld [wSavedListScrollOffset], a
+	ld a, [wNumItems]
+	ld [wListCount], a
+	cp 2
+	jr c, .got_max_menu_item
+	ld a, 2
+.got_max_menu_item
+	ld [wMaxMenuItem], a
+	jr .jump_to_loop
+
 PrintListMenuEntries::
+	ld a, [wListMenuID]
+	cp ITEMLISTMENU
+	jr nz, .done_page_title
+	ld a, [wCurrentItemList]
+	cp 2
+	jr nc, .done_page_title
+	callba PrintItemPageName
+	ld a, [wNumItems]
+	ld [wListCount], a
+	call ResetCurrentSelectedItemIfPastCancel
+	ld hl, wMaxMenuItem
+	ld [hl], a
+	cp 2
+	jr c, .done_page_title
+	ld [hl], 2
+.done_page_title
 	coord hl, 5, 3
 	ld b, 9
 	ld c, 14
@@ -328,10 +415,14 @@ PrintListMenuEntries::
 .printItemQuantity
 	ld a, [wd11e]
 	ld [wcf91], a
+	ld a, [de]
+	cp 2
+	jr nc, .force_printing_quantity
 	call IsKeyItem ; check if item is unsellable
 	ld a, [wIsKeyItem]
 	and a ; is the item unsellable?
 	jr nz, .skipPrintingItemQuantity ; if so, don't print the quantity
+.force_printing_quantity
 	push hl
 	ld bc, SCREEN_WIDTH + 8 ; 1 row down and 8 columns right
 	add hl, bc
@@ -356,6 +447,15 @@ PrintListMenuEntries::
 	inc c
 	push bc
 	inc c
+	call GetCurrentPageNumber
+	cp -1
+	jr z, .do_check
+	push hl
+	ld hl, wMenuItemPageToSwap
+	cp [hl]
+	pop hl
+	jr nz, .nextListEntry
+.do_check
 	ld a, [wMenuItemToSwap] ; ID of item chosen for swapping (counts from 1)
 	and a ; is an item being swapped?
 	jr z, .nextListEntry
@@ -383,3 +483,45 @@ PrintListMenuEntries::
 
 ListMenuCancelText::
 	db "CANCEL@"
+
+GetCurrentPageNumber::
+	ld a, [wListMenuID]
+	cp ITEMLISTMENU
+	jr nz, .no_pages
+	ld a, [wCurrentItemList]
+	cp 2
+	jr nc, .no_pages
+	and a
+	ld a, [wCurrentItemPage]
+	ret z
+	ld a, [wCurrentItemPage + 1]
+	ret
+
+.no_pages
+	ld a, -1
+	ret
+
+ResetCurrentSelectedItemIfPastCancel::
+	; in: a: max items
+	; out: a: max items
+	push af
+	ld l, a
+	inc l
+	ld a, [wListScrollOffset]
+	ld h, a
+	ld a, [wCurrentMenuItem]
+	add a, h
+	jr c, .fix_offsets
+	cp l
+	jr c, .offsets_OK
+.fix_offsets
+	xor a
+	ld [wListScrollOffset], a
+	ld [wCurrentMenuItem], a
+.offsets_OK
+	ld a, [wCurrentMenuItem]
+	ld [wBagSavedMenuItem], a
+	ld a, [wListScrollOffset]
+	ld [wSavedListScrollOffset], a
+	pop af
+	ret

@@ -1396,7 +1396,11 @@ AddItemToInventory::
 	pop bc
 	ret
 
+IF _ITEMAPI
+INCLUDE "home/display_list_menu_api.asm"
+ELSE
 INCLUDE "home/display_list_menu.asm"
+ENDC
 
 DisplayChooseQuantityMenu::
 ; text box dimensions/coordinates for just quantity
