@@ -16,6 +16,7 @@ InitPlayerData2:
 	call InitializeEmptyList
 	ld hl, wNumInBox
 	call InitializeEmptyList
+IF _ITEMAPI
 .initialize_player_items
 	ld a, ITEMAPI_INITIALIZE_ITEM_LISTS
 	call ItemAPI
@@ -26,6 +27,12 @@ InitPlayerData2:
 	xor a
 	ld [wCurrentItemPage], a
 	ld [wCurrentPCItemPage], a
+ELSE
+	ld hl, wNumBagItems
+	call InitializeEmptyList
+	ld hl, wNumBoxItems
+	call InitializeEmptyList
+ENDC
 
 START_MONEY EQU $3000
 	ld hl, wPlayerMoney + 1

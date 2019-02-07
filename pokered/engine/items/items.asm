@@ -578,7 +578,11 @@ ItemUseBall:
 	ret nz ; if so, don't remove a ball from the bag
 
 ; Remove a ball from the bag.
+IF _ITEMAPI
 	ld hl, wCurrentItemPage
+ELSE
+	ld hl, wNumBagItems
+ENDC
 	inc a
 	ld [wItemQuantity], a
 	jp RemoveItemFromInventory
@@ -784,7 +788,11 @@ ItemUseEvoStone:
 	jr z, .noEffect
 	pop af
 	ld [wWhichPokemon], a
+IF _ITEMAPI
 	ld hl, wCurrentItemPage
+ELSE
+	ld hl, wNumBagItems
+ENDC
 	ld a, 1 ; remove 1 stone
 	ld [wItemQuantity], a
 	jp RemoveItemFromInventory
@@ -2317,7 +2325,11 @@ PrintItemUseTextAndRemoveItem:
 	call WaitForTextScrollButtonPress ; wait for button press
 
 RemoveUsedItem:
+IF _ITEMAPI
 	ld hl, wCurrentItemPage
+ELSE
+	ld hl, wNumBagItems
+ENDC
 	ld a, 1 ; one item
 	ld [wItemQuantity], a
 	jp RemoveItemFromInventory
@@ -2582,7 +2594,8 @@ GetSelectedMoveOffset2:
 
 ; confirms the item toss and then tosses the item
 ; INPUT:
-; hl = address of page number (wCurrentItemPage or wCurrentPCItemPage)
+; (no item API) hl = address of inventory (either wNumBagItems or wNumBoxItems)
+; (item API)    hl = address of page number (wCurrentItemPage or wCurrentPCItemPage)
 ; [wcf91] = item ID
 ; [wWhichPokemon] = index of item within inventory
 ; [wItemQuantity] = quantity to toss
