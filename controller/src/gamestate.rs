@@ -407,7 +407,7 @@ impl GameState {
 
                         let species = LittleEndian::read_u16(&decrypted_pk3[0x20..0x22]);
 
-                        if species <= 151 || species == 410 {
+                        if species <= 152 {
                             let mut uid = get_uid(decrypted_pk3[0x20], decrypted_pk3[0x3E]);
                             if uid == 0x0000 {
                                 let mut j = 1;
