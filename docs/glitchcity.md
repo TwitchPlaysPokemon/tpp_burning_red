@@ -58,25 +58,25 @@
 
 Blocks:
 
-![Glitch City blocks](docs/glitchcity/blocks.png)
+![Glitch City blocks](glitchcity/blocks.png)
 
 Events:
 
-![Glitch City events](docs/glitchcity/events.png)
+![Glitch City events](glitchcity/events.png)
 
 Annotated blocks:
 
-![Glitch City annotated blocks](docs/glitchcity/annotated.png)
+![Glitch City annotated blocks](glitchcity/annotated.png)
 
 ## Celadon City
 
 Blocks:
 
-![Celadon City blocks](docs/glitchcity/celadon_blocks.png)
+![Celadon City blocks](glitchcity/celadon_blocks.png)
 
 Events:
 
-![Celadon City events](docs/glitchcity/celadon_events.png)
+![Celadon City events](glitchcity/celadon_events.png)
 
 ---
 
