@@ -138,6 +138,25 @@ impl Bizhawk {
         }
     }
 
+    pub fn read_slice_chained(&self, region: MemRegion, sections: &[(u32, usize)]) -> Result<Box<[u8]>, String> {
+        let mut string_to_send = format!("{}/ReadByteRange", region.as_static());
+        let mut total_bytes = 0x00;
+        for section in sections {
+            string_to_send.push_str(format!("/{:X}/{:X}", section.0, section.1).as_str());
+            total_bytes += section.1;
+        }
+        match self.send_command_and_get_response(string_to_send.as_str()) {
+            Ok(response) => {
+                let mut bytes = Vec::new();
+                for i in 0..total_bytes {
+                    bytes.push(u8::from_str_radix(&response[i*2..i*2+2], 16).unwrap());
+                }
+                Ok(bytes.into_boxed_slice())
+            },
+            Err(error) => Err(error)
+        }
+    }
+    
     pub fn read_slice_custom(&self, message: String, count: usize) -> Result<Box<[u8]>, String> {
         match self.send_command_and_get_response(format!("ReadByteRange/{}", message).as_str()) {
             Ok(response) => {

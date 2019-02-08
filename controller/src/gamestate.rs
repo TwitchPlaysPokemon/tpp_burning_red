@@ -2,11 +2,14 @@ use crate::pokemon::*;
 use crate::constants::*;
 use crate::bizhawk::*;
 use bincode;
+use rocket::{get, routes};
+use rocket::config::{Config, Environment, LoggingLevel};
 use std::collections::{BTreeMap, HashMap};
 use std::fs::File;
 use rand;
 use byteorder::{ByteOrder, LittleEndian, BigEndian};
 use std::sync::{Arc, Mutex};
+use std::thread;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GameState {
@@ -92,7 +95,7 @@ impl GameState {
     pub fn get_current_game(&mut self) {
         self.game = if let Ok(name) = BIZHAWK.get_rom_name() {
             match name.as_str() {
-                "Pokemon - Red Version (USA, Europe)" => Game::RED,
+                "red" => Game::RED,
                 "firered" => Game::FIRERED,
                 _ => panic!("Neither red nor firered loaded!")
             }
@@ -762,25 +765,6 @@ impl TrainerInfo {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Default)]
-pub struct Bag {
-    pub general: BTreeMap<u16, u16>, // ID, Count
-    pub key: BTreeMap<u16, u16>,
-    pub balls: BTreeMap<u16, u16>,
-    pub tmhm: BTreeMap<u16, u16>
-}
-
-impl Bag {
-    pub fn new() -> Bag {
-        Bag {
-            general: BTreeMap::new(),
-            key: BTreeMap::new(),
-            balls: BTreeMap::new(),
-            tmhm: BTreeMap::new()
-        }
-    }
-}
-
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Options {
     pub text_speed: u8,
@@ -802,4 +786,116 @@ impl Options {
 pub enum Game {
     RED,
     FIRERED
+}
+
+#[derive(Serialize, Deserialize, Clone, Default)]
+pub struct Bag {
+    pub general: BTreeMap<u16, u16>, // ID, Count
+    pub key: BTreeMap<u16, u16>,
+    pub balls: BTreeMap<u16, u16>,
+    pub tmhm: BTreeMap<u16, u16>
+}
+
+impl Bag {
+    pub fn new() -> Bag {
+        Bag {
+            general: BTreeMap::new(),
+            key: BTreeMap::new(),
+            balls: BTreeMap::new(),
+            tmhm: BTreeMap::new()
+        }
+    }
+}
+
+#[derive(Clone, Default)]
+pub struct ApiState {
+    pub inventory: Bag,
+    pub locked: bool,
+    pub page: u8,
+}
+
+#[derive(PartialEq, Eq)]
+pub enum ApiResponse {
+  NONE,
+  CODE,
+  APIBUFFER,
+  PAGE
+}
+
+pub fn start_item_api() {
+    let config = Config::build(Environment::Staging)
+        .address("localhost")
+        .port(5340)
+        .log_level(LoggingLevel::Off)
+        .finalize().unwrap();
+    rocket::custom(config).mount("/", routes![item_api_handler]).launch();
+}
+
+#[get("/item_api")]
+fn item_api_handler() -> &'static str {
+    let mut item_memory = BIZHAWK.read_slice_chained(MemRegion::WRAM, &[(0x131D, 0x11), (0x1526, 0x7A)]).unwrap();
+
+    let code = item_memory[0x00];
+    let api_buffer = &item_memory[0x01..0x12];
+
+    let mut api_state = RED_ITEM_STATE.lock().unwrap();
+    let mut response = ApiResponse::NONE;
+
+    if code > 0x03 {
+        if api_state.locked {
+            if code == ITEM_UNLOCK {
+                // if the api buffer == "InitItemAPI@"
+                if api_buffer[0x00..0x0C] == [0x88, 0xAD, 0xA8, 0xB3, 0x88, 0xB3, 0xA4, 0xAC, 0x80, 0x8F, 0x88, 0x50] {
+                    item_memory[0x00] = ITEM_TRUE;
+                    response = ApiResponse::CODE;
+                }
+            }
+        } else {
+            match code {
+                ITEM_LOCK => {
+                    api_state.locked = true;
+                    item_memory[0x00] = ITEM_TRUE;
+                    response = ApiResponse::CODE;
+                },
+                ITEM_UNLOCK => {
+                    item_memory[0x00] = ITEM_NULL;
+                    response = ApiResponse::CODE;
+                },
+                ITEM_INITIALIZE_ITEM_LISTS => {},
+                ITEM_ERASE_SAVED_DATA => {},
+                ITEM_SAVE => {},
+                ITEM_LOAD => {},
+                ITEM_CAN_GET_ITEM => {},
+                ITEM_ADD_ITEM => {},
+                ITEM_HAS_ITEM => {},
+                ITEM_REMOVE_ITEM => {},
+                ITEM_CAN_GET_PC_ITEM => {},
+                ITEM_ADD_ITEM_TO_PC => {},
+                ITEM_HAS_ITEM_IN_PC => {},
+                ITEM_REMOVE_ITEM_FROM_PC => {},
+                ITEM_DEPOSIT => {},
+                ITEM_WITHDRAW => {},
+                ITEM_SWAP_ITEMS => {},
+                ITEM_SWAP_PC_ITEMS => {},
+                ITEM_IS_BAG_EMPTY => {},
+                ITEM_IS_PC_EMPTY => {},
+                ITEM_GET_ITEM_QUANTITIES => {},
+                ITEM_GET_PAGE_LIMITS => {},
+                _ => {}
+            }; 
+        }
+        match response {
+            ApiResponse::NONE => {},
+            ApiResponse::CODE => {
+                BIZHAWK.write_u8(MemRegion::WRAM, 0x131D, item_memory[0x00]).unwrap();
+            },
+            ApiResponse::APIBUFFER => {
+                BIZHAWK.write_slice(MemRegion::WRAM, 0x131D, &item_memory[0x00..0x12]).unwrap();
+            },
+            ApiResponse::PAGE => {}
+        }
+
+    }
+    
+    "ok"
 }

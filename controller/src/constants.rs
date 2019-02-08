@@ -2,10 +2,12 @@ use crate::bizhawk::Bizhawk;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 use std::time;
-use crate::gamestate::{TrainerInfo};
+use crate::gamestate::ApiState;
 use crate::warp_connections::*;
+use std::sync::{Arc, Mutex};
 
 // Red Map IDs
+
 pub const PALLET_TOWN: u8 = 0x00;
 pub const VIRIDIAN_CITY: u8 = 0x01;
 pub const PEWTER_CITY: u8 = 0x02;
@@ -255,6 +257,36 @@ pub const LORELEIS_ROOM: u8 = 0xF5;
 pub const BRUNOS_ROOM: u8 = 0xF6;
 pub const AGATHAS_ROOM: u8 = 0xF7;
 
+// Red Item API codes
+
+pub const ITEM_FALSE: u8 = 0x00;
+pub const ITEM_TRUE: u8 = 0x01;
+pub const ITEM_NULL: u8 = 0x02;
+pub const ITEM_TIMEOUT: u8 = 0x03;
+
+pub const ITEM_LOCK: u8 = 0x04;
+pub const ITEM_UNLOCK: u8 = 0x05;
+pub const ITEM_INITIALIZE_ITEM_LISTS: u8 = 0x06;
+pub const ITEM_ERASE_SAVED_DATA: u8 = 0x07;
+pub const ITEM_SAVE: u8 = 0x08;
+pub const ITEM_LOAD: u8 = 0x09;
+pub const ITEM_CAN_GET_ITEM: u8 = 0x10;
+pub const ITEM_ADD_ITEM: u8 = 0x11;
+pub const ITEM_HAS_ITEM: u8 = 0x12;
+pub const ITEM_REMOVE_ITEM: u8 = 0x13;
+pub const ITEM_CAN_GET_PC_ITEM: u8 = 0x14;
+pub const ITEM_ADD_ITEM_TO_PC: u8 = 0x15;
+pub const ITEM_HAS_ITEM_IN_PC: u8 = 0x16;
+pub const ITEM_REMOVE_ITEM_FROM_PC: u8 = 0x17;
+pub const ITEM_DEPOSIT: u8 = 0x18;
+pub const ITEM_WITHDRAW: u8 = 0x19;
+pub const ITEM_SWAP_ITEMS: u8 = 0x1A;
+pub const ITEM_SWAP_PC_ITEMS: u8 = 0x1B;
+pub const ITEM_IS_BAG_EMPTY: u8 = 0x1C;
+pub const ITEM_IS_PC_EMPTY: u8 = 0x1D;
+pub const ITEM_GET_ITEM_QUANTITIES: u8 = 0x1E;
+pub const ITEM_GET_PAGE_LIMITS: u8 = 0x1F;
+
 pub const POLL_DELAY: time::Duration = time::Duration::from_millis(1);
 
 #[derive(Debug, Clone)]
@@ -315,6 +347,7 @@ lazy_static! {
     static ref GEN_3_BYTES: &'static [u8] = include_bytes!("personal_fr");
     pub static ref BASE_STATS: Vec<BaseStats> = BaseStats::from_bytes(&GEN_1_BYTES, &GEN_2_BYTES, &GEN_3_BYTES);
     pub static ref BIZHAWK: Bizhawk = Bizhawk::new(5337);
+    pub static ref RED_ITEM_STATE: Arc<Mutex<ApiState>> = Arc::new(Mutex::new(ApiState::default()));
 }
                                           
 pub static NATURE_EFFECTS: [[f32;5];25] = [/*ATK, DEF, SPE, SPA, SPD*/

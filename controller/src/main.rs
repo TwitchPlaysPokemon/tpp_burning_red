@@ -1,4 +1,5 @@
 #![allow(clippy::cast_lossless)]
+#![feature(proc_macro_hygiene, decl_macro)]
 
 extern crate phf;
 extern crate reqwest;
@@ -40,6 +41,13 @@ fn main() {
             gfx.run();
         })
         .expect("error: failed to start gui");
+
+    thread::Builder::new()
+        .name("ItemApi".to_string())
+        .spawn(move || {
+            start_item_api();
+        })
+        .expect("error: failed to start ItemApi");
 
     let mut game_state = GameState::from_file().unwrap();
 
