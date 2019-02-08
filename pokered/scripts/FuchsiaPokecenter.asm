@@ -1,5 +1,7 @@
 FuchsiaPokecenter_Script:
 	call Serial_TryEstablishingExternallyClockedConnection
+	ld a, FUCHSIA_CITY
+	ld [wLastBlackoutMap], a
 	jp EnableAutoTextBoxDrawing
 
 FuchsiaPokecenter_TextPointers:

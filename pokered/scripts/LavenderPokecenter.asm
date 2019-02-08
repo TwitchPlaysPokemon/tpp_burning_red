@@ -1,5 +1,7 @@
 LavenderPokecenter_Script:
 	call Serial_TryEstablishingExternallyClockedConnection
+	ld a, LAVENDER_TOWN
+	ld [wLastBlackoutMap], a
 	jp EnableAutoTextBoxDrawing
 
 LavenderPokecenter_TextPointers:

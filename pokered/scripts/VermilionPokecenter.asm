@@ -1,5 +1,7 @@
 VermilionPokecenter_Script:
 	call Serial_TryEstablishingExternallyClockedConnection
+	ld a, VERMILION_CITY
+	ld [wLastBlackoutMap], a
 	jp EnableAutoTextBoxDrawing
 
 VermilionPokecenter_TextPointers:

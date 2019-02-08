@@ -1,5 +1,7 @@
 CinnabarPokecenter_Script:
 	call Serial_TryEstablishingExternallyClockedConnection
+	ld a, CINNABAR_ISLAND
+	ld [wLastBlackoutMap], a
 	jp EnableAutoTextBoxDrawing
 
 CinnabarPokecenter_TextPointers:

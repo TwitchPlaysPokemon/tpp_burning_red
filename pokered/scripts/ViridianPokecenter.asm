@@ -1,5 +1,7 @@
 ViridianPokecenter_Script:
 	call Serial_TryEstablishingExternallyClockedConnection
+	ld a, VIRIDIAN_CITY
+	ld [wLastBlackoutMap], a
 	jp EnableAutoTextBoxDrawing
 
 ViridianPokecenter_TextPointers:

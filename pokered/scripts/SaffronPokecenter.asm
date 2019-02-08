@@ -1,5 +1,7 @@
 SaffronPokecenter_Script:
 	call Serial_TryEstablishingExternallyClockedConnection
+	ld a, SAFFRON_CITY
+	ld [wLastBlackoutMap], a
 	jp EnableAutoTextBoxDrawing
 
 SaffronPokecenter_TextPointers:

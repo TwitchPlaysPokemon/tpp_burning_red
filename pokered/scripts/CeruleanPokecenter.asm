@@ -1,5 +1,7 @@
 CeruleanPokecenter_Script:
 	call Serial_TryEstablishingExternallyClockedConnection
+	ld a, CERULEAN_CITY
+	ld [wLastBlackoutMap], a
 	jp EnableAutoTextBoxDrawing
 
 CeruleanPokecenter_TextPointers:

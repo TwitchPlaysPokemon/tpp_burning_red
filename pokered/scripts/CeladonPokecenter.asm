@@ -1,5 +1,7 @@
 CeladonPokecenter_Script:
 	call Serial_TryEstablishingExternallyClockedConnection
+	ld a, CELADON_CITY
+	ld [wLastBlackoutMap], a
 	jp EnableAutoTextBoxDrawing
 
 CeladonPokecenter_TextPointers:

@@ -18,19 +18,19 @@ RGBLINK ?= $(RGBDS)rgblink
 .SECONDARY:
 .PHONY: all clean tidy tools
 
-roms := pokered.gbc
+roms := pokered.gb
 
 ROMFLAGS := 0
 
 all: $(roms)
 
 clean:
-	rm -f $(roms) $(pokered_obj) $(roms:.gbc=.sym)
+	rm -f $(roms) $(pokered_obj) $(roms:.gb=.sym)
 	find . \( -iname '*.1bpp' -o -iname '*.2bpp' -o -iname '*.pic' \) -exec rm {} +
 	$(MAKE) clean -C tools/
 
 tidy:
-	rm -f $(roms) $(pokered_obj) $(roms:.gbc=.sym)
+	rm -f $(roms) $(pokered_obj) $(roms:.gb=.sym)
 	$(MAKE) clean -C tools/
 
 tools:
@@ -56,7 +56,7 @@ else
 pokered_opt := -jsv -k 01 -l 0x33 -m 0x13 -p 0 -r 03 -t "POKEMON RED"
 endif
 
-pokered.gbc: $(pokered_obj)
+pokered.gb: $(pokered_obj)
 	$(RGBLINK) -d -n pokered.sym -l pokered.link -o $@ $^
 	$(RGBFIX) $(pokered_opt) $@
 	sort pokered.sym -o pokered.sym
