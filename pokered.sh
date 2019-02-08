@@ -10,7 +10,7 @@ for (( flags = 0 ; flags < NUM_ROMS ; flags = flags + 1 )); do
   if [ $rv -ne 0 ]; then
   	exit $rv
   fi
-  cp pokered.gbc ../build/pokered$flags.gbc
+  cp pokered.gb ../build/pokered$flags.gb
   cp pokered.sym ../build/pokered$flags.sym
   popd
 done
