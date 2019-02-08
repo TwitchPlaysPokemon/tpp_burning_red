@@ -393,7 +393,7 @@ PrintGameVersionOnTitleScreen:
 ; these point to special tiles specifically loaded for that purpose and are not usual text
 VersionOnTitleScreenText:
 IF _RED
-	db $60,$61,$7F,$65,$66,$67,$68,$69,"@" ; "Red Version"
+	db $60,$61,$62,$63,$7F,$68,$69,$7F,"@" ; "Burning Red Version"
 ENDC
 IF _BLUE
 	db $61,$62,$63,$64,$65,$66,$67,$68,"@" ; "Blue Version"
