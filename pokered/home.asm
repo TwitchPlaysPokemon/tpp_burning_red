@@ -302,6 +302,12 @@ LoadFrontSpriteByMonIndex::
 	ld [MBC1RomBank], a
 	ret
 
+ApplyPhanceroCryModifier::
+	ld a, [wcf91]
+	cp PHANCERO
+	ret nz
+	inc d
+	ret
 
 PlayCry::
 ; Play monster a's cry.
