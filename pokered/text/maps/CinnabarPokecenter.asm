@@ -1,11 +1,7 @@
 _CinnabarPokecenterText2::
-	text "You can cancel"
-	line "evolution."
-
-	para "When a #MON is"
-	line "evolving, you can"
-	cont "stop it and leave"
-	cont "it the way it is."
+	text "Stop it and leave."
+	
+	para "Now. Get out."
 	done
 
 _CinnabarPokecenterText3::
