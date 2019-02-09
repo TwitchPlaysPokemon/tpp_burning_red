@@ -335,6 +335,13 @@ PrintListMenuEntries::
 	push hl
 	ld bc, SCREEN_WIDTH + 8 ; 1 row down and 8 columns right
 	add hl, bc
+	lb bc, 1, 2
+	ld a, [de]
+	cp 100
+	jr c, .quantity_OK
+	dec hl
+	inc c
+.quantity_OK
 	ld a, "×"
 	ld [hli], a
 	ld a, [wd11e]
@@ -344,7 +351,6 @@ PrintListMenuEntries::
 	push de
 	ld de, wd11e
 	ld [de], a
-	lb bc, 1, 2
 	call PrintNumber
 	pop de
 	pop af

@@ -1438,7 +1438,7 @@ DisplayChooseQuantityMenu::
 	ld a, [wMaxItemQuantity]
 	ld [hl], a
 .handleNewQuantity
-	coord hl, 17, 10
+	coord hl, 16, 10
 	ld a, [wListMenuID]
 	cp PRICEDITEMLISTMENU
 	jr nz, .printQuantity
@@ -1483,10 +1483,17 @@ DisplayChooseQuantityMenu::
 	ld de, hMoney ; total price
 	ld c, $a3
 	call PrintBCDNumber
-	coord hl, 9, 10
+	coord hl, 8, 10
 .printQuantity
 	ld de, wItemQuantity ; current quantity
-	lb bc, LEADING_ZEROES | 1, 2 ; 1 byte, 2 digits
+	lb bc, LEADING_ZEROES | 1, 3 ; 1 byte, 3 digits
+	ld a, [de]
+	cp 100
+	jr nc, .print_without_symbol
+	ld a, "×"
+	ld [hli], a
+	dec c
+.print_without_symbol
 	call PrintNumber
 	jp .waitForKeyPressLoop
 .buttonAPressed ; the player chose to make the transaction
