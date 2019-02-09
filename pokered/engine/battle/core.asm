@@ -2175,8 +2175,7 @@ DisplayBattleMenu:
 	ld [hl], D_RIGHT | A_BUTTON ; wMenuWatchedKeys
 	call HandleMenuInput
 	bit BIT_A_BUTTON, a ; check if A was pressed
-	jr z, .rightColumn
-	jr .AButtonPressed ; the A button was pressed
+	jr nz, .AButtonPressed ; the A button was pressed
 .rightColumn ; put cursor in right column of menu
 	ld a, [wBattleType]
 	cp BATTLE_TYPE_SAFARI
