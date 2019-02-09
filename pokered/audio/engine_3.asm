@@ -921,6 +921,7 @@ Audio3_7d707:
 	call Audio3_7d759
 	jr nc, .asm_7d71f
 	ld d, $0
+	call ApplyPhanceroCryModifier
 	ld a, [wTempoModifier]
 	add $80
 	jr nc, .asm_7d716
@@ -941,6 +942,7 @@ Audio3_7d707:
 Audio3_7d729:
 	call Audio3_7d759
 	jr nc, .asm_7d73a
+	call ApplyPhanceroCryModifier
 	ld a, [wFrequencyModifier]
 	add e
 	jr nc, .asm_7d735

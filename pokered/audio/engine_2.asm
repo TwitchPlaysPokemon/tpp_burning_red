@@ -949,6 +949,7 @@ Audio2_21e2f:
 	jr nc, .asm_21e4c
 .asm_21e39
 	ld d, $0
+	call ApplyPhanceroCryModifier
 	ld a, [wTempoModifier]
 	add $80
 	jr nc, .asm_21e43
@@ -972,6 +973,7 @@ Audio2_21e56:
 	call Audio2_21e9f
 	jr nc, .asm_21e6c
 .asm_21e60
+	call ApplyPhanceroCryModifier
 	ld a, [wFrequencyModifier]
 	add e
 	jr nc, .asm_21e67

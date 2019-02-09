@@ -947,6 +947,7 @@ Audio1_SetSfxTempo:
 	call Audio1_IsCry
 	jr nc, .notCry
 	ld d, 0
+	call ApplyPhanceroCryModifier
 	ld a, [wTempoModifier]
 	add $80
 	jr nc, .next
@@ -968,6 +969,7 @@ Audio1_ApplyFrequencyModifier:
 	call Audio1_IsCry
 	jr nc, .done
 ; if playing a cry, add the cry's frequency modifier
+	call ApplyPhanceroCryModifier
 	ld a, [wFrequencyModifier]
 	add e
 	jr nc, .noCarry

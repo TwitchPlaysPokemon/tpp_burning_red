@@ -2922,6 +2922,7 @@ wBeatGymFlags:: ; d72a
 wd72c:: ; d72c
 ; bit 0: if not set, the 3 minimum steps between random battles have passed
 ; bit 1: prevent audio fade out
+; bit 2: playing Phancero cry
 	ds 1
 
 wd72d:: ; d72d

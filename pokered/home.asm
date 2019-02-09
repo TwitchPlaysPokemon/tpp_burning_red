@@ -302,12 +302,28 @@ LoadFrontSpriteByMonIndex::
 	ld [MBC1RomBank], a
 	ret
 
+ApplyPhanceroCryModifier::
+	push hl
+	ld hl, wd72c
+	bit 2, [hl]
+	pop hl
+	ret z
+	inc d
+	ret
 
 PlayCry::
 ; Play monster a's cry.
+	cp PHANCERO
+	jr nz, .notPhancero
+	ld hl, wd72c
+	set 2, [hl]
+.notPhancero
 	call GetCryData
 	call PlaySound
-	jp WaitForSoundToFinish
+	call WaitForSoundToFinish
+	ld hl, wd72c
+	res 2, [hl]
+	ret
 
 GetCryData::
 ; Load cry data for monster a.

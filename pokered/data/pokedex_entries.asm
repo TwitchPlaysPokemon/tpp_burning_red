@@ -1093,7 +1093,7 @@ TentacruelDexEntry:
 
 PhanceroDexEntry:
 	db "GLITCHBIRD@"
-	db 4,9
+	db 5,1
 	dw 1032
 	TX_FAR _PhanceroDexEntry
 	db "@"
