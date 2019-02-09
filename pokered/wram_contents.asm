@@ -616,7 +616,7 @@ wSafariEscapeFactor:: ; cce8
 	ds 1
 wSafariBaitFactor:: ; cce9
 	ds 1;
-
+wWildMonSpecies:: ;ccea
 	ds 1
 
 wTransformedEnemyMonOriginalDVs:: ; cceb

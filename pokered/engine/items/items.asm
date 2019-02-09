@@ -467,13 +467,13 @@ ItemUseBall:
 
 	push hl
 
-; If the Pokémon is transformed, the Pokémon is assumed to be a Ditto.
-; This is a bug because a wild Pokémon could have used Transform via
+; If the Pokémon is transformed, the Pokémon was assumed to be a Ditto.
+; This was a bug because a wild Pokémon could have used Transform via
 ; Mirror Move even though the only wild Pokémon that knows Transform is Ditto.
 	ld hl, wEnemyBattleStatus3
 	bit TRANSFORMED, [hl]
 	jr z, .notTransformed
-	ld a, DITTO
+	ld a, [wWildMonSpecies]
 	ld [wEnemyMonSpecies2], a
 	jr .skip6
 
