@@ -36,7 +36,7 @@ HandleItemListSwapping:
 	call GetCurrentPageNumber
 	ld [wMenuItemPageToSwap], a
 	ld c, 20
-	call DelayFrames
+	rst DelayFrames
 .jump_to_loop
 	callba LoadItemListFromAPI
 	jp DisplayListMenuIDLoop

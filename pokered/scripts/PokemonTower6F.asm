@@ -158,7 +158,7 @@ PokemonTower6Text7:
 	call PlayCry
 	call WaitForSoundToFinish
 	ld c, 30
-	call DelayFrames
+	rst DelayFrames
 	ld hl, PokemonTower2Text_60c24
 	call PrintText
 	jp TextScriptEnd

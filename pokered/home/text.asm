@@ -283,7 +283,7 @@ Char51:: ; para
 	lb bc, 4, 18
 	call ClearScreenArea
 	ld c, 20
-	call DelayFrames
+	rst DelayFrames
 	pop de
 	coord hl, 1, 14
 	jp PlaceNextChar_inc
@@ -298,7 +298,7 @@ Char49::
 	lb bc, 7, 18
 	call ClearScreenArea
 	ld c, 20
-	call DelayFrames
+	rst DelayFrames
 	pop de
 	pop hl
 	coord hl, 1, 11
@@ -572,7 +572,7 @@ TextCommand0A::
 	and A_BUTTON | B_BUTTON
 	jr nz, .skipDelay
 	ld c, 30
-	call DelayFrames
+	rst DelayFrames
 .skipDelay
 	pop bc
 	pop hl
@@ -650,7 +650,7 @@ TextCommand0C::
 	and A_BUTTON | B_BUTTON
 	jr nz, .skipDelay ; if so, skip the delay
 	ld c, 10
-	call DelayFrames
+	rst DelayFrames
 .skipDelay
 	dec d
 	jr nz, .loop

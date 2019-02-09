@@ -118,7 +118,7 @@ Evolution_PartyMonLoop: ; loop over party mons
 	ld hl, IsEvolvingText
 	call PrintText
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	xor a
 	ld [H_AUTOBGTRANSFERENABLED], a
 	coord hl, 0, 0
@@ -150,7 +150,7 @@ Evolution_PartyMonLoop: ; loop over party mons
 	call PlaySoundWaitForCurrent
 	call WaitForSoundToFinish
 	ld c, 40
-	call DelayFrames
+	rst DelayFrames
 	call ClearScreen
 	call RenameEvolvedMon
 	ld a, [wd11e]

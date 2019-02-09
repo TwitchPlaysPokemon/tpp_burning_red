@@ -25,7 +25,7 @@ PewterJigglypuffText:
 	call PrintText
 	StopAllMusic
 	ld c, 32
-	call DelayFrames
+	rst DelayFrames
 	ld hl, JigglypuffFacingDirections
 	ld de, wJigglypuffFacingDirections
 	ld bc, JigglypuffFacingDirectionsEnd - JigglypuffFacingDirections
@@ -58,7 +58,7 @@ PewterJigglypuffText:
 	pop hl
 
 	ld c, 24
-	call DelayFrames
+	rst DelayFrames
 
 	ld a, [wChannelSoundIDs]
 	ld b, a
@@ -67,7 +67,7 @@ PewterJigglypuffText:
 	jr nz, .loop
 
 	ld c, 48
-	call DelayFrames
+	rst DelayFrames
 	call PlayDefaultMusic
 	jp TextScriptEnd
 

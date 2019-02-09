@@ -2,7 +2,7 @@ SoftReset::
 	call StopAllSounds
 	call GBPalWhiteOut
 	ld c, 32
-	call DelayFrames
+	rst DelayFrames
 IF _ITEMAPI
 	ld a, ITEMAPI_LOCK
 	call ItemAPI

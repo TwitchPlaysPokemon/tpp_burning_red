@@ -349,7 +349,7 @@ OverworldLoopLessDelay::
 	jr z, .allPokemonFainted
 .noFaintCheck
 	ld c, 10
-	call DelayFrames
+	rst DelayFrames
 	jp EnterMap
 .allPokemonFainted
 	ld a, $ff

@@ -176,7 +176,7 @@ OakAppearsText:
 	TX_FAR _OakAppearsText
 	TX_ASM
 	ld c, 10
-	call DelayFrames
+	rst DelayFrames
 	xor a
 	ld [wEmotionBubbleSpriteIndex], a ; player's sprite
 	ld [wWhichEmotionBubble], a ; EXCLAMATION_BUBBLE

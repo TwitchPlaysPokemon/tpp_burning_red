@@ -19,7 +19,7 @@ LoadSAV:
 	ld hl, FileDataDestroyedText
 	call PrintText
 	ld c, 100
-	call DelayFrames
+	rst DelayFrames
 	pop hl
 	res 6, [hl]
 	ld a, $1 ; bad checksum
@@ -168,14 +168,15 @@ ENDC
 	ld de, NowSavingString
 	call PlaceString
 	ld c, 120
-	call DelayFrames
+	rst DelayFrames
 	ld hl, GameSavedText
 	call PrintText
 	ld a, SFX_SAVE
 	call PlaySoundWaitForCurrent
 	call WaitForSoundToFinish
 	ld c, 30
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 NowSavingString:
 	db "Now saving...@"

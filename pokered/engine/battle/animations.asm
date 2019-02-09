@@ -136,7 +136,7 @@ DrawFrameBlock:
 	jr z, .advanceFrameBlockDestAddr; skip delay and don't clean OAM buffer
 	ld a, [wSubAnimFrameDelay]
 	ld c, a
-	call DelayFrames
+	rst DelayFrames
 	ld a, [wFBMode]
 	cp 3
 	jr z, .advanceFrameBlockDestAddr ; skip cleaning OAM buffer
@@ -402,7 +402,7 @@ MoveAnimation:
 	jr .next4
 .animationsDisabled
 	ld c, 30
-	call DelayFrames
+	rst DelayFrames
 .next4
 	call PlayApplyingAttackAnimation ; shake the screen or flash the pic in and out (to show damage)
 .animationFinished
@@ -501,7 +501,7 @@ AnimationShakeScreenHorizontallySlow:
 	inc a
 	ld [rWX], a
 	ld c, 2
-	call DelayFrames
+	rst DelayFrames
 	dec b
 	jr nz, .loop1
 	pop bc
@@ -510,7 +510,7 @@ AnimationShakeScreenHorizontallySlow:
 	dec a
 	ld [rWX], a
 	ld c, 2
-	call DelayFrames
+	rst DelayFrames
 	dec b
 	jr nz, .loop2
 	pop bc
@@ -787,7 +787,7 @@ DoBallShakeSpecialEffects:
 	ld a, SFX_TINK
 	call PlaySound
 	ld c, 40
-	call DelayFrames
+	rst DelayFrames
 .skipPlayingSound
 	ld a, [wSubAnimCounter]
 	dec a
@@ -954,7 +954,7 @@ TradeJumpPokeball:
 .skipPlayingSound
 	push bc
 	ld c, 5
-	call DelayFrames
+	rst DelayFrames
 	pop bc
 	ld a, [hSCX] ; background scroll X
 	sub 8 ; scroll to the left
@@ -983,7 +983,8 @@ TailWhipAnimationUnused:
 	ld a, 1
 	ld [wSubAnimCounter], a
 	ld c, 20
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 ; Format: Special Effect ID (1 byte), Address (2 bytes)
 SpecialEffectPointers:
@@ -1069,7 +1070,8 @@ SpecialEffectPointers:
 
 AnimationDelay10:
 	ld c, 10
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 ; calls a function with the turn flipped from player to enemy or vice versa
 ; input - hl - address of function to call
@@ -1157,7 +1159,8 @@ FlashScreenLongDelay:
 	cp 2 ; nothing is done with this
 	ld c, 1
 .delayFrames
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 AnimationFlashScreen:
 	ld a, [rBGP]
@@ -1165,11 +1168,11 @@ AnimationFlashScreen:
 	ld a, %00011011 ; 0, 1, 2, 3 (inverted colors)
 	ld [rBGP], a
 	ld c, 2
-	call DelayFrames
+	rst DelayFrames
 	xor a ; white out background
 	ld [rBGP], a
 	ld c, 2
-	call DelayFrames
+	rst DelayFrames
 	pop af
 	ld [rBGP], a ; restore initial palette
 	ret
@@ -1372,7 +1375,7 @@ _AnimationSlideMonUp:
 	jr nz, .fillBottomRowLoop
 
 	ld c, 2
-	call DelayFrames
+	rst DelayFrames
 	pop bc
 	pop hl
 	pop de
@@ -1485,10 +1488,10 @@ AnimationBlinkMon:
 	push bc
 	call AnimationHideMonPic
 	ld c, 5
-	call DelayFrames
+	rst DelayFrames
 	call AnimationShowMonPic
 	ld c, 5
-	call DelayFrames
+	rst DelayFrames
 	pop bc
 	dec c
 	jr nz, .loop
@@ -1584,7 +1587,8 @@ AnimationMoveMonHorizontally:
 	pop hl
 	call CopyPicTiles
 	ld c, 3
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 AnimationResetMonPosition:
 ; Resets the mon's sprites to be located at the normal coordinates.
@@ -1641,7 +1645,7 @@ AnimationSpiralBallsInward:
 	dec c
 	jr nz, .innerLoop
 	ld c, 5
-	call DelayFrames
+	rst DelayFrames
 	pop hl
 	inc hl
 	inc hl
@@ -1796,7 +1800,7 @@ _AnimationShootBallsUpward:
 	add hl, de ; next OAM entry
 	dec b
 	jr nz, .innerLoop
-	call DelayFrames
+	rst DelayFrames
 	pop bc
 	ld a, [wNumShootingBalls]
 	and a
@@ -1881,7 +1885,7 @@ AnimationSlideMonDownAndHide:
 	call GetMonSpriteTileMapPointerFromRowCount
 	call CopyPicTiles
 	ld c, 8
-	call DelayFrames
+	rst DelayFrames
 	pop af
 	inc a
 	pop bc
@@ -1931,7 +1935,7 @@ _AnimationSlideMonOff:
 	jr nz, .rowLoop
 	ld a, [wSlideMonDelay]
 	ld c, a
-	call DelayFrames
+	rst DelayFrames
 	pop hl
 	dec d
 	dec e
@@ -2931,12 +2935,12 @@ ShakeEnemyHUD_ShakeBG:
 	add d
 	ld [hSCX], a
 	ld c, 2
-	call DelayFrames
+	rst DelayFrames
 	ld a, [wTempSCX]
 	sub d
 	ld [hSCX], a
 	ld c, 2
-	call DelayFrames
+	rst DelayFrames
 	dec e
 	jr nz, .loop
 	ld a, [wTempSCX]

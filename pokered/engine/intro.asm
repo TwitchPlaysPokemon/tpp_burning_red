@@ -157,7 +157,7 @@ AnimateIntroNidorino:
 	ld c, 6 * 6
 	call UpdateIntroNidorinoOAM
 	ld c, 5
-	call DelayFrames
+	rst DelayFrames
 	pop de
 	inc de
 	jr AnimateIntroNidorino
@@ -315,7 +315,7 @@ PlayShootingStar:
 	ldPal a, BLACK, DARK_GRAY, LIGHT_GRAY, WHITE
 	ld [rBGP], a
 	ld c, 180
-	call DelayFrames
+	rst DelayFrames
 	call ClearScreen
 	call DisableLCD
 	xor a
@@ -327,13 +327,13 @@ PlayShootingStar:
 	res 5, [hl]
 	set 3, [hl]
 	ld c, 64
-	call DelayFrames
+	rst DelayFrames
 	callba AnimateShootingStar
 	push af
 	pop af
 	jr c, .next ; skip the delay if the user interrupted the animation
 	ld c, 40
-	call DelayFrames
+	rst DelayFrames
 .next
 	ld a, BANK(Music_IntroBattle)
 	ld [wAudioROMBank], a

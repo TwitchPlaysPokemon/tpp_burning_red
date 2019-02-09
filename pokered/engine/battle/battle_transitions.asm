@@ -360,7 +360,7 @@ BattleTransition_FlashScreen_:
 	jr z, .done
 	ld [rBGP], a
 	ld c, 2
-	call DelayFrames
+	rst DelayFrames
 	jr .loop
 .done
 	dec b
@@ -397,13 +397,14 @@ BattleTransition_Shrink:
 	ld a, $1
 	ld [H_AUTOBGTRANSFERENABLED], a
 	ld c, 6
-	call DelayFrames
+	rst DelayFrames
 	pop bc
 	dec c
 	jr nz, .loop
 	call BattleTransition_BlackScreen
 	ld c, 10
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 ; used for high level trainer dungeon battles
 BattleTransition_Split:
@@ -435,7 +436,8 @@ BattleTransition_Split:
 	jr nz, .loop
 	call BattleTransition_BlackScreen
 	ld c, 10
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 BattleTransition_CopyTiles1:
 	ld a, c

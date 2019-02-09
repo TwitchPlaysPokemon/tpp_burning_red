@@ -243,7 +243,7 @@ StartBattle:
 	dec a ; is it a trainer battle?
 	call nz, EnemySendOutFirstMon ; if it is a trainer battle, send out enemy mon
 	ld c, 40
-	call DelayFrames
+	rst DelayFrames
 	call SaveScreenTilesToBuffer1
 .checkAnyPartyAlive
 	call AnyPartyAlive
@@ -617,7 +617,7 @@ HandlePoisonBurnLeechSeed:
 	ret nz          ; test if fainted
 	call DrawHUDsAndHPBars
 	ld c, 20
-	call DelayFrames
+	rst DelayFrames
 	xor a
 	ret
 
@@ -1028,7 +1028,7 @@ TrainerBattleVictory:
 	ret z
 	call ScrollTrainerPicAfterBattle
 	ld c, 40
-	call DelayFrames
+	rst DelayFrames
 	call PrintEndBattleText
 ; win money
 	ld hl, MoneyForWinningText
@@ -1231,7 +1231,7 @@ HandlePlayerBlackOut:
 	call ClearScreenArea
 	call ScrollTrainerPicAfterBattle
 	ld c, 40
-	call DelayFrames
+	rst DelayFrames
 	ld hl, Sony1WinText
 	call PrintText
 	ld a, [wCurMap]
@@ -1304,7 +1304,7 @@ SlideDownFaintedMonPic:
 	ld de, SevenSpacesText
 	call PlaceString
 	ld c, 2
-	call DelayFrames
+	rst DelayFrames
 	pop hl
 	pop de
 	pop bc
@@ -1354,7 +1354,7 @@ SlideTrainerPicOffScreen:
 	dec b
 	jr nz, .rowLoop
 	ld c, 2
-	call DelayFrames
+	rst DelayFrames
 	pop hl
 	pop bc
 	dec c
@@ -1866,7 +1866,7 @@ AnimateRetreatingPlayerMon:
 	ld [hBaseTileID], a
 	predef CopyDownscaledMonTiles
 	ld c, 4
-	call DelayFrames
+	rst DelayFrames
 	call .clearScreenArea
 	coord hl, 4, 9
 	lb bc, 3, 3
@@ -2123,12 +2123,12 @@ DisplayBattleMenu:
 	coord hl, 9, 14
 	ld [hl], "▶"
 	ld c, 80
-	call DelayFrames
+	rst DelayFrames
 	ld [hl], " "
 	coord hl, 9, 16
 	ld [hl], "▶"
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	ld [hl], "▷"
 	ld a, $2 ; select the "ITEM" menu
 	jp .upperLeftMenuItemWasNotSelected
@@ -2516,7 +2516,7 @@ PartyMenuOrRockOrRun:
 SwitchPlayerMon:
 	callab RetreatMon
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	call AnimateRetreatingPlayerMon
 	ld a, [wWhichPokemon]
 	ld [wPlayerMonNumber], a
@@ -2842,7 +2842,7 @@ AnyMoveToSelect:
 	ld hl, NoMovesLeftText
 	call PrintText
 	ld c, 60
-	call DelayFrames
+	rst DelayFrames
 	xor a
 	ret
 
@@ -3256,7 +3256,7 @@ playPlayerMoveAnimation:
 	jr MirrorMoveCheck
 playerCheckIfFlyOrChargeEffect:
 	ld c, 30
-	call DelayFrames
+	rst DelayFrames
 	ld a, [wPlayerMoveEffect]
 	cp FLY_EFFECT
 	jr z, .playAnim
@@ -4028,7 +4028,8 @@ PrintCriticalOHKOText:
 	ld [wCriticalHitOrOHKO], a
 .done
 	ld c, 20
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 CriticalOHKOTextPointers:
 	dw CriticalHitText
@@ -5808,7 +5809,7 @@ playEnemyMoveAnimation:
 EnemyCheckIfFlyOrChargeEffect:
 	call SwapPlayerAndEnemyLevels
 	ld c, 30
-	call DelayFrames
+	rst DelayFrames
 	ld a, [wEnemyMoveEffect]
 	cp FLY_EFFECT
 	jr z, .playAnim
@@ -7038,7 +7039,7 @@ AnimateSendingOutMon:
 	lb bc, 3, 3
 	predef CopyDownscaledMonTiles
 	ld c, 4
-	call DelayFrames
+	rst DelayFrames
 	ld bc, -(SCREEN_WIDTH * 2 + 1)
 	add hl, bc
 	xor a
@@ -7046,7 +7047,7 @@ AnimateSendingOutMon:
 	lb bc, 5, 5
 	predef CopyDownscaledMonTiles
 	ld c, 5
-	call DelayFrames
+	rst DelayFrames
 	ld bc, -(SCREEN_WIDTH * 2 + 1)
 	jr .next
 .notInBattle
@@ -7377,7 +7378,7 @@ PoisonEffect:
 	ret nz
 .didntAffect
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	jp PrintDidntAffectText
 
 PoisonedText:
@@ -8064,7 +8065,7 @@ SwitchAndTeleportEffect:
 	cp b ; is rand[0, playerLevel + enemyLevel) >= (enemyLevel / 4)?
 	jr nc, .playerMoveWasSuccessful ; if so, allow teleporting
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	ld a, [wPlayerMoveNum]
 	cp TELEPORT
 	jp nz, PrintDidntAffectText
@@ -8079,7 +8080,7 @@ SwitchAndTeleportEffect:
 	jr .playAnimAndPrintText
 .notWildBattle1
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	ld hl, IsUnaffectedText
 	ld a, [wPlayerMoveNum]
 	cp TELEPORT
@@ -8106,7 +8107,7 @@ SwitchAndTeleportEffect:
 	cp b
 	jr nc, .enemyMoveWasSuccessful
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	ld a, [wEnemyMoveNum]
 	cp TELEPORT
 	jp nz, PrintDidntAffectText
@@ -8121,7 +8122,7 @@ SwitchAndTeleportEffect:
 	jr .playAnimAndPrintText
 .notWildBattle2
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	ld hl, IsUnaffectedText
 	ld a, [wEnemyMoveNum]
 	cp TELEPORT
@@ -8131,7 +8132,7 @@ SwitchAndTeleportEffect:
 	push af
 	call PlayBattleAnimation
 	ld c, 20
-	call DelayFrames
+	rst DelayFrames
 	pop af
 	ld hl, RanFromBattleText
 	cp TELEPORT
@@ -8392,7 +8393,7 @@ ConfusionEffectFailed:
 	cp CONFUSION_SIDE_EFFECT
 	ret z
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	jp ConditionalPrintButItFailed
 
 ParalyzeEffect:
@@ -8435,7 +8436,7 @@ RageEffect:
 
 MimicEffect:
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	call MoveHitTest
 	ld a, [wMoveMissed]
 	and a

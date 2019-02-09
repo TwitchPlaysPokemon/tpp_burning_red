@@ -5,7 +5,7 @@ ChangeBGPalColor0_4Frames:
 	or b
 	ld [rBGP], a
 	ld c, 4
-	call DelayFrames
+	rst DelayFrames
 	ld a, [rBGP]
 	and %11111100
 	ld [rBGP], a
@@ -34,8 +34,7 @@ PredefShakeScreenVertically:
 	xor b
 	ld [$ff96], a
 	ld [rWY], a
-	ld c, 3
-	jp DelayFrames
+	jp Delay3
 
 PredefShakeScreenHorizontally:
 ; Moves the window right and then back in a sequence of progressively smaller
@@ -46,7 +45,7 @@ PredefShakeScreenHorizontally:
 	ld [$ff97], a
 	call .MutateWX
 	ld c, 1
-	call DelayFrames
+	rst DelayFrames
 	call .MutateWX
 	dec b
 	ld a, b
@@ -68,4 +67,5 @@ PredefShakeScreenHorizontally:
 	add 7
 	ld [rWX], a
 	ld c, 4
-	jp DelayFrames
+	rst DelayFrames
+	ret

@@ -14,7 +14,8 @@ PrintWaitingText:
 	ld de, WaitingText
 	call PlaceString
 	ld c, 50
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 WaitingText:
 	db "Waiting...!@"

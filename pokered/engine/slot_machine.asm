@@ -129,7 +129,8 @@ MainSlotMachineLoop:
 	ld hl, OutOfCoinsSlotMachineText
 	call PrintText
 	ld c, 60
-	jp DelayFrames
+	rst DelayFrames
+	ret
 .skip2
 	ld hl, OneMoreGoSlotMachineText
 	call PrintText
@@ -209,7 +210,7 @@ SlotMachine_SpinWheels:
 	call SlotMachine_AnimWheel2
 	call SlotMachine_AnimWheel3
 	ld c, 2
-	call DelayFrames
+	rst DelayFrames
 	pop bc
 	dec c
 	jr nz, .loop1
@@ -225,7 +226,7 @@ SlotMachine_SpinWheels:
 	xor $1
 	inc a
 	ld c, a
-	call DelayFrames
+	rst DelayFrames
 	jr .loop2
 
 ; Note that the wheels can only stop when a symbol is centred in the wheel
@@ -458,7 +459,7 @@ SlotMachine_CheckForMatches:
 	xor $40
 	ld [rBGP], a
 	ld c, 5
-	call DelayFrames
+	rst DelayFrames
 	dec b
 	jr nz, .flashScreenLoop
 	ld hl, wPayoutCoins
@@ -707,7 +708,7 @@ SlotMachine_PayCoinsToPlayer:
 	jr nc, .skip2
 	srl c ; c = 4 (make the the coins transfer faster if the symbol was 7 or bar)
 .skip2
-	call DelayFrames
+	rst DelayFrames
 	jr .loop
 
 SlotMachine_PutOutLitBalls:

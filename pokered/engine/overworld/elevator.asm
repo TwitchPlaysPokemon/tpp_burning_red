@@ -22,7 +22,7 @@ ShakeElevator:
 	call PlayMusic
 	pop bc
 	ld c, 2
-	call DelayFrames
+	rst DelayFrames
 	dec b
 	jr nz, .shakeLoop
 	ld a, d

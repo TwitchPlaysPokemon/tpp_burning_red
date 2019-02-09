@@ -158,7 +158,7 @@ InGameTrade_RestoreScreen:
 	call Delay3
 	call LoadGBPal
 	ld c, 10
-	call DelayFrames
+	rst DelayFrames
 	jpba LoadWildData
 
 InGameTrade_PrepareTradeData:

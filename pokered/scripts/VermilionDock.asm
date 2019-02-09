@@ -49,7 +49,7 @@ VermilionDock_1db9b:
 	xor a
 	ld [wSpriteStateData1 + 2], a
 	ld c, 120
-	call DelayFrames
+	rst DelayFrames
 	ld b, $9c
 	call CopyScreenTileBufferToVRAM
 	coord hl, 0, 10
@@ -204,7 +204,7 @@ VermilionDock_EraseSSAnne:
 	ld a, SFX_SS_ANNE_HORN
 	call PlaySound
 	ld c, 120
-	call DelayFrames
+	rst DelayFrames
 	ret
 
 VermilionDock_TextPointers:

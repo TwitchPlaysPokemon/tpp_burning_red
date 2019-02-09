@@ -25,7 +25,7 @@ HealEffect_:
 	push de
 	push af
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	ld hl, wBattleMonStatus
 	ld a, [H_WHOSETURN]
 	and a
@@ -103,7 +103,7 @@ HealEffect_:
 	jp PrintText
 .failed
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	ld hl, PrintButItFailedText_
 	jp BankswitchEtoF
 

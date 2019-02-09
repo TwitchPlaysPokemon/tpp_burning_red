@@ -133,7 +133,8 @@ TradeFuncPointerTable:
 
 Trade_Delay100:
 	ld c, 100
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 Trade_CopyTileMapToVRAM:
 	ld a, $1
@@ -145,7 +146,8 @@ Trade_CopyTileMapToVRAM:
 
 Trade_Delay80:
 	ld c, 80
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 Trade_ClearTileMap:
 	coord hl, 0, 0
@@ -300,7 +302,7 @@ Trade_AnimateBallEnteringLinkCable:
 	ld a, TRADE_BALL_SHAKE_ANIM
 	call Trade_ShowAnimation
 	ld c, 10
-	call DelayFrames
+	rst DelayFrames
 	ld a, %11100100
 	ld [rOBP0], a
 	xor a
@@ -561,7 +563,8 @@ Trade_CopyCableTilesOffScreen:
 	ld a, REDRAW_ROW
 	ld [hRedrawRowOrColumnMode], a
 	ld c, 10
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 Trade_AnimMonMoveHorizontal:
 ; Animates the mon going through the link cable horizontally over a distance of
@@ -665,7 +668,7 @@ Trade_AnimMonMoveVertical:
 	call Trade_AddOffsetsToOAMCoords
 	call Trade_AnimCircledMon
 	ld c, 8
-	call DelayFrames
+	rst DelayFrames
 	dec d
 	jr nz, .loop
 	ret
@@ -738,7 +741,8 @@ Trade_LoadMonSprite:
 	coord hl, 7, 2
 	call LoadFlippedFrontSpriteByMonIndex
 	ld c, 10
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 Trade_ShowClearedWindow:
 ; clears the window and covers the BG entirely with the window
@@ -761,7 +765,7 @@ Trade_SlideTextBoxOffScreen:
 ; after Trade_ShowEnemyMon in the external clock sequence, there is a mon pic
 ; above the text box and it is also scrolled off the screen.
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 .loop
 	call DelayFrame
 	ld a, [rWX]
@@ -772,7 +776,7 @@ Trade_SlideTextBoxOffScreen:
 	jr nz, .loop
 	call Trade_ClearTileMap
 	ld c, 10
-	call DelayFrames
+	rst DelayFrames
 	ld a, $7
 	ld [rWX], a
 	ret
@@ -781,7 +785,7 @@ PrintTradeWentToText:
 	ld hl, TradeWentToText
 	call PrintText
 	ld c, 200
-	call DelayFrames
+	rst DelayFrames
 	jp Trade_SlideTextBoxOffScreen
 
 TradeWentToText:

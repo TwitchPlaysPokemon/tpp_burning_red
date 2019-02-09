@@ -116,7 +116,7 @@ ENDC
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a
 	ld c, 4
-	call DelayFrames
+	rst DelayFrames
 	ld de, RedSprite
 	ld hl, vSprites
 	lb bc, BANK(RedSprite), $0C
@@ -125,7 +125,7 @@ ENDC
 	lb bc, BANK(ShrinkPic1), $00
 	call IntroDisplayPicCenteredOrUpperRight
 	ld c, 4
-	call DelayFrames
+	rst DelayFrames
 	ld de, ShrinkPic2
 	lb bc, BANK(ShrinkPic2), $00
 	call IntroDisplayPicCenteredOrUpperRight
@@ -144,7 +144,7 @@ ENDC
 	ld [H_LOADEDROMBANK], a
 	ld [MBC1RomBank], a
 	ld c, 20
-	call DelayFrames
+	rst DelayFrames
 	coord hl, 6, 5
 	ld b, 7
 	ld c, 7
@@ -153,7 +153,7 @@ ENDC
 	ld a, 1
 	ld [wUpdateSpritesEnabled], a
 	ld c, 50
-	call DelayFrames
+	rst DelayFrames
 	call GBFadeOutToWhite
 	jp ClearScreen
 OakSpeechText1:
@@ -181,7 +181,7 @@ FadeInIntroPic:
 	ld a, [hli]
 	ld [rBGP], a
 	ld c, 10
-	call DelayFrames
+	rst DelayFrames
 	dec b
 	jr nz, .next
 	ret

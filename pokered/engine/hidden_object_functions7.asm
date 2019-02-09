@@ -338,22 +338,22 @@ BillsHousePC:
 	ld [wDoNotWaitForButtonPressAfterDisplayingText], a
 	tx_pre BillsHouseInitiatedText
 	ld c, 32
-	call DelayFrames
+	rst DelayFrames
 	ld a, SFX_TINK
 	call PlaySound
 	call WaitForSoundToFinish
 	ld c, 80
-	call DelayFrames
+	rst DelayFrames
 	ld a, SFX_SHRINK
 	call PlaySound
 	call WaitForSoundToFinish
 	ld c, 48
-	call DelayFrames
+	rst DelayFrames
 	ld a, SFX_TINK
 	call PlaySound
 	call WaitForSoundToFinish
 	ld c, 32
-	call DelayFrames
+	rst DelayFrames
 	ld a, SFX_GET_ITEM_1
 	call PlaySound
 	call WaitForSoundToFinish
@@ -378,12 +378,12 @@ BillsHouseInitiatedText:
 	ld [wNewSoundID], a
 	call PlaySound
 	ld c, 16
-	call DelayFrames
+	rst DelayFrames
 	ld a, SFX_SWITCH
 	call PlaySound
 	call WaitForSoundToFinish
 	ld c, 60
-	call DelayFrames
+	rst DelayFrames
 	jp TextScriptEnd
 
 BillsHousePokemonList:

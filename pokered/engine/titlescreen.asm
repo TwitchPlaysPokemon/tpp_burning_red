@@ -183,7 +183,7 @@ ENDC
 .finishedBouncingPokemonLogo
 	call LoadScreenTilesFromBuffer1
 	ld c, 36
-	call DelayFrames
+	rst DelayFrames
 	ld a, SFX_INTRO_WHOOSH
 	call PlaySound
 

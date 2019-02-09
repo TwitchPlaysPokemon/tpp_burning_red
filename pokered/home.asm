@@ -1,18 +1,39 @@
-; The rst vectors are unused.
 SECTION "rst 00", ROM0
 	rst $38
+	nop ;padding
+	nop
+
+GBPalWhiteOutWithDelay3::
+	call GBPalWhiteOut
+
+Delay3::
+; The bg map is updated each frame in thirds.
+; Wait three frames to let the bg map fully update.
+	ld c, 3
+
 SECTION "rst 08", ROM0
-	rst $38
+RST_DelayFrames::
+; wait c frames
+	call DelayFrame
+	dec c
+	jr nz, RST_DelayFrames
+	ret
+
 SECTION "rst 10", ROM0
 	rst $38
+
 SECTION "rst 18", ROM0
 	rst $38
+
 SECTION "rst 20", ROM0
 	rst $38
+
 SECTION "rst 28", ROM0
 	rst $38
+
 SECTION "rst 30", ROM0
 	rst $38
+
 SECTION "rst 38", ROM0
 	rst $38
 
@@ -2341,7 +2362,8 @@ DisplayPokedex::
 SetSpriteFacingDirectionAndDelay::
 	call SetSpriteFacingDirection
 	ld c, 6
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 SetSpriteFacingDirection::
 	ld a, $9
@@ -2813,13 +2835,6 @@ LoadScreenTilesFromBuffer1::
 	ld [H_AUTOBGTRANSFERENABLED], a
 	ret
 
-DelayFrames::
-; wait c frames
-	call DelayFrame
-	dec c
-	jr nz, DelayFrames
-	ret
-
 PlaySoundWaitForCurrent::
 	push af
 	call WaitForSoundToFinish
@@ -3092,7 +3107,8 @@ ManualTextScroll::
 	jp PlaySound
 .inLinkBattle
 	ld c, 65
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 ; function to do multiplication
 ; all values are big endian
@@ -3876,17 +3892,7 @@ RestoreScreenTilesAndReloadTilePatterns::
 	call LoadScreenTilesFromBuffer2
 	call LoadTextBoxTilePatterns
 	call RunDefaultPaletteCommand
-	jr Delay3
-
-
-GBPalWhiteOutWithDelay3::
-	call GBPalWhiteOut
-
-Delay3::
-; The bg map is updated each frame in thirds.
-; Wait three frames to let the bg map fully update.
-	ld c, 3
-	jp DelayFrames
+	jp Delay3
 
 GBPalNormal::
 ; Reset BGP and OBP0.
