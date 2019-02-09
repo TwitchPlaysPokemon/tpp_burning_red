@@ -1,5 +1,15 @@
 WaterMons:
-	db $00
+	db $05
+	db 129,MAGIKARP
+	db 143,MAGIKARP
+	db 130,MAGIKARP
+	db 151,MAGIKARP
+	db 30,SNORLAX
+	db 50,GYARADOS
+	db 21,MEW
+	db 31,MEW
+	db 41,MEW
+	db 51,MEW
 	db $05
 	db 5,TENTACOOL
 	db 10,TENTACOOL
