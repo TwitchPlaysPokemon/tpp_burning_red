@@ -2,7 +2,7 @@ use crate::bizhawk::Bizhawk;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 use std::time;
-use crate::gamestate::ApiState;
+use crate::item_api::ApiState;
 use crate::warp_connections::*;
 use std::sync::{Arc, Mutex};
 
@@ -347,7 +347,7 @@ lazy_static! {
     static ref GEN_3_BYTES: &'static [u8] = include_bytes!("personal_fr");
     pub static ref BASE_STATS: Vec<BaseStats> = BaseStats::from_bytes(&GEN_1_BYTES, &GEN_2_BYTES, &GEN_3_BYTES);
     pub static ref BIZHAWK: Bizhawk = Bizhawk::new(5337);
-    pub static ref RED_ITEM_STATE: Arc<Mutex<ApiState>> = Arc::new(Mutex::new(ApiState::default()));
+    pub static ref RED_ITEM_STATE: Arc<Mutex<ApiState>> = Arc::new(Mutex::new(ApiState::new()));
 }
                                           
 pub static NATURE_EFFECTS: [[f32;5];25] = [/*ATK, DEF, SPE, SPA, SPD*/
@@ -491,7 +491,7 @@ pub static FIRERED_RED_TEXT: [u8;256] = [
 // Fire Red -> Red item map "0x00" means ignore when transfering
 pub static FIRERED_RED_ITEMS: [u8;384] = [
 /*      0x00  0x01  0x02  0x03  0x04  0x05  0x06  0x07  0x08  0x09  0x0A  0x0B  0x0C  0x0D  0x0E  0x0F*/
-/*0000*/0x00, 0x01, 0x02, 0x03, 0x04, 0x08, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x14, 0x0B, 0x0C,
+/*0000*/0x00, 0x01, 0x02, 0x03, 0x04, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x14, 0x0B, 0x0C,
 /*0010*/0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x34, 0x35, 0x36, 0x3C, 0x3D, 0x3E, 0x13, 0x00, 0x00,
 /*0020*/0x00, 0x00, 0x50, 0x51, 0x52, 0x53, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 /*0030*/0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x23,
@@ -533,5 +533,34 @@ pub static RED_FIRERED_ITEMS: [u16;256] = [
 /*0xB0*/0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 /*0xC0*/0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0121, 0x0122, 0x0123, 0x0124, 0x0125, 0x0126, 0x0127,
 /*0xD0*/0x0128, 0x0129, 0x012A, 0x012B, 0x012C, 0x012D, 0x012E, 0x012F, 0x0130, 0x0131, 0x0132, 0x0133, 0x0134, 0x0135, 0x0136, 0x0137,
-/*0xD0*/0x0138, 0x0139, 0x013A, 0x013B, 0x013C, 0x013D, 0x013E, 0x013F, 0x0140, 0x0141, 0x0142, 0x0143, 0x0144, 0x0145, 0x0146, 0x0147,
-/*0xD0*/0x0148, 0x0149, 0x014A, 0x014B, 0x014C, 0x014D, 0x014E, 0x014F, 0x0150, 0x0151, 0x0152, 0x0153, 0x0154, 0x0155, 0x0156, 0x0157];
+/*0xE0*/0x0138, 0x0139, 0x013A, 0x013B, 0x013C, 0x013D, 0x013E, 0x013F, 0x0140, 0x0141, 0x0142, 0x0143, 0x0144, 0x0145, 0x0146, 0x0147,
+/*0xF0*/0x0148, 0x0149, 0x014A, 0x014B, 0x014C, 0x014D, 0x014E, 0x014F, 0x0150, 0x0151, 0x0152, 0x0153, 0x0154, 0x0155, 0x0156, 0x0157];
+
+// Item Pockets
+
+pub const P_GENR: u8 = 0x00;
+pub const P_KEYI: u8 = 0x01;
+pub const P_BALL: u8 = 0x02;
+pub const P_TMHM: u8 = 0x03;
+pub const P_PC: u8 = 0x04;
+
+pub const MAX_ITEM_COUNTS: [usize;5] = [0x2A, 0x1E, 0x0D, 0x3A, 0x1E];
+
+pub static RED_ITEM_POCKETS: [u8;256] = [
+/*       0x00    0x01    0x02    0x03    0x04    0x05    0x06    0x07    0x08    0x09    0x0A    0x0B    0x0C    0x0D    0x0E    0x0F*/
+/*0x00*/P_GENR, P_BALL, P_BALL, P_BALL, P_BALL, P_KEYI, P_KEYI, P_GENR, P_BALL, P_KEYI, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR,
+/*0x10*/P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_KEYI, P_KEYI, P_KEYI, P_KEYI, P_KEYI, P_KEYI, P_KEYI, P_KEYI, P_GENR, P_GENR, P_KEYI,
+/*0x20*/P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_KEYI, P_KEYI, P_KEYI, P_GENR, P_KEYI, P_GENR, P_GENR,
+/*0x30*/P_KEYI, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_KEYI,
+/*0x40*/P_KEYI, P_GENR, P_GENR, P_GENR, P_GENR, P_KEYI, P_KEYI, P_KEYI, P_KEYI, P_KEYI, P_KEYI, P_KEYI, P_KEYI, P_KEYI, P_KEYI, P_GENR,
+/*0x50*/P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR,
+/*0x60*/P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR,
+/*0x70*/P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR,
+/*0x80*/P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR,
+/*0x90*/P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR,
+/*0xA0*/P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR,
+/*0xB0*/P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR, P_GENR,
+/*0xC0*/P_GENR, P_GENR, P_GENR, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM,
+/*0xD0*/P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM,
+/*0xE0*/P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM,
+/*0xF0*/P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM];

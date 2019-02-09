@@ -17,10 +17,12 @@ mod constants;
 mod pokemon;
 mod gamestate;
 mod gfx_system;
+mod item_api;
 
 use crate::gamestate::*;
 use crate::constants::*;
 use crate::gfx_system::*;
+use crate::item_api::*;
 use std::thread;
 use byteorder::{ByteOrder, LittleEndian};
 use std::sync::{Arc, Mutex};

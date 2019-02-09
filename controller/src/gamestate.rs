@@ -2,9 +2,7 @@ use crate::pokemon::*;
 use crate::constants::*;
 use crate::bizhawk::*;
 use bincode;
-use rocket::{get, routes};
-use rocket::config::{Config, Environment, LoggingLevel};
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 use std::fs::File;
 use rand;
 use byteorder::{ByteOrder, LittleEndian, BigEndian};
@@ -14,8 +12,8 @@ use std::thread;
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GameState {
     pub trainer: TrainerInfo,
-    red_items: Bag,
-    firered_items: Bag,
+    red_items: [Pocket;5],
+    firered_items: [Pocket;4],
     options: Options,
     pub game: Game,
     money: u32,
@@ -33,8 +31,15 @@ impl GameState {
     pub fn new() -> GameState {
         GameState {
             trainer: TrainerInfo::new(),
-            red_items: Bag::new(),
-            firered_items: Bag::new(),
+            red_items: [Pocket::new(&[0x86, 0xA4, 0xAD, 0xA4, 0xB1, 0xA0, 0xAB, 0x50], P_GENR), // "General"
+                        Pocket::new(&[0x8A, 0xA4, 0xB8, 0x7F, 0x88, 0xB3, 0xA4, 0xAC, 0xB2, 0x50], P_KEYI), // "Key Items"
+                        Pocket::new(&[0x8F, 0xAE, 0xAA, 0xBA, 0x7F, 0x81, 0xA0, 0xAB, 0xAB, 0xB2, 0x50], P_BALL), // "Poké Balls"
+                        Pocket::new(&[0x93, 0x8C, 0xB2, 0x7F, 0xF3, 0x7F, 0x87, 0x8C, 0xB2, 0x50], P_TMHM),// "TMs / HMs"
+                        Pocket::new(&[0x8F, 0x82, 0x7F, 0x88, 0xB3, 0xA4, 0xAC, 0xB2, 0x50, 0x50, 0x50, 0x50, 0x50], P_PC)], // "PC Items"
+            firered_items: [Pocket::new(&[0xFF], P_GENR), // We dont care about pocket name in FR
+                            Pocket::new(&[0xFF], P_KEYI),
+                            Pocket::new(&[0xFF], P_BALL),
+                            Pocket::new(&[0xFF], P_TMHM)],
             options: Options::new(),
             game: Game::FIRERED,
             money: 0,
@@ -249,6 +254,8 @@ impl GameState {
                     } else {
                         BIZHAWK.load_state("red_warp").unwrap();
                     }
+
+                    BIZHAWK.on_memory_write("item_api", 0xD31D, 0x04, "http://localhost:5340/item_api");
 
                     self.game = Game::RED;
 
@@ -607,15 +614,6 @@ impl GameState {
                     let current_section = LittleEndian::read_u16(&item_memory[(i*0x04 + 0x02)..(i*0x04) + 0x04]);
                     LittleEndian::write_u16(&mut item_memory[(i*0x04 + 0x02)..(i*0x04) + 0x04], current_section ^ key);
                 }
-                
-                /*println!("Address 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F");
-                for i in 0..(item_memory.len() / 0x10) {
-                    print!("{:07X}", i);
-                    for j in 0..0x10 {
-                        print!(" {:02X}", item_memory[(i*0x10)+j]);
-                    }
-                    println!("");
-                }*/
 
                 for i in 0..4 {
                     let pocket = match i {
@@ -625,24 +623,17 @@ impl GameState {
                         _ => &item_memory[0x0154..0x023C]
                     };
 
-                    let pocket_to_update = match i {
-                        0 => &mut self.firered_items.general,
-                        1 => &mut self.firered_items.key,
-                        2 => &mut self.firered_items.balls,
-                        _ => &mut self.firered_items.tmhm,
-                    };
-
                     for j in 0..pocket.len() / 0x04 {
                         let id = LittleEndian::read_u16(&pocket[j*0x04..0x02 + j*0x04]);
                         let count = LittleEndian::read_u16(&pocket[0x02 + j*0x04..0x04 + j*0x04]);
+
+                        self.firered_items[i].content.clear();
+
                         if id == 0 || count == 0 {
                             break;
-                        }
-                        if let Some(entry) = pocket_to_update.get_mut(&id) {
-                            *entry = count;
-                        } else {
-                            pocket_to_update.insert(id, count);
-                        }
+                        } 
+
+                        self.firered_items[i].content.push([id, count]);
                     }
                 }
             }
@@ -789,113 +780,18 @@ pub enum Game {
 }
 
 #[derive(Serialize, Deserialize, Clone, Default)]
-pub struct Bag {
-    pub general: BTreeMap<u16, u16>, // ID, Count
-    pub key: BTreeMap<u16, u16>,
-    pub balls: BTreeMap<u16, u16>,
-    pub tmhm: BTreeMap<u16, u16>
+pub struct Pocket {
+    pub content: Vec<[u16;2]>,
+    pub id: u8,
+    pub name: Vec<u8>
 }
 
-impl Bag {
-    pub fn new() -> Bag {
-        Bag {
-            general: BTreeMap::new(),
-            key: BTreeMap::new(),
-            balls: BTreeMap::new(),
-            tmhm: BTreeMap::new()
+impl Pocket {
+    pub fn new(name: &[u8], id: u8) -> Pocket {
+        Pocket {
+            content: Vec::new(),
+            id,
+            name: name.to_vec()
         }
     }
-}
-
-#[derive(Clone, Default)]
-pub struct ApiState {
-    pub inventory: Bag,
-    pub locked: bool,
-    pub page: u8,
-}
-
-#[derive(PartialEq, Eq)]
-pub enum ApiResponse {
-  NONE,
-  CODE,
-  APIBUFFER,
-  PAGE
-}
-
-pub fn start_item_api() {
-    let config = Config::build(Environment::Staging)
-        .address("localhost")
-        .port(5340)
-        .log_level(LoggingLevel::Off)
-        .finalize().unwrap();
-    rocket::custom(config).mount("/", routes![item_api_handler]).launch();
-}
-
-#[get("/item_api")]
-fn item_api_handler() -> &'static str {
-    let mut item_memory = BIZHAWK.read_slice_chained(MemRegion::WRAM, &[(0x131D, 0x11), (0x1526, 0x7A)]).unwrap();
-
-    let code = item_memory[0x00];
-    let api_buffer = &item_memory[0x01..0x12];
-
-    let mut api_state = RED_ITEM_STATE.lock().unwrap();
-    let mut response = ApiResponse::NONE;
-
-    if code > 0x03 {
-        if api_state.locked {
-            if code == ITEM_UNLOCK {
-                // if the api buffer == "InitItemAPI@"
-                if api_buffer[0x00..0x0C] == [0x88, 0xAD, 0xA8, 0xB3, 0x88, 0xB3, 0xA4, 0xAC, 0x80, 0x8F, 0x88, 0x50] {
-                    item_memory[0x00] = ITEM_TRUE;
-                    response = ApiResponse::CODE;
-                }
-            }
-        } else {
-            match code {
-                ITEM_LOCK => {
-                    api_state.locked = true;
-                    item_memory[0x00] = ITEM_TRUE;
-                    response = ApiResponse::CODE;
-                },
-                ITEM_UNLOCK => {
-                    item_memory[0x00] = ITEM_NULL;
-                    response = ApiResponse::CODE;
-                },
-                ITEM_INITIALIZE_ITEM_LISTS => {},
-                ITEM_ERASE_SAVED_DATA => {},
-                ITEM_SAVE => {},
-                ITEM_LOAD => {},
-                ITEM_CAN_GET_ITEM => {},
-                ITEM_ADD_ITEM => {},
-                ITEM_HAS_ITEM => {},
-                ITEM_REMOVE_ITEM => {},
-                ITEM_CAN_GET_PC_ITEM => {},
-                ITEM_ADD_ITEM_TO_PC => {},
-                ITEM_HAS_ITEM_IN_PC => {},
-                ITEM_REMOVE_ITEM_FROM_PC => {},
-                ITEM_DEPOSIT => {},
-                ITEM_WITHDRAW => {},
-                ITEM_SWAP_ITEMS => {},
-                ITEM_SWAP_PC_ITEMS => {},
-                ITEM_IS_BAG_EMPTY => {},
-                ITEM_IS_PC_EMPTY => {},
-                ITEM_GET_ITEM_QUANTITIES => {},
-                ITEM_GET_PAGE_LIMITS => {},
-                _ => {}
-            }; 
-        }
-        match response {
-            ApiResponse::NONE => {},
-            ApiResponse::CODE => {
-                BIZHAWK.write_u8(MemRegion::WRAM, 0x131D, item_memory[0x00]).unwrap();
-            },
-            ApiResponse::APIBUFFER => {
-                BIZHAWK.write_slice(MemRegion::WRAM, 0x131D, &item_memory[0x00..0x12]).unwrap();
-            },
-            ApiResponse::PAGE => {}
-        }
-
-    }
-    
-    "ok"
 }
