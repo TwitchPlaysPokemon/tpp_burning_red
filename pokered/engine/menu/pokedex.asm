@@ -515,19 +515,18 @@ ShowPokedexDataInternal:
 	inc de ; de = address of feet (height)
 	ld a, [de] ; reads feet, but a is overwritten without being used
 	coord hl, 12, 6
-	lb bc, 1, 2
-	call PrintNumber ; print feet (height)
-	ld a, $60 ; feet symbol tile (one tick)
-	ld [hl], a
-	inc de
+	call PrintTwoDigitNumber
+	inc hl
+	inc hl
+	ld [hl], $60 ; feet symbol tile (one tick)
 	inc de ; de = address of inches (height)
 	coord hl, 15, 6
-	lb bc, LEADING_ZEROES | 1, 2
-	call PrintNumber ; print inches (height)
-	ld a, $61 ; inches symbol tile (two ticks)
-	ld [hl], a
+	ld a, [de]
+	call PrintTwoDigitNumber
+	inc hl
+	inc hl
+	ld [hl], $61 ; inches symbol tile (two ticks)
 ; now print the weight (note that weight is stored in tenths of pounds internally)
-	inc de
 	inc de
 	inc de ; de = address of upper byte of weight
 	push de

@@ -1819,3 +1819,24 @@ SetMapTextPointer::
 	ld a, h
 	ld [wMapTextPtr + 1], a
 	ret
+
+PrintTwoDigitNumber:
+	; from a to hl
+	push bc
+	ld c, -1
+.loop
+	inc c
+	sub 10
+	jr nc, .loop
+	inc hl
+	; takes advantage that -10 ($f6) is the codepoint for "0"
+	ld [hld], a
+	ld a, c
+	pop bc
+	and a
+	jr nz, .got_tens
+	ld a, " " - "0"
+.got_tens
+	add a, "0"
+	ld [hl], a
+	ret
