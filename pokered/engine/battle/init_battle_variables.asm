@@ -35,6 +35,6 @@ InitBattleVariables:
 	ld [wBattleType], a
 .notSafariBattle
 	; despite the label, execution always gets here eventually.
-	ld a, $02
+	ld a, 2
 	ld [wBattleResult], a
 	jpab PlayBattleMusic
