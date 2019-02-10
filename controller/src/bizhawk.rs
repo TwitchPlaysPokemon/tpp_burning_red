@@ -1,5 +1,9 @@
+use std::collections::HashMap;
 use reqwest;
+use regex;
 use strum::AsStaticRef;
+use std::fs::File;
+use std::io::Read;
 
 //Memory regions
 #[derive(AsStaticStr)]
@@ -253,4 +257,56 @@ impl Bizhawk {
             Err("Failed to get rom name".to_string())
         }
     }
+}
+
+pub struct SymEntry {
+    region: MemRegion,
+    linear_addr: usize,
+    system_bus_addr: usize,
+    bank: usize
+}
+
+impl SymEntry {
+    pub fn new(bank: usize, system_bus_addr: usize) -> SymEntry {
+        let (region, bank_modulo) = match (system_bus_addr >> 8) as u8 {
+            0x00 ... 0x7F => (MemRegion::ROM, 0x4000),
+            0x80 ... 0x9F => (MemRegion::VRAM, 0x2000),
+            0xA0 ... 0xBF => (MemRegion::CartRAM, 0x2000),
+            0xC0 ... 0xFD => (MemRegion::WRAM, 0x2000), // 0xC000 to 0xDFFF + echo?
+            _ => (MemRegion::ROM, 0x0000) // should never have a sym for anything else
+        };
+
+        let linear_addr = (system_bus_addr % bank_modulo) + bank_modulo*bank;
+
+        SymEntry {
+            region,
+            linear_addr,
+            system_bus_addr,
+            bank
+        }
+    }
+}
+
+pub fn load_symfile_text() -> Result<String, String> {
+    if let Ok(mut symfile) = File::open("pokered.sym") {
+        let mut symfile_string = String::new();
+        if symfile.read_to_string(&mut symfile_string).is_ok() {
+            Ok(symfile_string)
+        } else {
+            Err("Symfile not valid UTF-8".to_string())
+        }
+    } else {
+        Err("Cannot open pokered symfile!".to_string())
+    }
+}
+
+pub fn load_symfile(symfile0: &'static str) -> HashMap<&'static str, SymEntry> {
+    let regex = regex::Regex::new(r"(?i)(?P<bank>[0-9A-F]+):(?P<addr>[0-9A-F]+) (?P<name>[^\s]+)").unwrap();
+    regex.captures_iter(&symfile0)
+        .map(|caps| {
+            Some((caps.name("name")?.as_str(), SymEntry::new(usize::from_str_radix(caps.name("bank")?.as_str(), 16).unwrap(),
+                                                             usize::from_str_radix(caps.name("addr")?.as_str(), 16).unwrap())))
+        })
+        .flatten()
+        .collect()
 }

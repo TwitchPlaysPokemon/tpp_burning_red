@@ -1,4 +1,4 @@
-use crate::bizhawk::Bizhawk;
+use crate::bizhawk;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 use std::time;
@@ -346,8 +346,10 @@ lazy_static! {
     static ref GEN_2_BYTES: &'static [u8] = include_bytes!("personal_gs"); // for gender ratios
     static ref GEN_3_BYTES: &'static [u8] = include_bytes!("personal_fr");
     pub static ref BASE_STATS: Vec<BaseStats> = BaseStats::from_bytes(&GEN_1_BYTES, &GEN_2_BYTES, &GEN_3_BYTES);
-    pub static ref BIZHAWK: Bizhawk = Bizhawk::new(5337);
+    pub static ref BIZHAWK: bizhawk::Bizhawk = bizhawk::Bizhawk::new(5337);
     pub static ref RED_ITEM_STATE: Arc<Mutex<ApiState>> = Arc::new(Mutex::new(ApiState::new()));
+    pub static ref SYMFILE_STRING: String = bizhawk::load_symfile_text().unwrap();
+    pub static ref SYM: HashMap<&'static str, bizhawk::SymEntry> = bizhawk::load_symfile(&SYMFILE_STRING);
 }
                                           
 pub static NATURE_EFFECTS: [[f32;5];25] = [/*ATK, DEF, SPE, SPA, SPD*/

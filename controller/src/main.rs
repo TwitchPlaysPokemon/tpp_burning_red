@@ -28,10 +28,6 @@ use byteorder::{ByteOrder, LittleEndian};
 use std::sync::{Arc, Mutex};
 
 fn main() {
-
-    // Game / Warp map
-    let bizhawk = bizhawk::Bizhawk::new(5337);
-
     let warp_enable = Arc::new(Mutex::new(false));
     let system_enable = Arc::new(Mutex::new(false));
 
@@ -57,11 +53,11 @@ fn main() {
     game_state.collect_mapstate();
 
     // Frame timing
-    let mut current_frame = bizhawk.framecount().unwrap();
+    let mut current_frame = BIZHAWK.framecount().unwrap();
 
     loop { 
         if game_state.enabled || *system_enable.lock().unwrap() {
-            if let Ok(frame) = bizhawk.framecount() {
+            if let Ok(frame) = BIZHAWK.framecount() {
                 if current_frame != frame {
                     current_frame = frame;
                     //println!("{:?}", frame);
@@ -71,7 +67,7 @@ fn main() {
         } else if game_state.game == gamestate::Game::FIRERED {
             game_state.collect_mapstate();
             // Keep the system disabled until we get oaks parcel 0x015D
-            if LittleEndian::read_u16(&bizhawk.read_slice_custom("*03005008+3b8/2".to_string(), 0x02).unwrap()) == 0x015D { // if first slot is oaks parcel
+            if LittleEndian::read_u16(&BIZHAWK.read_slice_custom("*03005008+3b8/2".to_string(), 0x02).unwrap()) == 0x015D { // if first slot is oaks parcel
                 println!("Enabling system");
                 game_state.read_trainer_data();
                 game_state.enabled = true;
