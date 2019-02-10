@@ -14,3 +14,5 @@ _GREEN EQU 0 ;we don't build Green
 _GIRL EQU (_BUILD_FLAGS & 2) == 2
 
 _ITEMAPI EQU (_BUILD_FLAGS & 4) == 4
+
+_TPP EQU 1 ;will fix
