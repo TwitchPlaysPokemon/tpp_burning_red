@@ -441,7 +441,6 @@ impl GameState {
                 let mut count = 0;
                 let mut data = vec![0;0x194];
                 for i in &self.party_uids {
-                    println!("{:?}", i);
                     if *i == 0x0000 {
                         data[0x01 + slot] = 0xFF;
                         slot += 1;
@@ -465,7 +464,6 @@ impl GameState {
             Game::FIRERED => {
                 let mut slot = 0;
                 for i in &self.party_uids {
-                    println!("{:?}", i);
                     if *i == 0x0000 {
                         BIZHAWK.write_slice(&MemRegion::EWRAM, 0x0002_4284 + (slot*100), &[0;100]).unwrap();
                         slot += 1;

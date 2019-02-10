@@ -37,7 +37,6 @@ impl Bizhawk {
     }
 
     pub fn send_command(&self, command: &str) -> Result<(), String> {
-        //println!("{}", command);
         if let Ok(mut result) = self.client.get(format!("http://localhost:{}/{}", self.port, command).as_str()).send() {
             let response = result.text().unwrap_or_default();
             if response != "ok" {
@@ -50,7 +49,6 @@ impl Bizhawk {
     }
 
     pub fn send_command_and_get_response(&self, command: &str) -> Result<String, String> {
-        //println!("{}", command);
         if let Ok(mut result) = self.client.get(format!("http://localhost:{}/{}", self.port, command).as_str()).send() {
             let response = result.text().unwrap_or_default();
             if response.get(0..1) == Some("R") {
