@@ -83,7 +83,7 @@ MainMenu:
 ; 	and a
 ; 	jr z, .choseContinue
 	cp 1
-	jp nz, StartNewGame
+	jp nz, .skipOption
 	call DisplayOptionMenu
 	ld a, 1
 	ld [wOptionsInitialized], a
