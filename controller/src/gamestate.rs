@@ -113,8 +113,8 @@ impl GameState {
         match self.game {
             Game::RED => {
                 self.map_state = MapState {
-                    previous_map: BIZHAWK.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16,
-                    previous_warp: BIZHAWK.read_u8(MemRegion::WRAM, 0x142F).unwrap(),
+                    previous_map: BIZHAWK.read_u8_sym(&SYM["wCurMap"]).unwrap() as u16,
+                    previous_warp: BIZHAWK.read_u8_sym(&SYM["wDestinationWarpID"]).unwrap(),
                     previous_lastmap: 0,
                     map_checked: true,
                     last_change: 0
@@ -122,9 +122,9 @@ impl GameState {
             },
             Game::FIRERED => {
                 self.map_state = MapState {
-                    previous_map: BIZHAWK.read_u16(MemRegion::EWRAM, 0x0003_1DBC).unwrap(),
-                    previous_warp: BIZHAWK.read_u8(MemRegion::EWRAM, 0x0003_1DBE).unwrap(),
-                    previous_lastmap: BIZHAWK.read_u32(MemRegion::EWRAM, 0x0003_1DB4).unwrap(),
+                    previous_map: BIZHAWK.read_u16(&MemRegion::EWRAM, 0x0003_1DBC).unwrap(),
+                    previous_warp: BIZHAWK.read_u8(&MemRegion::EWRAM, 0x0003_1DBE).unwrap(),
+                    previous_lastmap: BIZHAWK.read_u32(&MemRegion::EWRAM, 0x0003_1DB4).unwrap(),
                     map_checked: true,
                     last_change: 0
                 }
@@ -146,8 +146,8 @@ impl GameState {
                 let start_rewind = BIZHAWK.framecount().unwrap();
 
                 loop {
-                    let map_data = BIZHAWK.read_slice(MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
-                    let xy = BIZHAWK.read_slice(MemRegion::IWRAM, 0x0000_0014, 0x4).unwrap();
+                    let map_data = BIZHAWK.read_slice(&MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
+                    let xy = BIZHAWK.read_slice(&MemRegion::IWRAM, 0x0000_0014, 0x4).unwrap();
                     if xy[0] == 0x00 && xy[2] == 0x00 {entered_menu = true;}
                     if (LittleEndian::read_u16(&map_data[0x0C..0x0E]) != map || map_data[0x0E] != warp) && 
                         xy[0] % 0x10 == 0x00 && 
@@ -167,7 +167,7 @@ impl GameState {
                 BIZHAWK.toggle_rewind(false).unwrap();
                 //BIZHAWK.throttle().unwrap();
 
-                let map_data = BIZHAWK.read_slice(MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
+                let map_data = BIZHAWK.read_slice(&MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
 
                 self.map_state.previous_lastmap = LittleEndian::read_u32(&map_data[0x04..0x08]);
                 self.map_state.previous_map = LittleEndian::read_u16(&map_data[0x0C..0x0E]);
@@ -176,15 +176,15 @@ impl GameState {
                 BIZHAWK.play().unwrap();
             },
             Game::RED => {
-                BIZHAWK.write_u8(MemRegion::WRAM, 0x1365, last_map).unwrap(); // lastmap
-                BIZHAWK.write_u8(MemRegion::WRAM, 0x142F, warp).unwrap(); // destination warp
-                BIZHAWK.write_u8(MemRegion::HRAM, 0x000B, map as u8).unwrap(); // map
-                BIZHAWK.write_u8(MemRegion::WRAM, 0x135E, map as u8).unwrap(); // map
+                BIZHAWK.write_u8(&MemRegion::WRAM, 0x1365, last_map).unwrap(); // lastmap
+                BIZHAWK.write_u8(&MemRegion::WRAM, 0x142F, warp).unwrap(); // destination warp
+                BIZHAWK.write_u8(&MemRegion::HRAM, 0x000B, map as u8).unwrap(); // map
+                BIZHAWK.write_u8(&MemRegion::WRAM, 0x135E, map as u8).unwrap(); // map
 
                 BIZHAWK.play().unwrap();
 
-                self.map_state.previous_map = BIZHAWK.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16;
-                self.map_state.previous_warp = BIZHAWK.read_u8(MemRegion::WRAM, 0x142F).unwrap();
+                self.map_state.previous_map = BIZHAWK.read_u8(&MemRegion::WRAM, 0x135E).unwrap() as u16;
+                self.map_state.previous_warp = BIZHAWK.read_u8(&MemRegion::WRAM, 0x142F).unwrap();
 
                 self.map_state.last_change = BIZHAWK.framecount().unwrap();
 
@@ -209,7 +209,6 @@ impl GameState {
             match &self.game {
                 Game::RED => { 
                     println!("Supported map, starting transition to FIRE RED map: {:04x}, warp: {:02x}", map, warp);
-                    //println!("--Loading FIRE RED ROM");
 
                     BIZHAWK.load_rom("firered.gba").unwrap();
                     BIZHAWK.load_state("firered_warp").unwrap();
@@ -222,31 +221,23 @@ impl GameState {
 
                     self.write_misc();
 
-                    BIZHAWK.write_u16(MemRegion::EWRAM, 0x0003_1DBC, map).unwrap();
-                    BIZHAWK.write_u8(MemRegion::EWRAM, 0x0003_1DBE, warp).unwrap();
+                    BIZHAWK.write_u16(&MemRegion::EWRAM, 0x0003_1DBC, map).unwrap();
+                    BIZHAWK.write_u8(&MemRegion::EWRAM, 0x0003_1DBE, warp).unwrap();
 
                     BIZHAWK.frameadvance().unwrap();
 
-                    BIZHAWK.write_u32(MemRegion::EWRAM, 0x0003_1DB4, 0xFFFF_FFFF).unwrap();
-
-                    //let mut map_state = self.map_state.lock().unwrap();
+                    BIZHAWK.write_u32(&MemRegion::EWRAM, 0x0003_1DB4, 0xFFFF_FFFF).unwrap();
 
                     self.map_state.previous_lastmap = 0xFFFF_FFFF;
 
                     BIZHAWK.play().unwrap();
-
-                    self.map_state.previous_map = map;
-                    self.map_state.previous_warp = warp; 
-
-                    self.map_state.last_change = BIZHAWK.framecount().unwrap();
-
-                    //println!("--DONE\n");
                 },
                 Game::FIRERED => {
                     BIZHAWK.mute().unwrap();
+
                     println!("Supported map, starting transition to RED map: {:02x}, warp: {:02x}, Lastmap {:02x}", map, warp, last_map);
 
-                    BIZHAWK.load_rom("red.gbc").unwrap();
+                    BIZHAWK.load_rom("red.gb").unwrap();
                     if self.first_warp {
                         BIZHAWK.load_state("red_default").unwrap();
                         self.first_warp = false;
@@ -255,11 +246,9 @@ impl GameState {
                         BIZHAWK.load_state("red_warp").unwrap();
                     }
 
-                    BIZHAWK.on_memory_write("item_api", 0xD31D, 0x04, "http://localhost:5340/item_api");
+                    BIZHAWK.on_memory_write("item_api", SYM["wItemAPICommand"].bus_addr as u32, 0x04, "http://localhost:5340/item_api").ok();
 
                     self.game = Game::RED;
-
-                    let start_warp = BIZHAWK.framecount().unwrap();
 
                     self.write_trainer_data();
 
@@ -267,36 +256,37 @@ impl GameState {
 
                     self.write_misc();
 
-                    BIZHAWK.write_u8(MemRegion::WRAM, 0x142F, warp).unwrap(); // destination warp
-                    BIZHAWK.write_u8(MemRegion::HRAM, 0x000B, map as u8).unwrap(); // map
-                    BIZHAWK.write_u8(MemRegion::WRAM, 0x135E, map as u8).unwrap(); // map
-                    BIZHAWK.write_u8(MemRegion::WRAM, 0x1367, 0x16).unwrap(); // tileset id
+                    BIZHAWK.write_u8_sym(&SYM["wDestinationWarpID"], warp).unwrap();
+                    BIZHAWK.write_u8_sym(&SYM["wCurMap"], map as u8).unwrap();
+                    BIZHAWK.write_u8_sym(&SYM["wCurMapTileset"], 0x16).unwrap(); // Writing the 0x16 tileset fixes a bug with overworld maps
+                    BIZHAWK.write_u8(&MemRegion::HRAM, 0x000B, map as u8).unwrap();
 
                     BIZHAWK.stop_drawing().unwrap();
                     BIZHAWK.clear_screen(0x00000000).unwrap();
                     BIZHAWK.play().unwrap();
                     BIZHAWK.unthrottle(0).unwrap();
+
+                    let start_warp = BIZHAWK.framecount().unwrap();
                     
                     while BIZHAWK.framecount().unwrap() - start_warp < 240 {
-                        BIZHAWK.write_u8(MemRegion::WRAM, 0x0002, 0x01).unwrap(); // Music
+                        BIZHAWK.write_u8_sym(&SYM["wMuteAudioAndPauseMusic"], 0x01).unwrap();
                         std::thread::sleep(POLL_DELAY);
                     }; // wait 240 frames
 
                     BIZHAWK.throttle().unwrap();
                     BIZHAWK.start_drawing().unwrap();
 
-                    let current_music = BIZHAWK.read_u8(MemRegion::WRAM, 0x0FCA).unwrap(); // music
-                    BIZHAWK.write_slice(MemRegion::WRAM, 0x0fC7, &[current_music, 0x00, 0x00]).unwrap();
-                    BIZHAWK.write_u8(MemRegion::WRAM, 0x1365, last_map).unwrap(); // lastmap
+                    let current_music = BIZHAWK.read_u8_sym(&SYM["wLastMusicSoundID"]).unwrap();
+                    BIZHAWK.write_slice_sym(&SYM["wAudioFadeOutControl"], &[current_music, 0x00, 0x00]).unwrap();
+                    BIZHAWK.write_u8_sym(&SYM["wLastMap"], last_map).unwrap();
 
                     BIZHAWK.unmute().unwrap();
-
-                    self.map_state.previous_map = BIZHAWK.read_u8(MemRegion::WRAM, 0x135E).unwrap() as u16;
-                    self.map_state.previous_warp = BIZHAWK.read_u8(MemRegion::WRAM, 0x142F).unwrap();
-
-                    self.map_state.last_change = BIZHAWK.framecount().unwrap();
                 }
             }
+            self.map_state.previous_map = map;
+            self.map_state.previous_warp = warp;
+
+            self.map_state.last_change = BIZHAWK.framecount().unwrap();
         } else {
             BIZHAWK.play().unwrap();
         }
@@ -305,11 +295,11 @@ impl GameState {
     pub fn check_for_transition(&mut self, mut current_frame: u32, warp_enable: Arc<Mutex<bool>>) {
         match self.game {
             Game::RED => {
-                let map_data = BIZHAWK.read_slice(MemRegion::WRAM, 0x1350, 0xFF).unwrap();
-                let last_map = map_data[0x15];
-                let current_map = map_data[0x0E];
-                let current_warp = map_data[0xDF];
-                
+                let map_data = BIZHAWK.read_slice_sym(&SYM["wCurMap"], 0xFF).unwrap();
+                let last_map = map_data[0x07];
+                let current_map = map_data[0x00];
+                let current_warp = map_data[0xD1];
+
                 if current_map as u16 != self.map_state.previous_map || current_warp != self.map_state.previous_warp {
                     BIZHAWK.pause().unwrap();
                     BIZHAWK.save_state("red_warp").unwrap();
@@ -335,11 +325,11 @@ impl GameState {
                 }
 
                 if current_warp != 0xFF && current_frame - self.map_state.last_change > 120 {
-                    BIZHAWK.write_u8(MemRegion::WRAM, 0x142F, 0xFF).unwrap();
+                    BIZHAWK.write_u8_sym(&SYM["wDestinationWarpID"], 0xFF).unwrap();
                 }
             },
             Game::FIRERED => {
-                let map_data = BIZHAWK.read_slice(MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
+                let map_data = BIZHAWK.read_slice(&MemRegion::EWRAM, 0x0003_1DB0, 0x10).unwrap();
                 let current_map = LittleEndian::read_u16(&map_data[0x0C..0x0E]);
                 let current_lastmap = LittleEndian::read_u32(&map_data[0x04..0x08]);
                 let current_warp = map_data[0x0E];
@@ -370,11 +360,11 @@ impl GameState {
     pub fn read_party(&mut self) {
         match &self.game {
             Game::RED => {
-                let party_count = BIZHAWK.read_u8(MemRegion::WRAM, 0x1163).unwrap() as u32;
+                let party_count = BIZHAWK.read_u8_sym(&SYM["wPartyCount"]).unwrap() as u32;
                 for i in 0..6 {
                     if i < party_count {
-                        let pk1 = &BIZHAWK.read_slice(MemRegion::WRAM, 0x116B + (44*i), 44).unwrap();
-                        let nickname = &BIZHAWK.read_slice(MemRegion::WRAM, 0x12B5 + (11*i), 11).unwrap();
+                        let pk1 = &BIZHAWK.read_slice(&MemRegion::WRAM, SYM["wPartyMons"].addr as u32 + (44*i), 44).unwrap();
+                        let nickname = &BIZHAWK.read_slice(&MemRegion::WRAM, SYM["wPartyMonNicks"].addr as u32 + (11*i), 11).unwrap();
 
                         let mut uid = get_uid(RED_FIRERED_SPECIES[pk1[0x00] as usize], pk1[0x07]);
 
@@ -405,10 +395,10 @@ impl GameState {
             },
             Game::FIRERED => {
                 for i in 0..6 {
-                    if BIZHAWK.read_u16(MemRegion::EWRAM, 0x0002_4284 + 100*i).unwrap() == 0 && BIZHAWK.read_u16(MemRegion::EWRAM, 0x0002_4284 + 100*i + 4).unwrap() == 0 {
+                    if BIZHAWK.read_u16(&MemRegion::EWRAM, 0x0002_4284 + 100*i).unwrap() == 0 && BIZHAWK.read_u16(&MemRegion::EWRAM, 0x0002_4284 + 100*i + 4).unwrap() == 0 {
                         self.party_uids[i as usize] = 0x0000;
                     } else {
-                        let pk3 = &BIZHAWK.read_slice(MemRegion::EWRAM, 0x0002_4284 + 100*i, 100).unwrap();
+                        let pk3 = &BIZHAWK.read_slice(&MemRegion::EWRAM, 0x0002_4284 + 100*i, 100).unwrap();
                         let mut decrypted_pk3 = pk3.clone();
                         decrypt_unshuffle_pk3(&mut decrypted_pk3);
 
@@ -449,18 +439,19 @@ impl GameState {
             Game::RED => {
                 let mut slot = 0;
                 let mut count = 0;
-                let mut data = BIZHAWK.read_slice(MemRegion::WRAM, 0x1160, 0x1A0).unwrap();
+                let mut data = vec![0;0x194];
                 for i in &self.party_uids {
+                    println!("{:?}", i);
                     if *i == 0x0000 {
-                        data[0x04 + slot] = 0xFF;
+                        data[0x01 + slot] = 0xFF;
                         slot += 1;
                     } else {
                         let pokemon = &self.pokemon_list.get(i).unwrap();
-                        data[0x04 + slot] = FIRERED_RED_SPECIES[pokemon.species as usize];
+                        data[0x01 + slot] = FIRERED_RED_SPECIES[pokemon.species as usize];
                         if let Some(ref gen1) = pokemon.gen1 {
-                            data[(0x0B + slot*0x2C)..(0x0B + (slot+1)*0x2C)].copy_from_slice(&gen1.bytes);
-                            data[(0x113 + slot*0x07)..(0x113 + (slot+1)*0x07 + 0x01)].copy_from_slice(&self.trainer.gen_1_name);
-                            data[(0x155 + slot*0x0B)..(0x155 + (slot+1)*0x0B)].copy_from_slice(&gen1.name);
+                            data[(0x08 + slot*0x2C)..(0x08 + (slot+1)*0x2C)].copy_from_slice(&gen1.bytes);
+                            data[(0x110 + slot*0x0B)..(0x118 + (slot)*0x0B)].copy_from_slice(&self.trainer.gen_1_name);
+                            data[(0x152 + slot*0x0B)..(0x152 + (slot+1)*0x0B)].copy_from_slice(&gen1.name);
                         } else {
                             panic!("Trying to write Gen 1 data but Gen 1 data is not generated yet");
                         }
@@ -468,18 +459,20 @@ impl GameState {
                         slot += 1;
                     }
                 }
-                data[0x03] = count as u8;
-                BIZHAWK.write_slice(MemRegion::WRAM, 0x1160, &data).unwrap();
+                data[0x00] = count as u8;
+                BIZHAWK.write_slice_sym(&SYM["wPartyDataStart"], &data).unwrap();
             },
             Game::FIRERED => {
                 let mut slot = 0;
                 for i in &self.party_uids {
+                    println!("{:?}", i);
                     if *i == 0x0000 {
-                        BIZHAWK.write_slice(MemRegion::EWRAM, 0x0002_4284 + (slot*100), &[0;100]).unwrap();
-                        break;
+                        BIZHAWK.write_slice(&MemRegion::EWRAM, 0x0002_4284 + (slot*100), &[0;100]).unwrap();
+                        slot += 1;
+                        //break;
                     } else {
                         let pokemon = &self.pokemon_list.get(i).unwrap();
-                        BIZHAWK.write_slice(MemRegion::EWRAM, 0x0002_4284 + (slot*100), &pokemon.get_encrypted_pk3().unwrap()).unwrap();
+                        BIZHAWK.write_slice(&MemRegion::EWRAM, 0x0002_4284 + (slot*100), &pokemon.get_encrypted_pk3().unwrap()).unwrap();
                         slot += 1;
                     }
                 }
@@ -490,13 +483,11 @@ impl GameState {
     pub fn read_trainer_data(&mut self) {
         match &self.game {
             Game::RED => {
-                self.trainer = TrainerInfo::from_gen1(BIZHAWK.read_u16_be(MemRegion::WRAM, 0x1359).unwrap(),
-                                                      &BIZHAWK.read_slice(MemRegion::WRAM, 0x1158, 0x08).unwrap(),
-                                                      &BIZHAWK.read_slice(MemRegion::WRAM, 0x134A, 0x08).unwrap());
+                self.trainer = TrainerInfo::from_gen1(BIZHAWK.read_u16_be_sym(&SYM["wPlayerID"]).unwrap(),
+                                                      &BIZHAWK.read_slice_sym(&SYM["wPlayerName"], 0x08).unwrap(),
+                                                      &BIZHAWK.read_slice_sym(&SYM["wRivalName"], 0x08).unwrap());
             },
             Game::FIRERED => {
-                /*let pointer = BIZHAWK.read_u32(MemRegion::IWRAM, 0x0300500C).unwrap();
-                let data = BIZHAWK.read_slice(MemRegion::EWRAM, pointer & 0x00FFFFFF, 0x0F).unwrap();*/
                 let data = BIZHAWK.read_slice_custom("*0300500C/F".to_string(), 0x0F).unwrap();
                 let rival_name = BIZHAWK.read_slice_custom("*03005008+3A4C/8".to_string(), 0x08).unwrap();
                 self.trainer = TrainerInfo::from_gen3(LittleEndian::read_u16(&data[0x0A..0x0C]),
@@ -510,18 +501,18 @@ impl GameState {
     pub fn write_trainer_data(&mut self) {
         match &self.game {
             Game::RED => {
-                BIZHAWK.write_u16_be(MemRegion::WRAM, 0x1359, self.trainer.tid).unwrap();
-                BIZHAWK.write_slice(MemRegion::WRAM, 0x1158, &self.trainer.gen_1_name).unwrap();
-                BIZHAWK.write_slice(MemRegion::WRAM, 0x134A, &self.trainer.gen_1_rival_name).unwrap();
+                BIZHAWK.write_u16_be_sym(&SYM["wPlayerID"], self.trainer.tid).unwrap();
+                BIZHAWK.write_slice_sym(&SYM["wPlayerName"], &self.trainer.gen_1_name).unwrap();
+                BIZHAWK.write_slice_sym(&SYM["wRivalName"], &self.trainer.gen_1_rival_name).unwrap();
             },
             Game::FIRERED => {
-                let pointer1 = BIZHAWK.read_u32(MemRegion::IWRAM, 0x500C).unwrap() & 0x00FFFFFF;
-                let pointer2 = BIZHAWK.read_u32(MemRegion::IWRAM, 0x5008).unwrap() & 0x00FFFFFF;
+                let pointer1 = BIZHAWK.read_u32(&MemRegion::IWRAM, 0x500C).unwrap() & 0x00FFFFFF;
+                let pointer2 = BIZHAWK.read_u32(&MemRegion::IWRAM, 0x5008).unwrap() & 0x00FFFFFF;
 
-                BIZHAWK.write_u16(MemRegion::EWRAM, pointer1 + 0x0A, self.trainer.tid).unwrap();
-                BIZHAWK.write_u16(MemRegion::EWRAM, pointer1 + 0x0C, self.trainer.sid).unwrap();
-                BIZHAWK.write_slice(MemRegion::EWRAM, pointer1 + 0x00, &self.trainer.gen_3_name).unwrap();
-                BIZHAWK.write_slice(MemRegion::EWRAM, pointer2 + 0x3A4C, &self.trainer.gen_3_rival_name).unwrap();
+                BIZHAWK.write_u16(&MemRegion::EWRAM, pointer1 + 0x0A, self.trainer.tid).unwrap();
+                BIZHAWK.write_u16(&MemRegion::EWRAM, pointer1 + 0x0C, self.trainer.sid).unwrap();
+                BIZHAWK.write_slice(&MemRegion::EWRAM, pointer1 + 0x00, &self.trainer.gen_3_name).unwrap();
+                BIZHAWK.write_slice(&MemRegion::EWRAM, pointer2 + 0x3A4C, &self.trainer.gen_3_rival_name).unwrap();
             }
         }
     }
@@ -529,16 +520,16 @@ impl GameState {
     pub fn read_misc(&mut self) {
         match &self.game {
             Game::RED => {
-                let options_byte = BIZHAWK.read_u8(MemRegion::WRAM, 0x1355).unwrap();
+                let options_byte = BIZHAWK.read_u8_sym(&SYM["wOptions"]).unwrap();
 
                 self.options.text_speed = options_byte & 0x0F;
                 self.options.animations = options_byte & 0x80 == 0x00;
                 self.options.switching = options_byte & 0x40 == 0x00;
                 
-                self.money = u32::from_str_radix(&format!("{:06x}", BIZHAWK.read_u32_be(MemRegion::WRAM, 0x1347).unwrap() >> 8), 10).unwrap_or(0); // BCD
+                self.money = u32::from_str_radix(&format!("{:06x}", BIZHAWK.read_u32_be_sym(&SYM["wPlayerMoney"]).unwrap() >> 8), 10).unwrap_or(0); // BCD
 
-                self.owned.copy_from_slice(&BIZHAWK.read_slice(MemRegion::WRAM, 0x12f7, 19).unwrap());
-                self.seen.copy_from_slice(&BIZHAWK.read_slice(MemRegion::WRAM, 0x130a, 19).unwrap());
+                self.owned.copy_from_slice(&BIZHAWK.read_slice_sym(&SYM["wPokedexOwned"], 19).unwrap());
+                self.seen.copy_from_slice(&BIZHAWK.read_slice_sym(&SYM["wPokedexSeen"], 19).unwrap());
             },
             Game::FIRERED => {
                 let options_word = LittleEndian::read_u16(&BIZHAWK.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap());
@@ -563,20 +554,20 @@ impl GameState {
                                    (if self.options.animations { 0x00 } else { 0x80 }) |
                                    (if self.options.switching { 0x00 } else { 0x40 });
 
-                BIZHAWK.write_u8(MemRegion::WRAM, 0x1355, options_byte).unwrap();
+                BIZHAWK.write_u8_sym(&SYM["wOptions"], options_byte).unwrap();
 
                 let mut money_vec = vec![0;3];
 
-                LittleEndian::write_u24(&mut money_vec, u32::from_str_radix(&format!("{:06}", self.money), 16).unwrap());
+                BigEndian::write_u24(&mut money_vec, u32::from_str_radix(&format!("{:06}", self.money), 16).unwrap());
 
-                BIZHAWK.write_slice(MemRegion::WRAM, 0x1347, &money_vec).unwrap(); // BCD
+                BIZHAWK.write_slice_sym(&SYM["wPlayerMoney"], &money_vec).unwrap(); // BCD
 
-                BIZHAWK.write_slice(MemRegion::WRAM, 0x12f7, &self.owned).unwrap();
-                BIZHAWK.write_slice(MemRegion::WRAM, 0x130a, &self.seen).unwrap();
+                BIZHAWK.write_slice_sym(&SYM["wPokedexOwned"], &self.owned).unwrap();
+                BIZHAWK.write_slice_sym(&SYM["wPokedexSeen"], &self.seen).unwrap();
             },
             Game::FIRERED => {
-                let pointer1 = BIZHAWK.read_u32(MemRegion::IWRAM, 0x500C).unwrap() & 0x00FFFFFF;
-                let pointer2 = BIZHAWK.read_u32(MemRegion::IWRAM, 0x5008).unwrap() & 0x00FFFFFF;
+                let pointer1 = BIZHAWK.read_u32(&MemRegion::IWRAM, 0x500C).unwrap() & 0x00FFFFFF;
+                let pointer2 = BIZHAWK.read_u32(&MemRegion::IWRAM, 0x5008).unwrap() & 0x00FFFFFF;
 
                 // get the byte with the options we change from the game masked off
                 let mut options_word = LittleEndian::read_u16(&BIZHAWK.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap()) & 0xF9FC;
@@ -587,14 +578,14 @@ impl GameState {
                                 (if self.options.switching { 0x0000 } else { 0x0200 });
 
                 // write it back
-                BIZHAWK.write_u16(MemRegion::EWRAM, pointer1 + 0x14, options_word).unwrap();
+                BIZHAWK.write_u16(&MemRegion::EWRAM, pointer1 + 0x14, options_word).unwrap();
 
                 let key = LittleEndian::read_u32(&BIZHAWK.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap());
 
-                BIZHAWK.write_u32(MemRegion::EWRAM, pointer2 + 0x290, self.money ^ key).unwrap();
+                BIZHAWK.write_u32(&MemRegion::EWRAM, pointer2 + 0x290, self.money ^ key).unwrap();
 
-                BIZHAWK.write_slice(MemRegion::EWRAM, pointer1 + 0x28, &self.owned).unwrap();
-                BIZHAWK.write_slice(MemRegion::EWRAM, pointer1 + 0x5C, &self.seen).unwrap();
+                BIZHAWK.write_slice(&MemRegion::EWRAM, pointer1 + 0x28, &self.owned).unwrap();
+                BIZHAWK.write_slice(&MemRegion::EWRAM, pointer1 + 0x5C, &self.seen).unwrap();
             }
         }
     }

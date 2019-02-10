@@ -31,6 +31,8 @@ fn main() {
     let warp_enable = Arc::new(Mutex::new(false));
     let system_enable = Arc::new(Mutex::new(false));
 
+    println!("{}", SYM["wItemAPICommand"].addr); // use the sym table to make sure it gets built now and not later (builds on first use)
+
     let mut gfx = GfxSystem::new(Arc::clone(&warp_enable), Arc::clone(&system_enable));
 
     thread::Builder::new()
@@ -46,6 +48,8 @@ fn main() {
             start_item_api();
         })
         .expect("error: failed to start ItemApi");
+
+        BIZHAWK.on_memory_write("item_api", SYM["wItemAPICommand"].bus_addr as u32, 0x04, "http://localhost:5340/item_api").ok();
 
     let mut game_state = GameState::from_file().unwrap();
 

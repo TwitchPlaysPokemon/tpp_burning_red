@@ -43,7 +43,7 @@ pub fn start_item_api() {
 
 #[get("/item_api")]
 fn item_api_handler() -> &'static str {
-    let mut item_memory = BIZHAWK.read_slice_chained(MemRegion::WRAM, &[(0x131D, 0x11), (0x1526, 0x7A)]).unwrap();
+    let mut item_memory = BIZHAWK.read_slice_chained_sym(&[(&SYM["wItemAPICommand"], 0x11), (&SYM["wNumItems"], 0x7A)]).unwrap();
 
     let code = item_memory[0x00];
     item_memory[0x00] = ITEM_FALSE; // Default response
@@ -420,14 +420,14 @@ fn item_api_handler() -> &'static str {
         match response {
             ApiResponse::NONE => {},
             ApiResponse::CODE => {
-                BIZHAWK.write_u8(MemRegion::WRAM, 0x131D, item_memory[0x00]).unwrap();
+                BIZHAWK.write_u8_sym(&SYM["wItemAPICommand"], item_memory[0x00]).unwrap();
             },
             ApiResponse::APIBUFFER => {
-                BIZHAWK.write_slice(MemRegion::WRAM, 0x131D, &item_memory[0x00..0x11]).unwrap();
+                BIZHAWK.write_slice_sym(&SYM["wItemAPICommand"], &item_memory[0x00..0x11]).unwrap();
             },
             ApiResponse::PAGE => {
-                BIZHAWK.write_slice(MemRegion::WRAM, 0x131D, &item_memory[0x00..0x11]).unwrap();
-                BIZHAWK.write_slice(MemRegion::WRAM, 0x1526, &item_memory[0x11..]).unwrap();
+                BIZHAWK.write_slice_sym(&SYM["wItemAPICommand"], &item_memory[0x00..0x11]).unwrap();
+                BIZHAWK.write_slice_sym(&SYM["wNumItems"], &item_memory[0x11..]).unwrap();
             }
         }
 
