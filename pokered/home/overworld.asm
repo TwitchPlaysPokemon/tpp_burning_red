@@ -48,8 +48,9 @@ OverworldLoop::
 OverworldLoopLessDelay::
 	call DelayFrame
 	call LoadGBPal
-	ld a, [wd736]
-	bit 6, a ; jumping down a ledge?
+	ld hl, wd736
+	res 3, [hl] ; not using a warp anymore
+	bit 6, [hl] ; jumping down a ledge?
 	call nz, HandleMidJump
 	ld a, [wWalkCounter]
 	and a
@@ -484,6 +485,8 @@ WarpFound1::
 	ld [hWarpDestinationMap], a
 
 WarpFound2::
+	ld hl, wd736
+	set 3, [hl] ; using a warp
 	ld a, [wNumberOfWarps]
 	sub c
 	ld [wWarpedFromWhichWarp], a ; save ID of used warp

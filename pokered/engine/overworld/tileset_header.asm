@@ -25,8 +25,11 @@ LoadTilesetHeader:
 	ld a, [hl]
 	ld [hTilesetType], a
 	xor a
-	ld [$ffd8], a
+	ld [hMovingBGTilesCounter1], a
 	pop hl
+	ld a, [wd736]
+	bit 3, a
+	jr nz, .skip_same_tileset_check
 	ld a, [wCurMapTileset]
 	push hl
 	push de
@@ -35,16 +38,16 @@ LoadTilesetHeader:
 	call IsInArray
 	pop de
 	pop hl
-	jr c, .asm_c797
+	jr c, .skip_same_tileset_check
 	ld a, [wCurMapTileset]
 	ld b, a
 	ld a, [hPreviousTileset]
 	cp b
-	jr z, .done
-.asm_c797
+	ret z
+.skip_same_tileset_check
 	ld a, [wDestinationWarpID]
 	cp $ff
-	jr z, .done
+	ret z
 	call LoadDestinationWarpPosition
 	ld a, [wYCoord]
 	and $1
@@ -52,7 +55,6 @@ LoadTilesetHeader:
 	ld a, [wXCoord]
 	and $1
 	ld [wXBlockCoord], a
-.done
 	ret
 
 INCLUDE "data/dungeon_tilesets.asm"
