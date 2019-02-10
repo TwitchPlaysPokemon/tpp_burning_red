@@ -2,7 +2,7 @@ VictoryRoad2F_Script:
 	ld hl, wCurrentMapScriptFlags
 	bit 6, [hl]
 	res 6, [hl]
-	call nz, VictoryRoad2Script_517c4
+	call nz, VictoryRoad2Script_517c9
 	ld hl, wCurrentMapScriptFlags
 	bit 5, [hl]
 	res 5, [hl]
@@ -14,9 +14,6 @@ VictoryRoad2F_Script:
 	call ExecuteCurMapScriptInTable
 	ld [wVictoryRoad2FCurScript], a
 	ret
-
-VictoryRoad2Script_517c4:
-	;ResetEvent EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
 
 VictoryRoad2Script_517c9:
 	CheckEvent EVENT_VICTORY_ROAD_2_BOULDER_ON_SWITCH1

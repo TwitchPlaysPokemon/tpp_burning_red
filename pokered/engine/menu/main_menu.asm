@@ -29,27 +29,17 @@ MainMenu:
 	call LoadFontTilePatterns
 	ld hl, wd730
 	set 6, [hl]
-	ld a, [wSaveFileStatus]
-	cp 1
-	jr z, .noSaveFile
-; there's a save file
 	coord hl, 0, 0
-	ld b, 6
-	ld c, 13
-	call TextBoxBorder
-	coord hl, 2, 2
-	ld de, ContinueText
-	call PlaceString
-	jr .next2
-.noSaveFile
-	coord hl, 0, 0
-	ld b, 4
-	ld c, 13
+	lb bc, 4, 13
 	call TextBoxBorder
 	coord hl, 2, 2
 	ld de, NewGameText
+	ld a, [wSaveFileStatus]
+	dec a
+	jr z, .got_menu_text
+	ld de, ContinueText
+.got_menu_text
 	call PlaceString
-.next2
 	ld hl, wd730
 	res 6, [hl]
 	call UpdateSprites
@@ -58,37 +48,29 @@ MainMenu:
 	ld [wLastMenuItem], a
 	ld [wMenuJoypadPollCount], a
 	inc a
+	ld [wMaxMenuItem], a
 	ld [wTopMenuItemX], a
 	inc a
 	ld [wTopMenuItemY], a
 	ld a, A_BUTTON | B_BUTTON | START
 	ld [wMenuWatchedKeys], a
-	ld a, [wSaveFileStatus]
-	ld [wMaxMenuItem], a
 	call HandleMenuInput
 	bit 1, a ; pressed B?
 	jp nz, DisplayTitleScreen ; if so, go back to the title screen
 	ld c, 20
 	rst DelayFrames
 	ld a, [wCurrentMenuItem]
-	ld b, a
-	ld a, [wSaveFileStatus]
-	cp 2
-	jp z, .skipInc
-; If there's no save file, increment the current menu item so that the numbers
-; are the same whether or not there's a save file.
-	inc b
-.skipInc
-	ld a, b
 	and a
-	jr z, .choseContinue
-	cp 1
-	jp z, StartNewGame
+	jr z, .not_options
 	call DisplayOptionMenu
 	ld a, 1
 	ld [wOptionsInitialized], a
 	jp .mainMenuLoop
-.choseContinue
+
+.not_options
+	ld a, [wSaveFileStatus]
+	cp 2
+	jp nz, StartNewGame
 	call DisplayContinueGameInfo
 	ld hl, wCurrentMapScriptFlags
 	set 5, [hl]
@@ -341,7 +323,8 @@ SpecialEnterMap:
 	jp EnterMap
 
 ContinueText:
-	db "CONTINUE", $4e
+	db   "CONTINUE"
+	next "OPTION@"
 
 NewGameText:
 	db   "NEW GAME"

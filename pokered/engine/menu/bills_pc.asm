@@ -318,7 +318,7 @@ BillsPCRelease:
 	jp BillsPCMenu
 
 BillsPCChangeBox:
-	callba ChangeBox
+	callba RequestChangeBox
 	jp BillsPCMenu
 
 DisplayMonListMenu:

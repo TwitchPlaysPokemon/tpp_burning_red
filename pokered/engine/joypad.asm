@@ -3,7 +3,6 @@ _Joypad::
 ; hJoyPressed:  (hJoyLast ^ hJoyInput) & hJoyInput
 
 	ld a, [hJoyInput]
-
 	ld b, a
 	ld a, [hJoyLast]
 	ld e, a
@@ -37,6 +36,19 @@ _Joypad::
 	and b
 	ld [hJoyPressed], a
 	ret
+
+TrySoftReset:
+	call DelayFrame
+
+	; deselect (redundant)
+	ld a, $30
+	ld [rJOYP], a
+
+	ld hl, hSoftReset
+	dec [hl]
+	jp z, SoftReset
+
+	jp Joypad
 
 DiscardButtonPresses:
 	xor a

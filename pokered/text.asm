@@ -40,7 +40,7 @@ _CardKeyFailText::
 	done
 
 _TrainerNameText::
-	TX_RAM wcd6d
+	TX_RAM wTrainerName
 	text ": @@"
 
 _NoNibbleText::
@@ -2026,7 +2026,15 @@ _OlderFileWillBeErasedText::
 	cont "save. Okay?"
 	done
 
-WantToChangeBoxText::
+_WhenYouChangeBoxText::
+	text "When you change a"
+	line "#MON BOX, data"
+	cont "will be saved."
+
+	para "Is that okay?"
+	done
+
+_WantToChangeBoxTextBox::
 	text "The current"
 	line "<pkmn> BOX is full."
 
@@ -2039,7 +2047,7 @@ _BoxChangedToText::
 	text "<PLAYER> saved"
 	line "the game and"
 	cont "switched to"
-	cont "BOX "
+	cont "BOX @"
 	TX_NUM wcd6d,1,1
 	text "!"
 	prompt

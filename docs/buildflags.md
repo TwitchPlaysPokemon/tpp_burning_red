@@ -1,9 +1,9 @@
 # Build Flags
 
 The current build system allows specifying a value for the Red ROM's build flags that indicates which features are
-built into it. Running `make` from the parent directory will build all versions of the ROM in the `build` directory,
-tagged with the value of the flags (e.g., `pokered3.gb`, where 3 is the value); building from the `pokered` directory
-allows passing a value to `ROMFLAGS` directly (e.g., `make ROMFLAGS=4`) and assumes 0 otherwise.
+built into it. Building from the `pokered` directory allows passing a value to `ROMFLAGS` directly (e.g.,
+`make ROMFLAGS=4`) and assumes 0 otherwise; building from the parent directory will output ROMs (into `build/`) named
+after the combinatino of flags enabled by their `ROMFLAGS` value.
 
 Make sure to run `make clean` before changing the value of `ROMFLAGS` if building from the `pokered` directory.
 

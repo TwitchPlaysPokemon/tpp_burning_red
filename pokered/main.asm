@@ -194,7 +194,12 @@ PokedexTileGraphics:            INCBIN "gfx/pokedex.2bpp"
 PokedexTileGraphicsEnd:
 WorldMapTileGraphics:           INCBIN "gfx/town_map.2bpp"
 WorldMapTileGraphicsEnd:
-PlayerCharacterTitleGraphics:   INCBIN "gfx/player_title.2bpp"
+PlayerCharacterTitleGraphics:   
+	IF _GIRL
+		INCBIN "gfx/player_title_girl.2bpp"
+	ELSE
+		INCBIN "gfx/player_title.2bpp"
+	ENDC
 PlayerCharacterTitleGraphicsEnd:
 
 
@@ -614,7 +619,6 @@ TangelaPicBack::      INCBIN "pic/monback/tangelab.pic"
 SECTION "Battle (BANK 9)", ROMX
 
 INCLUDE "engine/battle/print_type.asm"
-INCLUDE "engine/battle/save_trainer_name.asm"
 INCLUDE "engine/battle/moveEffects/focus_energy_effect.asm"
 
 
