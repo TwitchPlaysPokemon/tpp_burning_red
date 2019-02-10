@@ -307,13 +307,6 @@ ScrollTitleScreenGameVersion:
 	jr z, .wait2
 	ret
 
-DrawDiplomaPic:
-	ld hl, DiplomaPic
-	ld de, vSprites
-	ld bc, DiplomaPicEnd - DiplomaPic
-	ld a, BANK(DiplomaPic)
-	jr DrawPlayerCharacter
-
 DrawTitlePlayer:
 	ld hl, PlayerCharacterTitleGraphics
 	ld de, vSprites

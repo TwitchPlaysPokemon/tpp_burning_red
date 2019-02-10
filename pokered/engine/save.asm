@@ -430,11 +430,11 @@ IncrementPCBox::
 	ld c, 30
 	jp DelayFrames
 
- WantToChangeBoxText:
+WantToChangeBoxText:
 	TX_FAR _WantToChangeBoxTextBox
 	db "@"
 
- BoxChangedToText:
+BoxChangedToText:
 	TX_FAR _BoxChangedToText
 	db "@"
 

@@ -194,7 +194,12 @@ PokedexTileGraphics:            INCBIN "gfx/pokedex.2bpp"
 PokedexTileGraphicsEnd:
 WorldMapTileGraphics:           INCBIN "gfx/town_map.2bpp"
 WorldMapTileGraphicsEnd:
-PlayerCharacterTitleGraphics:   INCBIN "gfx/player_title.2bpp"
+PlayerCharacterTitleGraphics:   
+	IF _GIRL
+		INCBIN "gfx/player_title_girl.2bpp"
+	ELSE
+		INCBIN "gfx/player_title.2bpp"
+	ENDC
 PlayerCharacterTitleGraphicsEnd:
 
 
@@ -2156,13 +2161,3 @@ INCLUDE "engine/evolution.asm"
 INCLUDE "engine/overworld/elevator.asm"
 
 INCLUDE "engine/items/tm_prices.asm"
-
-SECTION "New Development", ROMX, BANK[$2]
-
-DiplomaPic:
-	IF _GIRL
-		INCBIN "gfx/player_title_girl.2bpp"
-	ELSE
-		INCBIN "gfx/player_title.2bpp"
-	ENDC
-DiplomaPicEnd:

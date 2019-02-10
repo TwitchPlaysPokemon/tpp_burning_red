@@ -36,7 +36,7 @@ DisplayDiploma:
 	coord hl, 10, 4
 	ld de, wPlayerName
 	call PlaceString
-	callba DrawDiplomaPic
+	callba DrawTitlePlayer
 
 ; Move the player 33 pixels right and set the priority bit so he appears
 ; behind the background layer.
