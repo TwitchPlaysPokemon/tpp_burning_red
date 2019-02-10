@@ -453,15 +453,14 @@ ItemUseBall:
 	ld hl, ItemUseBallText04
 	jp z, .printMessage
 
-; Check if overleveled, set to level 50 if so
-	ld a,[wEnemyMonLevel]
-	cp a, 101
+; Check if overleveled, set to level 50 if so and reset HP to 1
+	ld a, [wEnemyMonLevel]
+	cp 101
 	jr c, .saveHP
-	ld a, 0
+	xor a
 	ld hl, wEnemyMonHP
 	ld [hli], a
-	inc a
-	ld [hli], a
+	ld [hl], 1
 	ld a, 50 
 	ld [wEnemyMonLevel], a
 
