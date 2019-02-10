@@ -2039,7 +2039,7 @@ _BoxChangedToText::
 	text "<PLAYER> saved"
 	line "the game and"
 	cont "switched to"
-	cont "BOX "
+	cont "BOX @"
 	TX_NUM wcd6d,1,1
 	text "!"
 	prompt
