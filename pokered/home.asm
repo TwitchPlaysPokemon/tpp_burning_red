@@ -54,7 +54,7 @@ EnableLCD::
 	ret
 
 SECTION "timer",  ROM0
-	jp Timer
+	reti
 
 SECTION "serial", ROM0
 	jp Serial
@@ -152,7 +152,6 @@ INCLUDE "home/stats.asm"
 INCLUDE "home/text.asm"
 INCLUDE "home/text_data.asm"
 INCLUDE "home/text_predefs.asm"
-INCLUDE "home/timer.asm"
 INCLUDE "home/trainer.asm"
 INCLUDE "home/trainer_types.asm"
 INCLUDE "home/vblank.asm"
