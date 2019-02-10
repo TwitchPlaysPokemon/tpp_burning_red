@@ -19,7 +19,7 @@ RST_DelayFrames::
 	jr nz, RST_DelayFrames
 	ret
 
-EmptyFunc2::
+GenericDummyFunction::
 	ret
 
 SECTION "rst 10", ROM0

@@ -19,7 +19,10 @@ EnterMap::
 	bit 5, [hl] ; did a battle happen immediately before this?
 	res 5, [hl] ; unset the "battle just happened" flag
 IF !_TPP
-	call z, ResetUsingStrengthOutOfBattleBit
+	jr nz, .no_strength_reset
+	ld hl, wd728
+	res 0, [hl]
+.no_strength_reset
 ENDC
 	call nz, MapEntryAfterBattle
 	ld hl, wd732
@@ -176,7 +179,6 @@ OverworldLoopLessDelay::
 	jr z, .noDirectionButtonsPressed
 	ld a, 1
 	ld [wSpriteStateData1 + 5], a ; delta X
-
 
 .handleDirectionButtonPress
 	ld [wPlayerDirection], a ; new direction
@@ -1222,12 +1224,13 @@ IsSpriteInFrontOfPlayer2::
 ; sets the carry flag if there is a collision, and unsets it if there isn't a collision
 CollisionCheckOnLand::
 	ld a, [wd736]
+	and a ;clear carry
 	bit 6, a ; is the player jumping?
-	jr nz, .noCollision
+	ret nz
 ; if not jumping a ledge
 	ld a, [wSimulatedJoypadStatesIndex]
 	and a
-	jr nz, .noCollision ; no collisions when the player's movements are being controlled by the game
+	ret nz ; no collisions when the player's movements are being controlled by the game
 	ld a, [wPlayerDirection] ; the direction that the player is trying to go in
 	ld d, a
 	ld a, [wSpriteStateData1 + 12] ; the player sprite's collision data (bit field) (set in the sprite movement code)
@@ -1244,7 +1247,7 @@ CollisionCheckOnLand::
 	call CheckForJumpingAndTilePairCollisions
 	jr c, .collision
 	call CheckTilePassable
-	jr nc, .noCollision
+	ret nc
 .collision
 	ld a, [wChannelSoundIDs + Ch4]
 	cp SFX_COLLISION ; check if collision sound is already playing
@@ -1253,9 +1256,6 @@ CollisionCheckOnLand::
 	call PlaySound ; play collision sound (if it's not already playing)
 .setCarry
 	scf
-	ret
-.noCollision
-	and a
 	ret
 
 ; function that checks if the tile in front of the player is passable
@@ -1271,13 +1271,11 @@ CheckTilePassable::
 .loop
 	ld a, [hli]
 	cp $ff
-	jr z, .tileNotPassable
+	scf
+	ret z
 	cp c
 	ret z
 	jr .loop
-.tileNotPassable
-	scf
-	ret
 
 ; check if the player is going to jump down a small ledge
 ; and check for collisions that only occur between certain pairs of tiles
@@ -1399,10 +1397,9 @@ LoadCurrentMapView::
 	pop hl
 	pop de
 	pop bc
-	inc hl
-	inc hl
-	inc hl
-	inc hl
+	rept 4
+		inc hl
+	endr
 	inc de
 	dec c
 	jr nz, .rowInnerLoop
@@ -1957,22 +1954,20 @@ CollisionCheckOnWater::
 	call PlaySound ; play collision sound (if it's not already playing)
 .setCarry
 	scf
-	jr .done
-.noCollision
-	and a
-.done
 	ret
+
+.checkIfVermilionDockTileset
+	ld a, [wCurMapTileset] ; tileset
+	cp SHIP_PORT ; Vermilion Dock tileset
+	jr nz, .noCollision ; keep surfing if it's not the boarding platform tile
 .stopSurfing
 	xor a
 	ld [wWalkBikeSurfState], a
 	call LoadPlayerSpriteGraphics
 	call PlayDefaultMusic
-	jr .noCollision
-.checkIfVermilionDockTileset
-	ld a, [wCurMapTileset] ; tileset
-	cp SHIP_PORT ; Vermilion Dock tileset
-	jr nz, .noCollision ; keep surfing if it's not the boarding platform tile
-	jr .stopSurfing ; if it is the boarding platform tile, stop surfing
+.noCollision
+	and a
+	ret
 
 ; function to run the current map's script
 RunMapScript::
@@ -1995,11 +1990,9 @@ RunMapScript::
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	ld de, .return
+	ld de, GenericDummyFunction
 	push de
 	jp hl ; jump to script
-.return
-	ret
 
 LoadWalkingPlayerSpriteGraphics::
 	ld de, RedSprite
@@ -2411,11 +2404,6 @@ IgnoreInputForHalfSecond:
 	ld a, [hl]
 	or %00100110
 	ld [hl], a ; set ignore input bit
-	ret
-
-ResetUsingStrengthOutOfBattleBit:
-	ld hl, wd728
-	res 0, [hl]
 	ret
 
 ForceBikeOrSurf::
