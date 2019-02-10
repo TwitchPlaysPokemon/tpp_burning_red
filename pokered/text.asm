@@ -2026,7 +2026,7 @@ _OlderFileWillBeErasedText::
 	cont "save. Okay?"
 	done
 
-WantToChangeBoxText::
+_WantToChangeBoxTextBox::
 	text "The current"
 	line "<pkmn> BOX is full."
 

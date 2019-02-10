@@ -427,11 +427,11 @@ IncrementPCBox::
 	ld [wcd6d], a
 	ld hl, BoxChangedToText
 	call PrintText
-	ld c,30
+	ld c, 30
 	jp DelayFrames
 
  WantToChangeBoxText:
-	TX_FAR _WantToChangeBoxText
+	TX_FAR _WantToChangeBoxTextBox
 	db "@"
 
  BoxChangedToText:

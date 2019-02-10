@@ -2156,3 +2156,13 @@ INCLUDE "engine/evolution.asm"
 INCLUDE "engine/overworld/elevator.asm"
 
 INCLUDE "engine/items/tm_prices.asm"
+
+SECTION "New Development", ROMX, BANK[$2]
+
+DiplomaPic:
+	IF _GIRL
+		INCBIN "gfx/player_title_girl.2bpp"
+	ELSE
+		INCBIN "gfx/player_title.2bpp"
+	ENDC
+DiplomaPicEnd:
