@@ -2026,6 +2026,14 @@ _OlderFileWillBeErasedText::
 	cont "save. Okay?"
 	done
 
+_WhenYouChangeBoxText::
+	text "When you change a"
+	line "#MON BOX, data"
+	cont "will be saved."
+
+	para "Is that okay?"
+	done
+
 _WantToChangeBoxTextBox::
 	text "The current"
 	line "<pkmn> BOX is full."

@@ -140,10 +140,10 @@ LoadSAVIgnoreBadCheckSum:
 SaveSAV:
 	callba PrintSaveScreenText
 	ld a, [wPartyCount] ; is party full?
-	cp a, PARTY_LENGTH
+	cp PARTY_LENGTH
 	jr nz, .normalSave
 	ld a, [wNumInBox] ; is box full?
-	cp a, MONS_PER_BOX
+	cp MONS_PER_BOX
 	call z, IncrementPCBox
 	ret z
 .normalSave
@@ -363,7 +363,13 @@ BoxSRAMPointerTable:
 	dw sBox5 ; sBox11
 	dw sBox6 ; sBox12
 
-ChangeBox::
+RequestChangeBox::
+	ld hl, WhenYouChangeBoxText
+	call PrintText
+	call YesNoChoice
+	ld a, [wCurrentMenuItem]
+	and a
+	ret nz ; chose no
 	ld hl, wCurrentBoxNum
 	bit 7, [hl] ; is it the first time player is changing the box?
 	call z, EmptyAllSRAMBoxes ; if so, empty all boxes in SRAM
@@ -376,7 +382,9 @@ ChangeBox::
 	res 1, [hl]
 	bit 1, a ; pressed b
 	ret nz
-.performChange
+	; fallthrough
+
+ChangeBox::
 	call GetBoxSRAMLocation
 	ld e, l
 	ld d, h
@@ -404,6 +412,10 @@ ChangeBox::
 	call WaitForSoundToFinish
 	ret
 
+WhenYouChangeBoxText::
+	TX_FAR _WhenYouChangeBoxText
+	db "@"
+
 IncrementPCBox::
 	ld hl, WantToChangeBoxText
 	call SaveSAVConfirm
@@ -415,12 +427,12 @@ IncrementPCBox::
 	ld a, [wCurrentBoxNum]
 	and $7f
 	inc a
-	cp a, NUM_BOXES
+	cp NUM_BOXES
 	jr c, .boxOk
 	xor a
 .boxOk
 	ld [wCurrentMenuItem], a
-	call ChangeBox.performChange
+	call ChangeBox
 	ld a, [wCurrentBoxNum]
 	and $7f
 	inc a
@@ -428,7 +440,8 @@ IncrementPCBox::
 	ld hl, BoxChangedToText
 	call PrintText
 	ld c, 30
-	jp DelayFrames
+	rst DelayFrames
+	ret
 
 WantToChangeBoxText:
 	TX_FAR _WantToChangeBoxTextBox
