@@ -1,3 +1,4 @@
+use itertools::rev;
 use crate::pokemon::*;
 use crate::constants::*;
 use crate::bizhawk::*;
@@ -13,7 +14,9 @@ use std::thread;
 pub struct GameState {
     pub trainer: TrainerInfo,
     red_items: [Pocket;5],
-    firered_items: [Pocket;4],
+    firered_items: [Pocket;6],
+    red_progress: u32,
+    firered_progress: u32,
     options: Options,
     pub game: Game,
     money: u32,
@@ -31,15 +34,19 @@ impl GameState {
     pub fn new() -> GameState {
         GameState {
             trainer: TrainerInfo::new(),
-            red_items: [Pocket::new(&[0x86, 0xA4, 0xAD, 0xA4, 0xB1, 0xA0, 0xAB, 0x50], P_GENR), // "General"
-                        Pocket::new(&[0x8A, 0xA4, 0xB8, 0x7F, 0x88, 0xB3, 0xA4, 0xAC, 0xB2, 0x50], P_KEYI), // "Key Items"
-                        Pocket::new(&[0x8F, 0xAE, 0xAA, 0xBA, 0x7F, 0x81, 0xA0, 0xAB, 0xAB, 0xB2, 0x50], P_BALL), // "Poké Balls"
-                        Pocket::new(&[0x93, 0x8C, 0xB2, 0x7F, 0xF3, 0x7F, 0x87, 0x8C, 0xB2, 0x50], P_TMHM),// "TMs / HMs"
+            red_items: [Pocket::new(&[0x86, 0xA4, 0xAD, 0xA4, 0xB1, 0xA0, 0xAB, 0x50, 0x50, 0x50, 0x50, 0x50, 0x50], P_GENR), // "General"
+                        Pocket::new(&[0x8A, 0xA4, 0xB8, 0x7F, 0x88, 0xB3, 0xA4, 0xAC, 0xB2, 0x50, 0x50, 0x50, 0x50], P_KEYI), // "Key Items"
+                        Pocket::new(&[0x8F, 0xAE, 0xAA, 0xBA, 0x7F, 0x81, 0xA0, 0xAB, 0xAB, 0xB2, 0x50, 0x50, 0x50], P_BALL), // "Poké Balls"
+                        Pocket::new(&[0x93, 0x8C, 0xB2, 0x7F, 0xF3, 0x7F, 0x87, 0x8C, 0xB2, 0x50, 0x50, 0x50, 0x50], P_TMHM),// "TMs / HMs"
                         Pocket::new(&[0x8F, 0x82, 0x7F, 0x88, 0xB3, 0xA4, 0xAC, 0xB2, 0x50, 0x50, 0x50, 0x50, 0x50], P_PC)], // "PC Items"
             firered_items: [Pocket::new(&[0xFF], P_GENR), // We dont care about pocket name in FR
                             Pocket::new(&[0xFF], P_KEYI),
                             Pocket::new(&[0xFF], P_BALL),
-                            Pocket::new(&[0xFF], P_TMHM)],
+                            Pocket::new(&[0xFF], P_TMHM),
+                            Pocket::new(&[0xFF], P_PC),
+                            Pocket::new(&[0xFF], P_BERY)],
+            red_progress: 0,
+            firered_progress: 0,
             options: Options::new(),
             game: Game::FIRERED,
             money: 0,
@@ -57,13 +64,18 @@ impl GameState {
     pub fn from_file() -> std::io::Result<GameState> {
         if let Ok(f) = File::open("GameState") {
             println!("GameState found, loading from disk.\n");
-            Ok(bincode::deserialize_from(f).unwrap())
+            let loaded: GameState = bincode::deserialize_from(f).unwrap();
+            let mut items = RED_ITEM_STATE.lock().unwrap();
+            items.inventory = loaded.red_items.clone();
+            Ok(loaded)
         } else {
             println!("No existing GameState found, using default.\n");
             let mut default = GameState::new();
             default.get_current_game();
             default.read_trainer_data();
             default.collect_mapstate();
+            let mut items = RED_ITEM_STATE.lock().unwrap();
+            items.inventory[P_KEYI as usize].content.push([0x0046, 0x0001]); // add oaks parcel when init
             Ok(default)
         }
     }
@@ -90,8 +102,10 @@ impl GameState {
         }
     }
 
-    pub fn save_state(&self) -> std::io::Result<()> {
+    pub fn save_state(&mut self) -> std::io::Result<()> {
         //println!("Saving GameState to disk.\n");
+        let items = RED_ITEM_STATE.lock().unwrap();
+        self.red_items = items.inventory.clone();
         let f = File::create("GameState")?;
         bincode::serialize_into(f, self).unwrap();
         Ok(())
@@ -203,6 +217,8 @@ impl GameState {
 
         self.read_misc();
 
+        self.read_items();
+
         let warp_enable = warp_enable.lock().unwrap();
 
         if *warp_enable {
@@ -220,6 +236,8 @@ impl GameState {
                     self.write_party();
 
                     self.write_misc();
+
+                    self.write_items();
 
                     BIZHAWK.write_u16(&MemRegion::EWRAM, 0x0003_1DBC, map).unwrap();
                     BIZHAWK.write_u8(&MemRegion::EWRAM, 0x0003_1DBE, warp).unwrap();
@@ -246,8 +264,6 @@ impl GameState {
                         BIZHAWK.load_state("red_warp").unwrap();
                     }
 
-                    BIZHAWK.on_memory_write("item_api", SYM["wItemAPICommand"].bus_addr as u32, 0x04, "http://localhost:5340/item_api").ok();
-
                     self.game = Game::RED;
 
                     self.write_trainer_data();
@@ -255,6 +271,10 @@ impl GameState {
                     self.write_party();
 
                     self.write_misc();
+
+                    self.write_items();
+
+                    BIZHAWK.on_memory_write("item_api", SYM["wItemAPICommand"].bus_addr as u32, 0x04, "http://localhost:5340/item_api").ok();
 
                     BIZHAWK.write_u8_sym(&SYM["wDestinationWarpID"], warp).unwrap();
                     BIZHAWK.write_u8_sym(&SYM["wCurMap"], map as u8).unwrap();
@@ -591,12 +611,50 @@ impl GameState {
     pub fn read_items(&mut self) {
         match &self.game {
             Game::RED => {
-                // Dont use this function
+                let bag = RED_ITEM_STATE.lock().unwrap();
+                for pocket in &mut self.firered_items.iter_mut() {
+                    if pocket.id == P_GENR || pocket.id == P_BALL || pocket.id == P_TMHM {
+
+                        let mut indices_to_remove: Vec<usize> = Vec::new();
+                        let red_content = &bag.inventory[pocket.id as usize].content;
+                        let fire_red_content = &mut pocket.content;
+
+                        // Update quantities and record empty stacks for removal
+
+                        for (j, fire_red_item) in fire_red_content.iter_mut().enumerate() {
+                            let id = FIRERED_RED_ITEMS[fire_red_item[0] as usize] as u16;
+                            if id != 0x0000 { // If the item ID is a valid item to be transfered
+                                if let Some(red_item) = red_content.iter().find(|&x| {x[0] == id}) { // If we find it
+                                    fire_red_item[1] = red_item[1]; // Update the count
+                                } else {
+                                    indices_to_remove.push(j); // Mark the index for removal
+                                }
+                            }
+                        }
+
+                        // Remove empty stacks, in reverse order
+
+                        for i in rev(indices_to_remove) {
+                            fire_red_content.remove(i);
+                        }
+
+                        // Add any new stacks into the pocket
+
+                        for red_item in red_content.iter() {
+                            let id = RED_FIRERED_ITEMS[red_item[0] as usize];
+                            if id != 0x0000 { // If the item ID is a valid item to be transfered
+                                if fire_red_content.iter().find(|&x| {x[0] == id}).is_none() { // If we dont find it
+                                    fire_red_content.push([id, red_item[1]]); // Add the item to the pocket
+                                }
+                            }
+                        }
+                    }
+                }
             },
             Game::FIRERED => {
                 let key = LittleEndian::read_u32(&BIZHAWK.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap()) as u16;
 
-                let mut item_memory = BIZHAWK.read_slice_custom("*03005008+310/2E8".to_string(), 0x2E8).unwrap();
+                let mut item_memory = BIZHAWK.read_slice_custom("*03005008+298/360".to_string(), 0x360).unwrap();
 
                 // Decrypt
                 for i in 0..(item_memory.len() / 0x04) {
@@ -604,19 +662,21 @@ impl GameState {
                     LittleEndian::write_u16(&mut item_memory[(i*0x04 + 0x02)..(i*0x04) + 0x04], current_section ^ key);
                 }
 
-                for i in 0..4 {
+                for i in 0..5 {
                     let pocket = match i {
-                        0 => &item_memory[0x0000..0x00A8],
-                        1 => &item_memory[0x00A8..0x0120],
-                        2 => &item_memory[0x0120..0x0154],
-                        _ => &item_memory[0x0154..0x023C]
+                        0 => &item_memory[0x0078..0x0120],
+                        1 => &item_memory[0x0120..0x0198],
+                        2 => &item_memory[0x0198..0x01CC],
+                        3 => &item_memory[0x01CC..0x02B4],
+                        4 => &item_memory[0x0000..0x0078], // PC
+                        _ => &item_memory[0x02B4..0x0360]  // BERRY
                     };
+
+                    self.firered_items[i].content.clear();
 
                     for j in 0..pocket.len() / 0x04 {
                         let id = LittleEndian::read_u16(&pocket[j*0x04..0x02 + j*0x04]);
                         let count = LittleEndian::read_u16(&pocket[0x02 + j*0x04..0x04 + j*0x04]);
-
-                        self.firered_items[i].content.clear();
 
                         if id == 0 || count == 0 {
                             break;
@@ -632,10 +692,60 @@ impl GameState {
     pub fn write_items(&mut self) {
         match &self.game {
             Game::RED => {
-                // Dont use this function
+                let bag = &mut RED_ITEM_STATE.lock().unwrap();
+                for (i, pocket) in &mut bag.inventory.iter_mut().enumerate() {
+                    if pocket.id != P_KEYI {
+                        let content = &mut pocket.content;
+                        content.clear();
+                        let collection: Vec<[u16;2]> = self.firered_items[i].content
+                                           .iter() // get an iterator to each item
+                                           .map(|item| { // check if the item gets converted to a valid ID
+                                               let id = FIRERED_RED_ITEMS[item[0] as usize] as u16;
+                                               if id != 0x0000 {
+                                                   Some([id, item[1]]) // Valid ID, return the item
+                                               } else {
+                                                   None // Invalid ID
+                                               }
+                                           })
+                                           .flatten() // Remove invalid ID's
+                                           .collect(); // Collect into a vec
+
+                        content.extend(collection);
+                    };
+                }
             },
             Game::FIRERED => {
-                
+                let items_pointer = BIZHAWK.read_u32(&MemRegion::IWRAM, 0x5008).unwrap() & 0x00FFFFFF;
+                let key = LittleEndian::read_u32(&BIZHAWK.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap()) as u16;
+
+                let mut item_memory = vec![0u8;0x1C4];
+
+                for i in 0..3 {
+                    let section = match i {
+                        0 => &mut item_memory[0x0000..0x00A8],
+                        1 => &mut item_memory[0x00A8..0x00DC],
+                        _ => &mut item_memory[0x00DC..0x01C4]
+                    };
+
+                    let pocket = match i {
+                        0 => &self.firered_items[0].content,
+                        1 => &self.firered_items[2].content,
+                        _ => &self.firered_items[3].content,
+                    };
+
+                    for j in 0..section.len() / 0x04 {
+                        if j < pocket.len() {
+                            LittleEndian::write_u16(&mut section[j*0x04..0x02 + j*0x04], pocket[j][0]);
+                            LittleEndian::write_u16(&mut section[0x02 + j*0x04..0x04 + j*0x04], pocket[j][1] ^ key);
+                        } else {
+                            LittleEndian::write_u16(&mut section[j*0x04..0x02 + j*0x04], 0x00);
+                            LittleEndian::write_u16(&mut section[0x02 + j*0x04..0x04 + j*0x04], 0x00 ^ key);
+                        }
+                    }
+
+                    BIZHAWK.write_slice(&MemRegion::EWRAM, items_pointer + 0x310, &item_memory[0x0000..0x00A8]).unwrap();
+                    BIZHAWK.write_slice(&MemRegion::EWRAM, items_pointer + 0x430, &item_memory[0x00A8..0x01C4]).unwrap();
+                }
             }
         }
     }

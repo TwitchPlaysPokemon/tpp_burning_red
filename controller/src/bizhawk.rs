@@ -63,6 +63,9 @@ impl Bizhawk {
     pub fn on_memory_write(&self, name: &str, address: u32, len: u8, url: &str) -> Result<(), String> {
         self.send_command(format!("{}/OnMemoryWrite/{:X}/{:X}/{}", name, address, len, url).as_str())
     }
+    pub fn remove_callback(&self, name: &str) -> Result<(), String> {
+        self.send_command(format!("{}/RemoveMemoryCallback", name).as_str())
+    }
 
     pub fn write_u8(&self, region: &MemRegion, address: u32, value: u8) -> Result<(), String> {
         self.send_command(format!("{}/WriteByte/{:X}/{:X}", region.as_static(), address, value).as_str())

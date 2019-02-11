@@ -49,9 +49,12 @@ fn main() {
         })
         .expect("error: failed to start ItemApi");
 
-        BIZHAWK.on_memory_write("item_api", SYM["wItemAPICommand"].bus_addr as u32, 0x04, "http://localhost:5340/item_api").ok();
-
     let mut game_state = GameState::from_file().unwrap();
+
+    if game_state.game == gamestate::Game::RED {
+        BIZHAWK.remove_callback("item_api").ok();
+        BIZHAWK.on_memory_write("item_api", SYM["wItemAPICommand"].bus_addr as u32, 0x04, "http://localhost:5340/item_api").ok();
+    }
 
     game_state.get_current_game();
     game_state.collect_mapstate();

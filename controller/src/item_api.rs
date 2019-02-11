@@ -5,7 +5,7 @@ use rocket::{get, routes};
 use rocket::config::{Config, Environment, LoggingLevel};
 use std::sync::{Arc, Mutex};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ApiState {
     pub inventory: [Pocket;5],
     pub locked: bool
@@ -369,6 +369,10 @@ fn item_api_handler() -> &'static str {
                     ITEM_GET_ITEM_QUANTITIES => {
                         let item_id_buffer = item_memory[0x01..0x11].to_vec();
 
+                        for i in &mut item_memory[0x01..0x11] {
+                            *i = 0x00;
+                        }
+
                         response = ApiResponse::CODE;
 
                         for (i, item) in item_id_buffer.iter().enumerate() {
@@ -400,7 +404,7 @@ fn item_api_handler() -> &'static str {
             item_memory[0x12] = content.len() as u8;
             for (i, item) in content.iter().enumerate() {
                 item_memory[0x13 + i*2] = item[0] as u8;
-                item_memory[0x14 + i*2] = item[1] as u8;
+                item_memory[0x14 + i*2] = if item[1] > 99 { 99 } else { item[1] as u8 };
             }
             item_memory[0x13 + content.len() * 2] = 0xff;
         } else {
@@ -409,12 +413,12 @@ fn item_api_handler() -> &'static str {
             response = ApiResponse::PAGE;
             item_memory[0x00] = ITEM_TRUE;
             item_memory[0x01..0x0E].clone_from_slice(&api_state.inventory[page as usize].name);
-            item_memory[0x12] = content.len() as u8;
+            item_memory[0x11] = content.len() as u8;
             for (i, item) in content.iter().enumerate() {
-                item_memory[0x13 + i*2] = item[0] as u8;
-                item_memory[0x14 + i*2] = item[1] as u8;
+                item_memory[0x12 + i*2] = item[0] as u8;
+                item_memory[0x13 + i*2] = if item[1] > 99 { 99 } else { item[1] as u8 };
             }
-            item_memory[0x13 + content.len() * 2] = 0xff;
+            item_memory[0x12 + content.len() * 2] = 0xff;
         }
         
         match response {

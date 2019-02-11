@@ -545,6 +545,7 @@ pub const P_KEYI: u8 = 0x01;
 pub const P_BALL: u8 = 0x02;
 pub const P_TMHM: u8 = 0x03;
 pub const P_PC: u8 = 0x04;
+pub const P_BERY: u8 = 0x05;
 
 pub const MAX_ITEM_COUNTS: [usize;5] = [0x2A, 0x1E, 0x0D, 0x3A, 0x1E];
 
