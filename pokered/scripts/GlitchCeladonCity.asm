@@ -1,5 +1,4 @@
 GlitchCeladonCity_Script:
-	call EnableAutoTextBoxDrawing
-	ret
+	jp EnableAutoTextBoxDrawing
 
 GlitchCeladonCity_TextPointers:
