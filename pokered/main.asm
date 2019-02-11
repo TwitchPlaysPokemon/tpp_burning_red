@@ -302,6 +302,14 @@ INCLUDE "data/mapHeaders/CeladonCity.asm"
 INCLUDE "data/mapObjects/CeladonCity.asm"
 CeladonCity_Blocks: INCBIN "maps/CeladonCity.blk"
 
+INCLUDE "data/mapHeaders/GlitchCeladonCity.asm"
+INCLUDE "data/mapObjects/GlitchCeladonCity.asm"
+GlitchCeladonCity_Blocks: INCBIN "maps/GlitchCeladonCity.blk"
+
+INCLUDE "data/mapHeaders/BattleTentCorrupt.asm"
+INCLUDE "data/mapObjects/BattleTentCorrupt.asm"
+BattleTentCorrupt_Blocks: INCBIN "maps/BattleTentCorrupt.blk"
+
 INCLUDE "data/mapHeaders/PalletTown.asm"
 INCLUDE "data/mapObjects/PalletTown.asm"
 PalletTown_Blocks: INCBIN "maps/PalletTown.blk"
@@ -335,6 +343,8 @@ INCLUDE "scripts/PewterCity.asm"
 INCLUDE "scripts/CeruleanCity.asm"
 INCLUDE "scripts/VermilionCity.asm"
 INCLUDE "scripts/CeladonCity.asm"
+INCLUDE "scripts/GlitchCeladonCity.asm"
+INCLUDE "scripts/BattleTentCorrupt.asm"
 INCLUDE "scripts/FuchsiaCity.asm"
 
 INCLUDE "data/mapHeaders/BluesHouse.asm"
