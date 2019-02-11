@@ -24,6 +24,7 @@ WarpTileIDPointers:
 	dw FacilityWarpTileIDs
 	dw PlateauWarpTileIDs
 
+GlitchCeladonCityTileIDs:
 OverworldWarpTileIDs:
 	db $1B,$58,$FF
 

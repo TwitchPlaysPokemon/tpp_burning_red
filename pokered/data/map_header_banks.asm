@@ -248,3 +248,6 @@ MapHeaderBanks:
 	db BANK(LoreleisRoom_h)
 	db BANK(BrunosRoom_h)
 	db BANK(AgathasRoom_h)
+	db BANK(GlitchCeladonCity_h)
+	db BANK(BattleTentCorrupt_h)
+	
