@@ -2819,7 +2819,7 @@ wRoute18Gate1FCurScript:: ; d669
 wGlitchCeladonCityCurScript::
 	ds 1
 
-	ds 78
+	ds 77
 wGameProgressFlagsEnd::
 
 	ds 56
