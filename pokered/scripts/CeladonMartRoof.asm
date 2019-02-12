@@ -6,8 +6,10 @@ IF _ITEMAPI
 CeladonMartRoofScript_GetDrinksInBag:
 ; construct a list of all drinks in the player's bag
 	push bc
+	push de
 	ld de, CeladonMartRoofDrinkList
 	callba GetFilteredItemList
+	pop de
 	pop bc
 	ret
 
