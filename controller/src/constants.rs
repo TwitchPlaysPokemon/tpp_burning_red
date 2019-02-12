@@ -553,10 +553,10 @@ pub const G_BOULDERBADGE: u32 = 0x00000001; // level_cap = 18
 pub const G_CASCADEBADGE: u32 = 0x00000002; // level_cap = 24
 pub const G_THUNDERBADGE: u32 = 0x00000004; // level_cap = 28
 pub const G_RAINBOWBADGE: u32 = 0x00000008; // level_cap = 34
-pub const G_VOLCANOBADGE: u32 = 0x00000010; // level_cap = 50
-pub const G_EARTHBADGE:   u32 = 0x00000020; // level_cap = 54
-pub const G_SOULBADGE:    u32 = 0x00000040; // level_cap = 46
-pub const G_MARSHBADGE:   u32 = 0x00000080; // level_cap = 46
+pub const G_SOULBADGE:    u32 = 0x00000010; // level_cap = 46
+pub const G_MARSHBADGE:   u32 = 0x00000020; // level_cap = 46
+pub const G_VOLCANOBADGE: u32 = 0x00000040; // level_cap = 50
+pub const G_EARTHBADGE:   u32 = 0x00000080; // level_cap = 54
 pub const G_CUT:          u32 = 0x00000100; 
 pub const G_SURF:         u32 = 0x00000200; 
 pub const G_STRENGTH:     u32 = 0x00000400; 
