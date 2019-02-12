@@ -5,8 +5,8 @@
 ; [wItemQuantity] = item quantity
 ; sets carry flag if successful, unsets carry flag if unsuccessful
 AddItemToInventory_:
-	push af
 	push hl
+	push af
 	push bc
 	push de
 	push hl
@@ -47,13 +47,15 @@ AddItemToInventory_:
 	ld a, b
 	inc a
 	call ItemAPI
+	jr c, .done
 	jr z, .done
 	scf
 .done
 	pop de
 	pop bc
 	pop hl
-	pop af
+	ld a, h
+	pop hl
 	ret
 
 ; function to remove an item (in varying quantities) from the player's bag or PC box
