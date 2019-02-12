@@ -85,6 +85,7 @@ fn main() {
                 println!("Enabling system");
                 game_state.read_trainer_data();
                 game_state.enabled = true;
+                *OAKS_PARCEL_OBTAINED.lock().unwrap() = true;
             }
         } else {
             game_state.collect_mapstate();

@@ -351,6 +351,7 @@ lazy_static! {
     pub static ref SYMFILE_STRING: String = bizhawk::load_symfile_text().unwrap();
     pub static ref SYM: HashMap<&'static str, bizhawk::SymEntry> = bizhawk::load_symfile(&SYMFILE_STRING);
     pub static ref HUD: reqwest::Client = reqwest::Client::new();
+    pub static ref OAKS_PARCEL_OBTAINED: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
 }
                                           
 pub static NATURE_EFFECTS: [[f32;5];25] = [/*ATK, DEF, SPE, SPA, SPD*/
@@ -568,3 +569,24 @@ pub static RED_ITEM_POCKETS: [u8;256] = [
 /*0xD0*/P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM,
 /*0xE0*/P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM,
 /*0xF0*/P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM, P_TMHM];
+
+
+// Progress gates
+
+pub const G_BOULDERBADGE: u32 = 0x00000001;
+pub const G_CASCADEBADGE: u32 = 0x00000002;
+pub const G_THUNDERBADGE: u32 = 0x00000004;
+pub const G_RAINBOWBADGE: u32 = 0x00000008;
+pub const G_VOLCANOBADGE: u32 = 0x00000010;
+pub const G_EARTHBADGE:   u32 = 0x00000020;
+pub const G_SOULBADGE:    u32 = 0x00000040;
+pub const G_MARSHBADGE:   u32 = 0x00000080;
+pub const G_CUT:          u32 = 0x00000100;
+pub const G_SURF:         u32 = 0x00000200;
+pub const G_STRENGTH:     u32 = 0x00000400;
+pub const G_SILPHSCOPE:   u32 = 0x00000800;
+pub const G_SSTICKET:     u32 = 0x00001000;
+pub const G_POKEFLUTE:    u32 = 0x00002000;
+pub const G_SECRETKEY:    u32 = 0x00004000;
+pub const G_GUARDRUNK:    u32 = 0x00008000;
+pub const G_BIKE:         u32 = 0x00010000;

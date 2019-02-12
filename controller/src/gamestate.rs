@@ -797,26 +797,44 @@ impl GameState {
     pub fn write_items(&mut self) {
         match &self.game {
             Game::RED => {
-                let bag = &mut RED_ITEM_STATE.lock().unwrap();
-                for (i, pocket) in &mut bag.inventory.iter_mut().enumerate() {
-                    if pocket.id != P_KEYI {
-                        let content = &mut pocket.content;
-                        content.clear();
-                        let collection: Vec<[u16;2]> = self.firered_items[i].content
-                                           .iter() // get an iterator to each item
-                                           .map(|item| { // check if the item gets converted to a valid ID
-                                               let id = FIRERED_RED_ITEMS[item[0] as usize] as u16;
-                                               if id != 0x0000 {
-                                                   Some([id, item[1]]) // Valid ID, return the item
-                                               } else {
-                                                   None // Invalid ID
-                                               }
-                                           })
-                                           .flatten() // Remove invalid ID's
-                                           .collect(); // Collect into a vec
+                let mut bag = RED_ITEM_STATE.lock().unwrap();
+                for pocket in &mut bag.inventory.iter_mut() {
+                    if pocket.id == P_GENR || pocket.id == P_BALL || pocket.id == P_TMHM {
 
-                        content.extend(collection);
-                    };
+                        let mut indices_to_remove: Vec<usize> = Vec::new();
+                        let red_content = &mut pocket.content;
+                        let fire_red_content = &self.firered_items[pocket.id as usize].content;
+
+                        // Update quantities and record empty stacks for removal
+
+                        for (j, red_item) in red_content.iter_mut().enumerate() {
+                            let id = RED_FIRERED_ITEMS[red_item[0] as usize];
+                            if id != 0x0000 { // If the item ID is a valid item to be transfered
+                                if let Some(fire_red_item) = fire_red_content.iter().find(|&x| {x[0] == id}) { // If we find it
+                                    red_item[1] = fire_red_item[1]; // Update the count
+                                } else {
+                                    indices_to_remove.push(j); // Mark the index for removal
+                                }
+                            }
+                        }
+
+                        // Remove empty stacks, in reverse order
+
+                        for i in rev(indices_to_remove) {
+                            red_content.remove(i);
+                        }
+
+                        // Add any new stacks into the pocket
+
+                        for fire_red_item in fire_red_content.iter() {
+                            let id = FIRERED_RED_ITEMS[fire_red_item[0] as usize] as u16;
+                            if id != 0x0000 { // If the item ID is a valid item to be transfered
+                                if red_content.iter().find(|&x| {x[0] == id}).is_none() { // If we dont find it
+                                    red_content.push([id, fire_red_item[1]]); // Add the item to the pocket
+                                }
+                            }
+                        }
+                    }
                 }
             },
             Game::FIRERED => {

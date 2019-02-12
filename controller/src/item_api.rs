@@ -5,7 +5,7 @@ use rocket::{get, routes};
 use rocket::config::{Config, Environment, LoggingLevel};
 use std::sync::{Arc, Mutex};
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct ApiState {
     pub inventory: [Pocket;5],
     pub locked: bool
@@ -50,6 +50,8 @@ fn item_api_handler() -> &'static str {
 
     let mut api_state = RED_ITEM_STATE.lock().unwrap();
     let mut response = ApiResponse::NONE;
+
+    //println!("ItemAPI req: code:{:x}, params{:?}", code, &item_memory[0x01..0x11]);
 
     if code > 0x03 {
         if code < 0x40 {
@@ -133,15 +135,18 @@ fn item_api_handler() -> &'static str {
 
                         response = ApiResponse::APIBUFFER;
 
+                        let hide_balls = *OAKS_PARCEL_OBTAINED.lock().unwrap();
                         for i in 0x00..0x04 {
-                            let content = &api_state.inventory[i].content;
-                            if let Some(index) = content.iter().position(|&x| {x[0] == item}) {
-                                if content[index][1] >= count { // We have at least the count requested
-                                    item_memory[0x00] = ITEM_TRUE;
-                                    item_memory[0x01] = i as u8;
-                                    item_memory[0x02] = index as u8;
-                                    item_memory[0x03] = if content[index][1] > 99 { 99 } else { content[index][1] as u8 };
-                                    break;
+                            if !(hide_balls && (i as u8) == P_BALL) { // Skip the ball pocket if we have oaks parcel
+                                let content = &api_state.inventory[i].content;
+                                if let Some(index) = content.iter().position(|&x| {x[0] == item}) {
+                                    if content[index][1] >= count { // We have at least the count requested
+                                        item_memory[0x00] = ITEM_TRUE;
+                                        item_memory[0x01] = i as u8;
+                                        item_memory[0x02] = index as u8;
+                                        item_memory[0x03] = if content[index][1] > 99 { 99 } else { content[index][1] as u8 };
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -153,6 +158,9 @@ fn item_api_handler() -> &'static str {
                         response = ApiResponse::CODE;
 
                         if content.len() > index { // if the index is a valid position
+                            if content[index][0] == 0x0046 {
+                                *OAKS_PARCEL_OBTAINED.lock().unwrap() = false; // removing oaks parcel
+                            }
                             if content[index][1] >= count { // We have at least the count requested
                                 content[index][1] -= count;
                                 if content[index][1] == 0x00 { // If we empty the item stack
@@ -425,13 +433,16 @@ fn item_api_handler() -> &'static str {
             ApiResponse::NONE => {},
             ApiResponse::CODE => {
                 BIZHAWK.write_u8_sym(&SYM["wItemAPICommand"], item_memory[0x00]).unwrap();
+                //println!("ItemAPI resp: code:{:x}", item_memory[0x00]);
             },
             ApiResponse::APIBUFFER => {
                 BIZHAWK.write_slice_sym(&SYM["wItemAPICommand"], &item_memory[0x00..0x11]).unwrap();
+                //println!("ItemAPI resp: code:{:x}, params{:?}", item_memory[0x00], &item_memory[0x01..0x11]);
             },
             ApiResponse::PAGE => {
                 BIZHAWK.write_slice_sym(&SYM["wItemAPICommand"], &item_memory[0x00..0x11]).unwrap();
                 BIZHAWK.write_slice_sym(&SYM["wNumItems"], &item_memory[0x11..]).unwrap();
+                //println!("ItemAPI resp: code:{:x}, params:{:?}, items:{:?}", item_memory[0x00], &item_memory[0x01..0x11], &item_memory[0x11..]);
             }
         }
 
