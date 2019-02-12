@@ -64,7 +64,6 @@ fn main() {
     game_state.get_current_game();
     game_state.collect_mapstate();
 
-
     if game_state.game == gamestate::Game::RED {
         BIZHAWK.remove_callback("item_api").ok();
         BIZHAWK.on_memory_write("item_api", SYM["wItemAPICommand"].bus_addr as u32, 0x04, "http://localhost:5340/item_api").ok();
@@ -85,9 +84,6 @@ fn main() {
                     game_state.check_for_transition(current_frame, Arc::clone(&warp_enable));
                 }
             }
-            if cycle % 60000 == 59999 { // 5 minutes
-                make_backup();
-            }
         } else if game_state.game == gamestate::Game::FIRERED {
             game_state.collect_mapstate();
             // Keep the system disabled until we get oaks parcel 0x015D
@@ -103,6 +99,10 @@ fn main() {
 
         if cycle % 200 == 0 {
             game_state.recurring_functions();
+        }
+
+        if cycle % 60000 == 59999 { // 5 minutes
+            make_backup(false);
         }
 
         cycle += 1;

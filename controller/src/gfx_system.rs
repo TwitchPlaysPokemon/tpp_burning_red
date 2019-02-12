@@ -322,7 +322,7 @@ impl GfxSystem {
                                         }
                                     },
                                     SaveBackup => {
-                                        make_backup();
+                                        make_backup(true);
                                     }
                                 }
 

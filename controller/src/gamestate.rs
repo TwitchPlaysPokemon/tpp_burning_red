@@ -940,8 +940,6 @@ impl GameState {
                                 }
                             } 
                         }
-
-                        
                     } else {
                         break;
                     }
@@ -988,8 +986,8 @@ impl GameState {
     }
 }
 
-pub fn make_backup() {
-    let backup_name = Utc::now().format("%Y-%m-%d-%H%M%S");
+pub fn make_backup(manual: bool) {
+    let backup_name = format!("{} {}", if manual {"ManualSave"} else {"AutoSave"}, Utc::now().format("%Y-%m-%d-%H%M%S"));
     std::fs::create_dir(format!("{}\\Backups\\{}", &CONTROLLER_PATH.to_str().unwrap(), backup_name)).ok();
     std::fs::copy(format!("{}\\States\\red_warp.State", &CONTROLLER_PATH.to_str().unwrap()),
                   format!("{}\\Backups\\{}\\red_warp.State", &CONTROLLER_PATH.to_str().unwrap(), backup_name)).ok();
