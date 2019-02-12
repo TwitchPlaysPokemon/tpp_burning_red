@@ -4,6 +4,7 @@ use regex;
 use strum::AsStaticRef;
 use std::fs::File;
 use std::io::Read;
+use crate::constants::*;
 
 //Memory regions
 #[derive(AsStaticStr)]
@@ -249,15 +250,15 @@ impl Bizhawk {
     }
 
     pub fn save_state(&self, name: &str) -> Result<(), String> {
-        self.send_command(format!("savestate/States/{}.State", name).as_str())
+        self.send_command(format!("savestate/{}\\States\\{}.State", &CONTROLLER_PATH.to_str().unwrap(), name).as_str())
     }
 
     pub fn load_state(&self, name: &str) -> Result<(), String> {
-        self.send_command(format!("loadstate/States/{}.State", name).as_str())
+        self.send_command(format!("loadstate/{}\\States\\{}.State", &CONTROLLER_PATH.to_str().unwrap(), name).as_str())
     }
 
     pub fn load_rom(&self, name: &str) -> Result<(), String> {
-        self.send_command(format!("loadrom/Roms/{}", name).as_str())
+        self.send_command(format!("loadrom/{}\\Roms\\{}", &CONTROLLER_PATH.to_str().unwrap(), name).as_str())
     }
 
     pub fn pause(&self) -> Result<(), String> {

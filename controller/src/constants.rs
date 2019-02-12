@@ -328,6 +328,7 @@ lazy_static! {
     pub static ref SYM: HashMap<&'static str, bizhawk::SymEntry> = bizhawk::load_symfile(&SYMFILE_STRING);
     pub static ref HUD: reqwest::Client = reqwest::Client::new();
     pub static ref OAKS_PARCEL_OBTAINED: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    pub static ref CONTROLLER_PATH: std::path::PathBuf = std::env::current_dir().unwrap();
 }
                                           
 pub static NATURE_EFFECTS: [[f32;5];25] = [/*ATK, DEF, SPE, SPA, SPD*/
@@ -565,5 +566,4 @@ pub const G_SSTICKET:     u32 = 0x00001000;
 pub const G_POKEFLUTE:    u32 = 0x00002000; // level_cap = 42
 pub const G_SECRETKEY:    u32 = 0x00004000; 
 pub const G_GUARDRUNK:    u32 = 0x00008000; 
-pub const G_BIKE:         u32 = 0x00010000; 
-pub const G_DLVRD_PARCEL: u32 = 0x00020000; // level_cap = _
+pub const G_DLVRD_PARCEL: u32 = 0x00010000; // level_cap = _
