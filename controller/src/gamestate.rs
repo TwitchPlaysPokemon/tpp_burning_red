@@ -1,8 +1,9 @@
-use std::cmp::min;
-use itertools::rev;
+use crate::item_api::*;
 use crate::pokemon::*;
 use crate::constants::*;
 use crate::bizhawk::*;
+use std::cmp::min;
+use itertools::rev;
 use bincode;
 use std::collections::HashMap;
 use std::fs::File;
@@ -669,7 +670,6 @@ impl GameState {
             }
         }
     }
-
     pub fn write_misc(&mut self) {
         match &self.game {
             Game::RED => {
@@ -910,6 +910,8 @@ impl GameState {
     }
     pub fn recurring_functions(&mut self) {
         self.check_for_new_mon();
+        self.check_progress_gates();
+        self.enforce_level_cap();
     }
     pub fn check_for_new_mon(&mut self) {
         match &self.game {
@@ -1012,7 +1014,87 @@ impl GameState {
             }
         };
     }
+
+    pub fn check_progress_gates(&mut self) {
+
+        self.read_misc();
+        self.read_items();
+
+        // badges
+        self.red_progress |= self.badges[0] as u32;
+        self.firered_progress |= self.badges[1] as u32;
+        match &self.game {
+            Game::RED => {
+                if self.red_progress & G_GUARDRUNK == 0x00 {
+                    if BIZHAWK.read_u8_sym(&SYM["wd728"]).unwrap() & 0x40 != 0x00 { // bit 6 is guard drink
+                        self.red_progress |= G_GUARDRUNK;
+                    }
+                }
+                if self.red_progress & G_DLVRD_PARCEL == 0x00 {
+                    if BIZHAWK.read_u8(&MemRegion::WRAM, SYM["wEventFlags"].addr as u32 + 7).unwrap() & 0x01 != 0x00 { // bit 0 is delivered oaks parcel
+                        self.red_progress |= G_DLVRD_PARCEL;
+                    }
+                }
+            },
+            Game::FIRERED => {
+                if self.firered_progress & G_GUARDRUNK == 0x00 {
+                    if LittleEndian::read_u16(&BIZHAWK.read_slice_custom("*03005008+1000+C4/2".to_string(), 0x02).unwrap()) == 0x0001 {
+                        self.firered_progress |= G_GUARDRUNK;
+                    }
+                }
+                if self.firered_progress & G_DLVRD_PARCEL == 0x00 {
+                    if BIZHAWK.read_slice_custom("*03005008+EE0+7/1".to_string(), 0x01).unwrap()[0] & 0x01 != 0x00 { // bit 2 is delivered oaks parcel
+                        self.firered_progress |= G_DLVRD_PARCEL;
+                    }
+                }
+            }
+        }
+
+        let mut red_items = RED_ITEM_STATE.lock().unwrap();
+        // key items / hms // This both checks the flag and removes the items if the other games doesent have them.
+        self.check_item(&mut red_items, G_SILPHSCOPE, 0x48, 0x153, P_TMHM);
+        self.check_item(&mut red_items, G_POKEFLUTE, 0x49, 0x153, P_TMHM);
+        self.check_item(&mut red_items, G_SSTICKET, 0x3F, 0x153, P_TMHM);
+        self.check_item(&mut red_items, G_SECRETKEY, 0x2B, 0x153, P_TMHM);
+        self.check_item(&mut red_items, G_CUT, 0xC4, 0x153, P_TMHM);
+        self.check_item(&mut red_items, G_SURF, 0xC6, 0x153, P_TMHM);
+        self.check_item(&mut red_items, G_STRENGTH, 0xC7, 0x153, P_TMHM);
+
+        println!("Red {:08X} FireRed {:08X}", self.red_progress, self.firered_progress);
+
+    }
+
+    pub fn check_item(&mut self, red_items: &mut ApiState, flag_to_check: u32, item_to_check: u16, item_to_add: u16, pocket: u8) {
+        self.check_item_red(red_items, flag_to_check, item_to_check, item_to_add, pocket as usize);
+        self.check_item_firered(red_items, flag_to_check, item_to_check, item_to_add, pocket as usize);
+    }
+
+    pub fn check_item_red(&mut self, red_items: &mut ApiState, flag_to_check: u32, item_to_check: u16, item_to_add: u16, pocket: usize) {
+        if self.red_progress & flag_to_check == 0x00 { // if the flag is unset
+            if let Some(index) = &red_items.inventory[pocket].has_item(item_to_check) { // if we have the item
+                self.red_progress |= flag_to_check; // set the flag
+                if self.firered_progress & flag_to_check == 0x00 { // if the other game doesent have the item
+                    red_items.inventory[pocket].remove_item(*index); // remove it from our inventory
+                } else {
+                    self.firered_items[pocket].add_item(item_to_add, 0x01); // else add it to the other game ( it would have been removed by this point )
+                }
+            }
+        }
+    }
+    pub fn check_item_firered(&mut self, red_items: &mut ApiState, flag_to_check: u32, item_to_check: u16, item_to_add: u16, pocket: usize) {
+        if self.firered_progress & flag_to_check == 0x00 {
+            if let Some(index) = &self.firered_items[pocket].has_item(item_to_check) {
+                self.firered_progress |= flag_to_check;
+                if self.red_progress & flag_to_check == 0x00 {
+                    self.firered_items[pocket].remove_item(*index);
+                } else {
+                    red_items.inventory[pocket].add_item(item_to_add, 0x01);
+                }
+            }
+        }
+    }
 }
+
 pub fn make_backup(manual: bool) {
     let pathstr = &CONTROLLER_PATH.to_str().unwrap();
     let backup_name = format!("{} {}", if manual {"ManualSave"} else {"AutoSave"}, Utc::now().format("%Y-%m-%d-%H%M%S"));
@@ -1166,5 +1248,14 @@ impl Pocket {
             id,
             name: name.to_vec()
         }
+    }
+    pub fn has_item(&mut self, item: u16) -> Option<usize> {
+        self.content.iter().position(|&x| {x[0] == item})
+    }
+    pub fn remove_item(&mut self, index: usize) {
+        self.content.remove(index);
+    }
+    pub fn add_item(&mut self, item: u16, count: u16) {
+        self.content.push([item, count]);
     }
 }
