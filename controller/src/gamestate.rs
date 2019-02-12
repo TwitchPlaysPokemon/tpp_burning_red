@@ -336,6 +336,8 @@ impl GameState {
 
                     self.hud_enable(true);
 
+                    BIZHAWK.write_u8(&MemRegion::EWRAM, 0x0000_FC4, 0x01).unwrap();
+
                     BIZHAWK.play().unwrap();
                 },
                 Game::FIRERED => {
