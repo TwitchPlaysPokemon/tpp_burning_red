@@ -230,6 +230,8 @@ pub const COLOSSEUM: u8 = 0xF0;
 pub const LORELEIS_ROOM: u8 = 0xF5;
 pub const BRUNOS_ROOM: u8 = 0xF6;
 pub const AGATHAS_ROOM: u8 = 0xF7;
+pub const GLITCH_CELEDON_CITY: u8 = 0xF8;
+pub const BATTLE_TENT_CORRUPT: u8 = 0xF9;
 
 // Red Item API codes
 
@@ -564,3 +566,4 @@ pub const G_POKEFLUTE:    u32 = 0x00002000;
 pub const G_SECRETKEY:    u32 = 0x00004000;
 pub const G_GUARDRUNK:    u32 = 0x00008000;
 pub const G_BIKE:         u32 = 0x00010000;
+pub const G_DLVRD_PARCEL: u32 = 0x00020000;
