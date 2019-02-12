@@ -48,12 +48,6 @@ CeladonMartRoofScript_GetDrinksInBag:
 
 ENDC
 
-CeladonMartRoofDrinkList:
-	db FRESH_WATER
-	db SODA_POP
-	db LEMONADE
-	db $00
-
 CeladonMartRoofScript_GiveDrinkToGirl:
 	ld hl, wd730
 	set 6, [hl]
