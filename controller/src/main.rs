@@ -31,7 +31,11 @@ fn main() {
     let warp_enable = Arc::new(Mutex::new(false));
     let system_enable = Arc::new(Mutex::new(false));
 
-    println!("{}", SYM["wItemAPICommand"].addr); // use the sym table to make sure it gets built now and not later (builds on first use)
+    println!("Parsing Symfile");
+
+    println!("wItemAPICommand: 0x{:X}", SYM["wItemAPICommand"].bus_addr); // use the sym table to make sure it gets built now and not later (builds on first use)
+
+    println!("");
 
     let mut gfx = GfxSystem::new(Arc::clone(&warp_enable), Arc::clone(&system_enable));
 
@@ -51,13 +55,16 @@ fn main() {
 
     let mut game_state = GameState::from_file().unwrap();
 
+    game_state.get_current_game();
+    game_state.collect_mapstate();
+
     if game_state.game == gamestate::Game::RED {
         BIZHAWK.remove_callback("item_api").ok();
         BIZHAWK.on_memory_write("item_api", SYM["wItemAPICommand"].bus_addr as u32, 0x04, "http://localhost:5340/item_api").ok();
     }
 
-    game_state.get_current_game();
-    game_state.collect_mapstate();
+    game_state.send_hud_data();
+    game_state.hud_enable(true);
 
     // Frame timing
     let mut current_frame = BIZHAWK.framecount().unwrap();

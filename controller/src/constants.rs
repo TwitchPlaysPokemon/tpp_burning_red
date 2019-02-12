@@ -350,6 +350,7 @@ lazy_static! {
     pub static ref RED_ITEM_STATE: Arc<Mutex<ApiState>> = Arc::new(Mutex::new(ApiState::new()));
     pub static ref SYMFILE_STRING: String = bizhawk::load_symfile_text().unwrap();
     pub static ref SYM: HashMap<&'static str, bizhawk::SymEntry> = bizhawk::load_symfile(&SYMFILE_STRING);
+    pub static ref HUD: reqwest::Client = reqwest::Client::new();
 }
                                           
 pub static NATURE_EFFECTS: [[f32;5];25] = [/*ATK, DEF, SPE, SPA, SPD*/

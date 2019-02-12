@@ -1,3 +1,4 @@
+use std::cmp::min;
 use itertools::rev;
 use crate::pokemon::*;
 use crate::constants::*;
@@ -8,7 +9,88 @@ use std::fs::File;
 use rand;
 use byteorder::{ByteOrder, LittleEndian, BigEndian};
 use std::sync::{Arc, Mutex};
-use std::thread;
+use serde_json::to_string;
+
+/* for the HUD's API */
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct HUDData {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    game: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    badges: Option<u16>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    items: Option<Items>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    updates_paused: Option<bool>
+}
+
+/* for the HUD's API */
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Items {
+    items: Vec<Item>,
+    key_red: Vec<Item>,
+    key_firered: Vec<Item>,
+    balls: Vec<Item>,
+    berries: Vec<Item>,
+    tms: Vec<Item>,
+    pc_red: Vec<Item>,
+    pc_firered: Vec<Item>
+}
+
+impl Items {
+    pub fn from_pocket_data(red: &[Pocket;5], fire_red: &[Pocket;6], game: &Game) -> Items {
+        Items {
+            items: match game {
+                Game::RED => {
+                    red[P_GENR as usize].content.iter().map(Item::from_slice).collect()
+                },
+                Game::FIRERED => {
+                    fire_red[P_GENR as usize].content.iter().map(Item::from_slice).collect()
+                }
+            },
+
+            key_red: red[P_KEYI as usize].content.iter().map(Item::from_slice).collect(),
+            key_firered: fire_red[P_KEYI as usize].content.iter().map(Item::from_slice).collect(),
+
+            balls: match game {
+                Game::RED => {
+                    red[P_BALL as usize].content.iter().map(Item::from_slice).collect()
+                },
+                Game::FIRERED => {
+                    fire_red[P_BALL as usize].content.iter().map(Item::from_slice).collect()
+                }
+            },
+
+            berries: fire_red[P_BERY as usize].content.iter().map(Item::from_slice).collect(),
+            tms: match game {
+                Game::RED => {
+                    red[P_TMHM as usize].content.iter().map(Item::from_slice).collect()
+                },
+                Game::FIRERED => {
+                    fire_red[P_TMHM as usize].content.iter().map(Item::from_slice).collect()
+                }
+            },
+            pc_red: red[P_PC as usize].content.iter().map(Item::from_slice).collect(),
+            pc_firered: fire_red[P_PC as usize].content.iter().map(Item::from_slice).collect()
+        }
+    }
+}
+
+/* for the HUD's API */
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Item {
+    id: u16,
+    count: u16
+}
+
+impl Item {
+    pub fn from_slice(source: &[u16; 2]) -> Item {
+        Item {
+            id: source[0],
+            count: source[1]
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GameState {
@@ -226,6 +308,8 @@ impl GameState {
                 Game::RED => { 
                     println!("Supported map, starting transition to FIRE RED map: {:04x}, warp: {:02x}", map, warp);
 
+                    self.hud_enable(false);
+
                     BIZHAWK.load_rom("firered.gba").unwrap();
                     BIZHAWK.load_state("firered_warp").unwrap();
 
@@ -248,12 +332,18 @@ impl GameState {
 
                     self.map_state.previous_lastmap = 0xFFFF_FFFF;
 
+                    self.send_hud_data();
+
+                    self.hud_enable(true);
+
                     BIZHAWK.play().unwrap();
                 },
                 Game::FIRERED => {
                     BIZHAWK.mute().unwrap();
 
                     println!("Supported map, starting transition to RED map: {:02x}, warp: {:02x}, Lastmap {:02x}", map, warp, last_map);
+
+                    self.hud_enable(false);
 
                     BIZHAWK.load_rom("red.gb").unwrap();
                     if self.first_warp {
@@ -283,6 +373,11 @@ impl GameState {
 
                     BIZHAWK.stop_drawing().unwrap();
                     BIZHAWK.clear_screen(0x00000000).unwrap();
+
+                    self.send_hud_data();
+
+                    self.hud_enable(true);
+
                     BIZHAWK.play().unwrap();
                     BIZHAWK.unthrottle(0).unwrap();
 
@@ -548,11 +643,13 @@ impl GameState {
 
                 self.owned.copy_from_slice(&BIZHAWK.read_slice_sym(&SYM["wPokedexOwned"], 19).unwrap());
                 self.seen.copy_from_slice(&BIZHAWK.read_slice_sym(&SYM["wPokedexSeen"], 19).unwrap());
+
+                self.badges[0] |= BIZHAWK.read_u8_sym(&SYM["wObtainedBadges"]).unwrap();
             },
             Game::FIRERED => {
                 let options_word = LittleEndian::read_u16(&BIZHAWK.read_slice_custom("*0300500C+14/2".to_string(), 0x02).unwrap());
 
-                self.options.text_speed = ((0x03 - (options_word & 0x0003) as u8) * 2) - 1; // convert to red text speed
+                self.options.text_speed = ((0x03 - min((options_word & 0x0003) as u8, 0x02)) * 2) - 1; // convert to red text speed
                 self.options.animations = options_word & 0x0400 == 0x0000;
                 self.options.switching = options_word & 0x0200 == 0x0000;
 
@@ -561,6 +658,8 @@ impl GameState {
 
                 self.owned.copy_from_slice(&BIZHAWK.read_slice_custom("*0300500C+28/13".to_string(), 19).unwrap());
                 self.seen.copy_from_slice(&BIZHAWK.read_slice_custom("*0300500C+5C/13".to_string(), 19).unwrap());
+
+                self.badges[1] |= BIZHAWK.read_slice_custom("*03005008+EE0+104/1".to_string(), 0x01).unwrap()[0];
             }
         }
     }
@@ -582,6 +681,9 @@ impl GameState {
 
                 BIZHAWK.write_slice_sym(&SYM["wPokedexOwned"], &self.owned).unwrap();
                 BIZHAWK.write_slice_sym(&SYM["wPokedexSeen"], &self.seen).unwrap();
+
+                // AND both game's badges together
+                BIZHAWK.write_u8_sym(&SYM["wObtainedBadges"], &self.badges[0] & &self.badges[1]).unwrap();
             },
             Game::FIRERED => {
                 let pointer1 = BIZHAWK.read_u32(&MemRegion::IWRAM, 0x500C).unwrap() & 0x00FFFFFF;
@@ -604,6 +706,9 @@ impl GameState {
 
                 BIZHAWK.write_slice(&MemRegion::EWRAM, pointer1 + 0x28, &self.owned).unwrap();
                 BIZHAWK.write_slice(&MemRegion::EWRAM, pointer1 + 0x5C, &self.seen).unwrap();
+
+                // AND both game's badges together
+                BIZHAWK.write_u8(&MemRegion::EWRAM, pointer2 + 0xEE0 + 0x104, &self.badges[0] & &self.badges[1]).unwrap();
             }
         }
     }
@@ -748,6 +853,36 @@ impl GameState {
                 }
             }
         }
+    }
+    pub fn send_hud_data(&mut self) {
+        let data = match &self.game {
+            Game::RED => {
+                HUDData {
+                    game: Some("red.gb".to_string()),
+                    badges: Some(((self.badges[0] as u16) << 8) | ((self.badges[1] as u16) & 0xFF)),
+                    items: Some(Items::from_pocket_data(&RED_ITEM_STATE.lock().unwrap().inventory, &self.firered_items, &self.game)),
+                    updates_paused: None
+                }
+            },
+            Game::FIRERED => {
+                HUDData {
+                    game: Some("firered.gba".to_string()),
+                    badges: Some(((self.badges[0] as u16) << 8) | ((self.badges[1] as u16) & 0xFF)),
+                    items: Some(Items::from_pocket_data(&RED_ITEM_STATE.lock().unwrap().inventory, &self.firered_items, &self.game)),
+                    updates_paused: None
+                }
+            }
+        };
+        HUD.post("http://localhost:1337/override").body(to_string(&data).unwrap()).send().ok();
+    }
+    pub fn hud_enable(&mut self, enable: bool) {
+        let data = HUDData {
+            game: None,
+            badges: None,
+            items: None,
+            updates_paused: Some(!enable)
+        };
+        HUD.post("http://localhost:1337/override").body(to_string(&data).unwrap()).send().ok();
     }
 }
 
