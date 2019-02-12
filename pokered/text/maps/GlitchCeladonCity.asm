@@ -1,2 +1,2 @@
-_MewtwoBattleText::
-	text "Mew!@@"
+_PhanceroBattleText::
+	text "Rahdh!@@"
