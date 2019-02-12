@@ -26,10 +26,11 @@ use crate::item_api::*;
 use std::thread;
 use byteorder::{ByteOrder, LittleEndian};
 use std::sync::{Arc, Mutex};
+use chrono::{DateTime, Utc, SecondsFormat};
 
 fn main() {
-    let warp_enable = Arc::new(Mutex::new(false));
-    let system_enable = Arc::new(Mutex::new(false));
+    let warp_enable = Arc::new(Mutex::new(true));
+    let enable_bypass = Arc::new(Mutex::new(false));
 
     println!("Parsing Symfile");
 
@@ -37,7 +38,7 @@ fn main() {
 
     println!("");
 
-    let mut gfx = GfxSystem::new(Arc::clone(&warp_enable), Arc::clone(&system_enable));
+    let mut gfx = GfxSystem::new(Arc::clone(&warp_enable), Arc::clone(&enable_bypass));
 
     thread::Builder::new()
         .name("Gui".to_string())
@@ -53,10 +54,12 @@ fn main() {
         })
         .expect("error: failed to start ItemApi");
 
+    
     let mut game_state = GameState::from_file().unwrap();
 
     game_state.get_current_game();
     game_state.collect_mapstate();
+
 
     if game_state.game == gamestate::Game::RED {
         BIZHAWK.remove_callback("item_api").ok();
@@ -70,7 +73,7 @@ fn main() {
     let mut current_frame = BIZHAWK.framecount().unwrap();
 
     loop { 
-        if game_state.enabled || *system_enable.lock().unwrap() {
+        if game_state.enabled || *enable_bypass.lock().unwrap() {
             if let Ok(frame) = BIZHAWK.framecount() {
                 if current_frame != frame {
                     current_frame = frame;

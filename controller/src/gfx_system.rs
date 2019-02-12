@@ -12,9 +12,10 @@ use std::time::{Instant, Duration};
 use std::thread;
 
 use self::ButtonType::*;
+use crate::gamestate::*;
 
-const WINDOW_WIDTH: u32 = 200;
-const WINDOW_HEIGHT: u32 = 90;
+const WINDOW_WIDTH: u32 = 218;
+const WINDOW_HEIGHT: u32 = 130;
 
 const SH_SIZE: i32 = 2; // button shadow size
 
@@ -40,7 +41,7 @@ const COLOR_RED: pixels::Color = pixels::Color {
     r: 0xFF,
     g: 0x00,
     b: 0x00,
-    a: 0xFF,
+    a: 0x7f,
 };
 const COLOR_GREEN: pixels::Color = pixels::Color {
     r: 0x00,
@@ -63,7 +64,8 @@ pub enum Alignment {
 
 enum ButtonType {
     WarpToggle,
-    SystemToggle
+    SystemToggle,
+    SaveBackup
 }
 
 struct Button<'a> {
@@ -205,21 +207,30 @@ impl GfxSystem {
 
         let mut button_vec = vec![
                                 Button {
-                                    rect: rect!(90,10,100,30),
+                                    rect: rect!(158,10,50,30),
                                     color: pixels::Color::RGB(0x60, 0x60, 0x60),
-                                    text_color: COLOR_RED,
-                                    text: "Disabled",
+                                    text_color: COLOR_GREEN,
+                                    text: "ON",
                                     pressed: false,
                                     button_type: WarpToggle,
+                                    state: true
+                                },
+                                Button {
+                                    rect: rect!(158,50,50,30),
+                                    color: pixels::Color::RGB(0x60, 0x60, 0x60),
+                                    text_color: COLOR_RED,
+                                    text: "OFF",
+                                    pressed: false,
+                                    button_type: SystemToggle,
                                     state: false
                                 },
                                 Button {
-                                    rect: rect!(90,50,100,30),
+                                    rect: rect!(30,90,160,30),
                                     color: pixels::Color::RGB(0x60, 0x60, 0x60),
-                                    text_color: COLOR_RED,
-                                    text: "Disabled",
+                                    text_color: COLOR_WHITE,
+                                    text: "Backup State",
                                     pressed: false,
-                                    button_type: SystemToggle,
+                                    button_type: SaveBackup,
                                     state: false
                                 }];
 
@@ -248,14 +259,14 @@ impl GfxSystem {
                         &mut canvas,
                          "Warps: ",
                          COLOR_WHITE,
-                         rect!(0,10,100,30),
+                         rect!(75,10,100,30),
                          Alignment::Center);
         
         self.render_text(&font,
                         &mut canvas,
-                         "System: ",
+                         "Force Enable: ",
                          COLOR_WHITE,
-                         rect!(0,50,100,30),
+                         rect!(8,50,160,30),
                          Alignment::Center);
 
         for i in &button_vec {
@@ -282,14 +293,13 @@ impl GfxSystem {
                                                 println!("Warps Disabled");
                                                 *enable = false;
                                                 b.state = false;
-                                                b.text = "Disabled";
+                                                b.text = "OFF";
                                                 b.text_color = COLOR_RED;
-                                                canvas.box_(b.x() as i16 - 4, b.y() as i16  - 4, b.x2() as i16  - b.x() as i16  + 4, b.y2() as i16  - b.y() as i16  + 4, COLOR_BG).ok();
                                             } else {
                                                 println!("Warps Enabled");
                                                 *enable = true;
                                                 b.state = true;
-                                                b.text = "Enabled";
+                                                b.text = "ON";
                                                 b.text_color = COLOR_GREEN;
                                             }
                                         }
@@ -297,20 +307,22 @@ impl GfxSystem {
                                     SystemToggle => {
                                         if let Ok(mut enable) = self.system_enable.lock() {
                                             if b.state {
-                                                println!("System Disabled");
+                                                println!("Enable Bypass Disabled");
                                                 *enable = false;
                                                 b.state = false;
-                                                b.text = "Disabled";
+                                                b.text = "OFF";
                                                 b.text_color = COLOR_RED;
-                                                canvas.box_(b.x() as i16 - 4, b.y() as i16  - 4, b.x2() as i16  - b.x() as i16  + 4, b.y2() as i16  - b.y() as i16  + 4, COLOR_BG).ok();
                                             } else {
-                                                println!("System Enabled");
+                                                println!("Enable Bypass Enabled");
                                                 *enable = true;
                                                 b.state = true;
-                                                b.text = "Enabled";
+                                                b.text = "ON";
                                                 b.text_color = COLOR_GREEN;
                                             }
                                         }
+                                    },
+                                    SaveBackup => {
+                                        make_backup();
                                     }
                                 }
 

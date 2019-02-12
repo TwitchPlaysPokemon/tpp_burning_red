@@ -10,6 +10,7 @@ use rand;
 use byteorder::{ByteOrder, LittleEndian, BigEndian};
 use std::sync::{Arc, Mutex};
 use serde_json::to_string;
+use chrono::{DateTime, Utc};
 
 /* for the HUD's API */
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -904,6 +905,17 @@ impl GameState {
         };
         HUD.post("http://localhost:1337/override").body(to_string(&data).unwrap()).send().ok();
     }
+}
+
+pub fn make_backup() {
+    let backup_name = Utc::now().format("%Y-%m-%d-%H%M%S");
+    std::fs::create_dir(format!("{}\\Backups\\{}", &CONTROLLER_PATH.to_str().unwrap(), backup_name)).ok();
+    std::fs::copy(format!("{}\\States\\red_warp.State", &CONTROLLER_PATH.to_str().unwrap()),
+                  format!("{}\\Backups\\{}\\red_warp.State", &CONTROLLER_PATH.to_str().unwrap(), backup_name)).ok();
+    std::fs::copy(format!("{}\\States\\firered_warp.State", &CONTROLLER_PATH.to_str().unwrap()),
+                  format!("{}\\Backups\\{}\\firered_warp.State", &CONTROLLER_PATH.to_str().unwrap(), backup_name)).ok();
+    std::fs::copy(format!("{}\\Gamestate", &CONTROLLER_PATH.to_str().unwrap()),
+                  format!("{}\\Backups\\{}\\Gamestate", &CONTROLLER_PATH.to_str().unwrap(), backup_name)).ok();
 }
 
 #[derive(Serialize, Deserialize, Clone, Default)]
