@@ -71,6 +71,7 @@ RemoveItemFromInventory_:
 	ld a, [wWhichPokemon]
 	ld [hl], a
 	pop hl
+	push hl
 	ld a, l
 	cp LOW(wCurrentPCItemPage)
 	ld a, ITEMAPI_REMOVE_ITEM
