@@ -1013,16 +1013,16 @@ impl GameState {
         };
     }
 }
-
 pub fn make_backup(manual: bool) {
+    let pathstr = &CONTROLLER_PATH.to_str().unwrap();
     let backup_name = format!("{} {}", if manual {"ManualSave"} else {"AutoSave"}, Utc::now().format("%Y-%m-%d-%H%M%S"));
-    std::fs::create_dir(format!("{}\\Backups\\{}", &CONTROLLER_PATH.to_str().unwrap(), backup_name)).ok();
-    std::fs::copy(format!("{}\\States\\red_warp.State", &CONTROLLER_PATH.to_str().unwrap()),
-                  format!("{}\\Backups\\{}\\red_warp.State", &CONTROLLER_PATH.to_str().unwrap(), backup_name)).ok();
-    std::fs::copy(format!("{}\\States\\firered_warp.State", &CONTROLLER_PATH.to_str().unwrap()),
-                  format!("{}\\Backups\\{}\\firered_warp.State", &CONTROLLER_PATH.to_str().unwrap(), backup_name)).ok();
-    std::fs::copy(format!("{}\\Gamestate", &CONTROLLER_PATH.to_str().unwrap()),
-                  format!("{}\\Backups\\{}\\Gamestate", &CONTROLLER_PATH.to_str().unwrap(), backup_name)).ok();
+    std::fs::create_dir(format!("{}\\Backups\\{}", pathstr, backup_name)).ok();
+    std::fs::copy(format!("{}\\States\\red_warp.State", pathstr),
+                  format!("{}\\Backups\\{}\\red_warp.State", pathstr, backup_name)).ok();
+    std::fs::copy(format!("{}\\States\\firered_warp.State", pathstr),
+                  format!("{}\\Backups\\{}\\firered_warp.State", pathstr, backup_name)).ok();
+    std::fs::copy(format!("{}\\Gamestate", pathstr),
+                  format!("{}\\Backups\\{}\\Gamestate", pathstr, backup_name)).ok();
 }
 
 #[derive(Serialize, Deserialize, Clone, Default)]
