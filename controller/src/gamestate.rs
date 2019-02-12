@@ -1052,15 +1052,13 @@ impl GameState {
 
         let mut red_items = RED_ITEM_STATE.lock().unwrap();
         // key items / hms // This both checks the flag and removes the items if the other games doesent have them.
-        self.check_item(&mut red_items, G_SILPHSCOPE, 0x48, 0x153, P_TMHM);
-        self.check_item(&mut red_items, G_POKEFLUTE, 0x49, 0x153, P_TMHM);
-        self.check_item(&mut red_items, G_SSTICKET, 0x3F, 0x153, P_TMHM);
-        self.check_item(&mut red_items, G_SECRETKEY, 0x2B, 0x153, P_TMHM);
-        self.check_item(&mut red_items, G_CUT, 0xC4, 0x153, P_TMHM);
-        self.check_item(&mut red_items, G_SURF, 0xC6, 0x153, P_TMHM);
-        self.check_item(&mut red_items, G_STRENGTH, 0xC7, 0x153, P_TMHM);
-
-        println!("Red {:08X} FireRed {:08X}", self.red_progress, self.firered_progress);
+        self.check_item(&mut red_items, G_SILPHSCOPE, 0x48, 0x0167, P_TMHM);
+        self.check_item(&mut red_items, G_POKEFLUTE, 0x49, 0x015E, P_TMHM);
+        self.check_item(&mut red_items, G_SSTICKET, 0x3F, 0x0109, P_TMHM);
+        self.check_item(&mut red_items, G_SECRETKEY, 0x2B, 0x015F, P_TMHM);
+        self.check_item(&mut red_items, G_CUT, 0xC4, 0x0153, P_TMHM);
+        self.check_item(&mut red_items, G_SURF, 0xC6, 0x0155, P_TMHM);
+        self.check_item(&mut red_items, G_STRENGTH, 0xC7, 0x0156, P_TMHM);
 
     }
 
