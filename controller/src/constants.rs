@@ -549,21 +549,21 @@ pub static RED_ITEM_POCKETS: [u8;256] = [
 // Progress gates
 
 pub const G_NONE:         u32 = 0x00000000;
-pub const G_BOULDERBADGE: u32 = 0x00000001;
-pub const G_CASCADEBADGE: u32 = 0x00000002;
-pub const G_THUNDERBADGE: u32 = 0x00000004;
-pub const G_RAINBOWBADGE: u32 = 0x00000008;
-pub const G_VOLCANOBADGE: u32 = 0x00000010;
-pub const G_EARTHBADGE:   u32 = 0x00000020;
-pub const G_SOULBADGE:    u32 = 0x00000040;
-pub const G_MARSHBADGE:   u32 = 0x00000080;
-pub const G_CUT:          u32 = 0x00000100;
-pub const G_SURF:         u32 = 0x00000200;
-pub const G_STRENGTH:     u32 = 0x00000400;
-pub const G_SILPHSCOPE:   u32 = 0x00000800;
-pub const G_SSTICKET:     u32 = 0x00001000;
-pub const G_POKEFLUTE:    u32 = 0x00002000;
-pub const G_SECRETKEY:    u32 = 0x00004000;
-pub const G_GUARDRUNK:    u32 = 0x00008000;
-pub const G_BIKE:         u32 = 0x00010000;
-pub const G_DLVRD_PARCEL: u32 = 0x00020000;
+pub const G_BOULDERBADGE: u32 = 0x00000001; // level_cap = 18
+pub const G_CASCADEBADGE: u32 = 0x00000002; // level_cap = 24
+pub const G_THUNDERBADGE: u32 = 0x00000004; // level_cap = 28
+pub const G_RAINBOWBADGE: u32 = 0x00000008; // level_cap = 34
+pub const G_VOLCANOBADGE: u32 = 0x00000010; // level_cap = 50
+pub const G_EARTHBADGE:   u32 = 0x00000020; // level_cap = 54
+pub const G_SOULBADGE:    u32 = 0x00000040; // level_cap = 46
+pub const G_MARSHBADGE:   u32 = 0x00000080; // level_cap = 46
+pub const G_CUT:          u32 = 0x00000100; 
+pub const G_SURF:         u32 = 0x00000200; 
+pub const G_STRENGTH:     u32 = 0x00000400; 
+pub const G_SILPHSCOPE:   u32 = 0x00000800; // level_cap = 38
+pub const G_SSTICKET:     u32 = 0x00001000; 
+pub const G_POKEFLUTE:    u32 = 0x00002000; // level_cap = 42
+pub const G_SECRETKEY:    u32 = 0x00004000; 
+pub const G_GUARDRUNK:    u32 = 0x00008000; 
+pub const G_BIKE:         u32 = 0x00010000; 
+pub const G_DLVRD_PARCEL: u32 = 0x00020000; // level_cap = _

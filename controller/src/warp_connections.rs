@@ -2160,7 +2160,7 @@ pub fn get_map_requirements() -> HashMap<u8, u32> {
         VIRIDIAN_MART            => G_NONE,
         VIRIDIAN_SCHOOL          => G_NONE,
         VIRIDIAN_HOUSE           => G_NONE,
-        VIRIDIAN_GYM             => G_VOLCANOBADGE,
+        VIRIDIAN_GYM             => G_VOLCANOBADGE | G_SOULBADGE | G_MARSHBADGE | G_RAINBOWBADGE | G_THUNDERBADGE | G_CASCADEBADGE | G_BOULDERBADGE,
         DIGLETTS_CAVE_EXIT       => G_CASCADEBADGE,
         VIRIDIAN_FOREST_EXIT     => G_DLVRD_PARCEL,
         ROUTE_2_HOUSE            => G_CASCADEBADGE,
