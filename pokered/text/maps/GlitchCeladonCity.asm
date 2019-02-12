@@ -1,0 +1,2 @@
+_PhanceroBattleText::
+	text "Rahdh!@@"

@@ -23,6 +23,8 @@ CeladonCity_TextPointers:
 	dw CeladonCityText16
 	dw CeladonCityText17
 	dw CeladonCityText18
+	dw CeladonCityText19
+	dw CeladonCityText20
 
 CeladonCityText1:
 	TX_FAR _CeladonCityText1
@@ -129,4 +131,12 @@ CeladonCityText17:
 
 CeladonCityText18:
 	TX_FAR _CeladonCityText18
+	db "@"
+	
+CeladonCityText19:
+	TX_FAR _CeladonCityText19
+	db "@"
+
+CeladonCityText20:
+	TX_FAR _CeladonCityText20
 	db "@"

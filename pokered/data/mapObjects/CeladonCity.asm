@@ -1,7 +1,7 @@
 CeladonCity_Object:
 	db $f ; border block
 
-	db 13 ; warps
+	db 14 ; warps
 	warp 8, 13, 0, CELADON_MART_1F
 	warp 10, 13, 2, CELADON_MART_1F
 	warp 24, 9, 0, CELADON_MANSION_1F
@@ -10,22 +10,25 @@ CeladonCity_Object:
 	warp 41, 9, 0, CELADON_POKECENTER
 	warp 12, 27, 0, CELADON_GYM
 	warp 28, 19, 0, GAME_CORNER
-	warp 39, 19, 0, CELADON_MART_5F ; beta warp! no longer used
+	warp 21, 15, 0, GLITCH_CELADON_CITY
 	warp 33, 19, 0, GAME_CORNER_PRIZE_ROOM
 	warp 31, 27, 0, CELADON_DINER
 	warp 35, 27, 0, CELADON_CHIEF_HOUSE
 	warp 43, 27, 0, CELADON_HOTEL
+	warp 39, 20, 0, GLITCH_CELADON_CITY
 
-	db 9 ; signs
+	db 11 ; signs
 	sign 27, 15, 10 ; CeladonCityText10
 	sign 19, 15, 11 ; CeladonCityText11
 	sign 42, 9, 12 ; PokeCenterSignText
 	sign 13, 29, 13 ; CeladonCityText13
 	sign 21, 9, 14 ; CeladonCityText14
 	sign 12, 13, 15 ; CeladonCityText15
-	sign 39, 21, 16 ; CeladonCityText16
+	sign 43, 21, 16 ; CeladonCityText16
 	sign 33, 21, 17 ; CeladonCityText17
 	sign 27, 21, 18 ; CeladonCityText18
+	sign 39, 19, 19 ; CeladonCityText19
+	sign 39, 21, 20 ; CeladonCityText20
 
 	db 9 ; objects
 	object SPRITE_LITTLE_GIRL, 8, 17, WALK, 0, 1 ; person
@@ -47,8 +50,9 @@ CeladonCity_Object:
 	warp_to 41, 9, CELADON_CITY_WIDTH ; CELADON_POKECENTER
 	warp_to 12, 27, CELADON_CITY_WIDTH ; CELADON_GYM
 	warp_to 28, 19, CELADON_CITY_WIDTH ; GAME_CORNER
-	warp_to 39, 19, CELADON_CITY_WIDTH ; CELADON_MART_5F
+	warp_to 21, 15, CELADON_CITY_WIDTH ; GLITCH_CELADON_CITY
 	warp_to 33, 19, CELADON_CITY_WIDTH ; GAME_CORNER_PRIZE_ROOM
 	warp_to 31, 27, CELADON_CITY_WIDTH ; CELADON_DINER
 	warp_to 35, 27, CELADON_CITY_WIDTH ; CELADON_CHIEF_HOUSE
 	warp_to 43, 27, CELADON_CITY_WIDTH ; CELADON_HOTEL
+	warp_to 39, 20, CELADON_CITY_WIDTH

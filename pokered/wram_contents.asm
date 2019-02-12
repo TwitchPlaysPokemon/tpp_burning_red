@@ -2816,8 +2816,10 @@ wSeafoamIslandsB4FCurScript:: ; d668
 	ds 1
 wRoute18Gate1FCurScript:: ; d669
 	ds 1
+wGlitchCeladonCityCurScript::
+	ds 1
 
-	ds 78
+	ds 77
 wGameProgressFlagsEnd::
 
 	ds 56
