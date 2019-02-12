@@ -99,6 +99,7 @@ fn main() {
 
         if cycle % 200 == 0 {
             game_state.recurring_functions();
+            game_state.enforce_level_cap();
         }
 
         if cycle % 60000 == 59999 { // 5 minutes

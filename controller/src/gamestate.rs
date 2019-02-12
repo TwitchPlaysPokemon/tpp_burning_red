@@ -110,7 +110,9 @@ pub struct GameState {
     pokemon_list: HashMap<u16, Pokemon>,
     map_state: MapState,
     pub enabled: bool,
-    pub first_warp: bool
+    pub first_warp: bool,
+    #[serde(skip_serializing, skip_deserializing)]
+    pub level_cap: u8
 }
 
 impl GameState {
@@ -140,7 +142,8 @@ impl GameState {
             pokemon_list: HashMap::new(),
             map_state: MapState::new(),
             enabled: false,
-            first_warp: true
+            first_warp: true,
+            level_cap: 0
         }
     }
 
@@ -983,6 +986,31 @@ impl GameState {
                 
             }
         }
+    }
+
+    pub fn enforce_level_cap(&mut self) {
+         match &self.game {
+            Game::RED => {
+                let party_count = BIZHAWK.read_u8_sym(&SYM["wPartyCount"]).unwrap();
+                let mut allowed_exp = BIZHAWK.read_u8_sym(&SYM["wPartyGainExpFlags"]).unwrap(); // get the current state of allowed exp
+                for i in 0..party_count {
+                    if BIZHAWK.read_u8(&MemRegion::WRAM, SYM["wPartyMons"].addr as u32 + (44*i as u32) + 0x21).unwrap() >= self.level_cap {
+                        allowed_exp &= !(0x01 << i); // reset any bit position where the mon is at or over the level cap, to disable EXP gain
+                    }
+                }
+                BIZHAWK.write_u8_sym(&SYM["wPartyGainExpFlags"], allowed_exp).unwrap(); // write the new value
+
+            },
+            Game::FIRERED => {
+                let mut allowed_exp = BIZHAWK.read_u8(&MemRegion::EWRAM, 0x0002_3F4E).unwrap(); // get the current state of allowed exp
+                for i in 0..6 {
+                    if BIZHAWK.read_u8(&MemRegion::EWRAM, 0x0002_4284 + (100*i as u32) + 0x54).unwrap() >= self.level_cap {
+                        allowed_exp &= !(0x01 << i); // reset any bit position where the mon is at or over the level cap, to disable EXP gain
+                    }
+                }
+                BIZHAWK.write_u8(&MemRegion::EWRAM, 0x0002_3F4E, allowed_exp).unwrap();
+            }
+        };
     }
 }
 
