@@ -3,6 +3,7 @@ controller/**/*.rs.bk
 controller/GameState
 controller/Roms
 controller/States
+controller/Backups
 
 # build directory
 build

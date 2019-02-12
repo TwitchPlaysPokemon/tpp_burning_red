@@ -905,6 +905,87 @@ impl GameState {
         };
         HUD.post("http://localhost:1337/override").body(to_string(&data).unwrap()).send().ok();
     }
+    pub fn recurring_functions(&mut self) {
+        self.check_for_new_mon();
+    }
+    pub fn check_for_new_mon(&mut self) {
+        match &self.game {
+            Game::RED => {
+                // PARTY
+                let party_count = BIZHAWK.read_u8_sym(&SYM["wPartyCount"]).unwrap() as u32;
+                for i in 0..6 {
+                    if i < party_count {
+                        let pk1 = &BIZHAWK.read_slice(&MemRegion::WRAM, SYM["wPartyMons"].addr as u32 + (44*i), 44).unwrap();
+                        let nickname = &BIZHAWK.read_slice(&MemRegion::WRAM, SYM["wPartyMonNicks"].addr as u32 + (11*i), 11).unwrap();
+
+                        if RED_FIRERED_SPECIES[pk1[0x00] as usize] != 0 {
+                            let mut uid = get_uid(RED_FIRERED_SPECIES[pk1[0x00] as usize], pk1[0x07]);
+
+                            if uid == 0x0000 {
+                                println!("found new mon in party, {}", RED_FIRERED_SPECIES[pk1[0x00] as usize]);
+                                let mut j = 1;
+                                loop {
+                                    uid = get_uid(RED_FIRERED_SPECIES[pk1[0x00] as usize], j as u8);
+                                    if uid != 0x0000 && !self.pokemon_list.contains_key(&uid) {
+                                        let new_pokemon = Pokemon::from_pk1(pk1, nickname, &self.trainer, uid);
+                                        if let Some(ref gen1) = new_pokemon.gen1 {
+                                            BIZHAWK.write_u8(&MemRegion::WRAM, SYM["wPartyMons"].addr as u32 + (44*i) + 0x07, gen1.bytes[0x07]).unwrap(); // write the second part of the ID to the mon
+                                        } else {
+                                            panic!("Trying to write Gen 1 data but Gen 1 data is not generated yet");
+                                        }
+                                        self.pokemon_list.insert(uid, new_pokemon);
+                                        break;
+                                    }
+                                    j += 1;
+                                }
+                            } 
+                        }
+
+                        
+                    } else {
+                        break;
+                    }
+                }
+                // CURRENT BOX
+                let box_count = BIZHAWK.read_u8_sym(&SYM["wNumInBox"]).unwrap() as u32;
+                for i in 0..20 {
+                    if i < box_count {
+                        let pk1 = &mut BIZHAWK.read_slice(&MemRegion::WRAM, SYM["wBoxMons"].addr as u32 + (33*i), 33).unwrap().to_vec();
+                        pk1.extend(vec![0xAA;11]);
+                        let nickname = &BIZHAWK.read_slice(&MemRegion::WRAM, SYM["wBoxMonNicks"].addr as u32 + (11*i), 11).unwrap();
+
+                        if RED_FIRERED_SPECIES[pk1[0x00] as usize] != 0 {
+                            let mut uid = get_uid(RED_FIRERED_SPECIES[pk1[0x00] as usize], pk1[0x07]);
+
+                            if uid == 0x0000 {
+                                println!("found new mon in box, {}", RED_FIRERED_SPECIES[pk1[0x00] as usize]);
+                                let mut j = 1;
+                                loop {
+                                    uid = get_uid(RED_FIRERED_SPECIES[pk1[0x00] as usize], j as u8);
+                                    if uid != 0x0000 && !self.pokemon_list.contains_key(&uid) {
+                                        let new_pokemon = Pokemon::from_pk1(pk1, nickname, &self.trainer, uid);
+                                        if let Some(ref gen1) = new_pokemon.gen1 {
+                                            BIZHAWK.write_u8(&MemRegion::WRAM, SYM["wBoxMons"].addr as u32 + (33*i) + 0x07, gen1.bytes[0x07]).unwrap(); // write the second part of the ID to the mon
+                                        } else {
+                                            panic!("Trying to write Gen 1 data but Gen 1 data is not generated yet");
+                                        }
+                                        self.pokemon_list.insert(uid, new_pokemon);
+                                        break;
+                                    }
+                                    j += 1;
+                                }
+                            }
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            },
+            Game::FIRERED => {
+                
+            }
+        }
+    }
 }
 
 pub fn make_backup() {

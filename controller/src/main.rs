@@ -26,11 +26,15 @@ use crate::item_api::*;
 use std::thread;
 use byteorder::{ByteOrder, LittleEndian};
 use std::sync::{Arc, Mutex};
-use chrono::{DateTime, Utc, SecondsFormat};
+use std::time::{Instant, Duration};
 
 fn main() {
     let warp_enable = Arc::new(Mutex::new(true));
     let enable_bypass = Arc::new(Mutex::new(false));
+
+    let mut cycle = 0u64;
+
+    let mut old_time = Instant::now();
 
     println!("Parsing Symfile");
 
@@ -81,6 +85,9 @@ fn main() {
                     game_state.check_for_transition(current_frame, Arc::clone(&warp_enable));
                 }
             }
+            if cycle % 60000 == 59999 { // 5 minutes
+                make_backup();
+            }
         } else if game_state.game == gamestate::Game::FIRERED {
             game_state.collect_mapstate();
             // Keep the system disabled until we get oaks parcel 0x015D
@@ -93,7 +100,19 @@ fn main() {
         } else {
             game_state.collect_mapstate();
         }
-        std::thread::sleep(POLL_DELAY);
+
+        if cycle % 200 == 0 {
+            game_state.recurring_functions();
+        }
+
+        cycle += 1;
+        let new_time = Instant::now();
+
+        if old_time + POLL_DELAY > new_time {
+            //println!("{:?}", (POLL_DELAY - (new_time - old_time)));
+            thread::sleep(POLL_DELAY - (new_time - old_time));
+        }
+        old_time = new_time;
     }
 }
 

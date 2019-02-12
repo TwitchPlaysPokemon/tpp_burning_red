@@ -263,7 +263,7 @@ pub const ITEM_IS_PC_EMPTY: u8 = 0x1D;
 pub const ITEM_GET_ITEM_QUANTITIES: u8 = 0x1E;
 pub const ITEM_GET_PAGE_LIMITS: u8 = 0x1F;
 
-pub const POLL_DELAY: time::Duration = time::Duration::from_millis(1);
+pub const POLL_DELAY: time::Duration = time::Duration::from_millis(5);
 
 #[derive(Debug, Clone)]
 pub struct PKBase {
@@ -550,20 +550,20 @@ pub static RED_ITEM_POCKETS: [u8;256] = [
 // Progress gates
 
 pub const G_NONE:         u32 = 0x00000000;
-pub const G_BOULDERBADGE: u32 = 0x00000001; // level_cap = 18
-pub const G_CASCADEBADGE: u32 = 0x00000002; // level_cap = 24
-pub const G_THUNDERBADGE: u32 = 0x00000004; // level_cap = 28
-pub const G_RAINBOWBADGE: u32 = 0x00000008; // level_cap = 34
-pub const G_SOULBADGE:    u32 = 0x00000010; // level_cap = 46
-pub const G_MARSHBADGE:   u32 = 0x00000020; // level_cap = 46
-pub const G_VOLCANOBADGE: u32 = 0x00000040; // level_cap = 50
-pub const G_EARTHBADGE:   u32 = 0x00000080; // level_cap = 54
+pub const G_BOULDERBADGE: u32 = 0x00000001; // level_cap = 23 
+pub const G_CASCADEBADGE: u32 = 0x00000002; // level_cap = 29
+pub const G_THUNDERBADGE: u32 = 0x00000004; // level_cap = 32
+pub const G_RAINBOWBADGE: u32 = 0x00000008; // level_cap = 39
+pub const G_SOULBADGE:    u32 = 0x00000010; // level_cap = 51
+pub const G_MARSHBADGE:   u32 = 0x00000020; // level_cap = 51
+pub const G_VOLCANOBADGE: u32 = 0x00000040; // level_cap = 55
+pub const G_EARTHBADGE:   u32 = 0x00000080; // level_cap = 59
 pub const G_CUT:          u32 = 0x00000100; 
 pub const G_SURF:         u32 = 0x00000200; 
 pub const G_STRENGTH:     u32 = 0x00000400; 
-pub const G_SILPHSCOPE:   u32 = 0x00000800; // level_cap = 38
+pub const G_SILPHSCOPE:   u32 = 0x00000800; // level_cap = 43
 pub const G_SSTICKET:     u32 = 0x00001000; 
-pub const G_POKEFLUTE:    u32 = 0x00002000; // level_cap = 42
+pub const G_POKEFLUTE:    u32 = 0x00002000; // level_cap = 47
 pub const G_SECRETKEY:    u32 = 0x00004000; 
 pub const G_GUARDRUNK:    u32 = 0x00008000; 
 pub const G_DLVRD_PARCEL: u32 = 0x00010000; // level_cap = _

@@ -144,7 +144,7 @@ impl Pokemon {
             exp: BigEndian::read_u32(&data[0x0D..0x11]) & 0x00FF_FFFF,
             ivs: Ivs::from(ivs),
             status_condition: data[0x04] >> 1,
-            level: data[0x21],
+            level: if data[0x21] == 0xAA { data[0x03] } else { data[0x21] },
             pokerus_status: 0x00,
             pokerus_remaining: 0xFF,
             trainer: trainer.clone(),
@@ -690,6 +690,19 @@ pub fn encrypt_shuffle_pk3(data: &mut [u8]) {
     }
 
     shuffle_blocks(&mut data[0x20..0x50], (pv % 24) as u8);
+}
+
+pub fn get_uid_gen3(data: &[u8]) -> u16 {
+    let pv = LittleEndian::read_u32(&data[0x00..0x04]);
+    let ot_id = LittleEndian::read_u32(&data[0x04..0x08]);
+    let key = pv ^ ot_id;
+
+    let block_pos = BLOCK_POS[0][INVERT_BLOCK_POS[(pv % 24) as usize] as usize]*0x0C;
+    let sub_id_block_pos = BLOCK_POS[2][INVERT_BLOCK_POS[(pv % 24) as usize] as usize]*0x0C + 4;
+
+    let species = (LittleEndian::read_u32(&data[0x20 + block_pos..0x20 + block_pos+4]) ^ key) as u8;
+    let sub_id = ((LittleEndian::read_u32(&data[0x20 + sub_id_block_pos..0x20 + sub_id_block_pos+4]) ^ key) >> 16) & 0xFF;
+    get_uid(species, sub_id as u8)
 }
 
 pub fn get_checksum_u16(data: &[u8]) -> u16 {
