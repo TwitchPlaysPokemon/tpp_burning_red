@@ -150,3 +150,19 @@ _CeladonCityText18::
 	line "The playground"
 	cont "for grown-ups!"
 	done
+	
+_CeladonCityText19::
+	text "It's locked up"
+	line "tight."
+	
+	para "The building looks"
+	line "abandoned..."
+	done
+	
+_CeladonCityText20::
+	text "BATTLE TENT..."
+	
+	para "The sign looks"
+	line "scratched and"
+	cont "faded."
+	done

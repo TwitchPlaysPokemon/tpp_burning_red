@@ -234,3 +234,4 @@ const_value = 0
 	const HS_SEAFOAM_ISLANDS_B4F_BOULDER_1 ; E1
 	const HS_SEAFOAM_ISLANDS_B4F_BOULDER_2 ; E2
 	const HS_ARTICUNO                      ; E3 X
+	const HS_PHANCERO

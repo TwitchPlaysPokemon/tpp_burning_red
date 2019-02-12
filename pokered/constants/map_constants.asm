@@ -254,4 +254,4 @@ ENDM
 	mapconst BRUNOS_ROOM,                    6,  5 ; $F6
 	mapconst AGATHAS_ROOM,                   6,  5 ; $F7
 	mapconst GLITCH_CELADON_CITY,           18, 25 ; $F8
-	mapconst BATTLE_TENT_CORRUPT,            5, 10 ; $F9
+	mapconst BATTLE_TENT_CORRUPT,           10,  5 ; $F9
