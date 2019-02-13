@@ -2955,6 +2955,7 @@ wd72e:: ; d72e
 
 wd730:: ; d730
 ; bit 0: NPC sprite being moved by script
+; bit 4: game locked up
 ; bit 5: ignore joypad input
 ; bit 6: print text with no delay between each letter
 ; bit 7: set if joypad states are being simulated in the overworld or an NPC's movement is being scripted
