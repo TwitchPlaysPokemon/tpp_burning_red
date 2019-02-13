@@ -29,53 +29,47 @@ pub struct HUDData {
 }
 
 /* for the HUD's API */
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Items {
     items: Vec<Item>,
-    key_red: Vec<Item>,
-    key_firered: Vec<Item>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    key_red: Option<Vec<Item>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    key_firered: Option<Vec<Item>>,
     balls: Vec<Item>,
-    berries: Vec<Item>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    berries: Option<Vec<Item>>,
     tms: Vec<Item>,
-    pc_red: Vec<Item>,
-    pc_firered: Vec<Item>
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pc_red: Option<Vec<Item>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pc_firered: Option<Vec<Item>>
 }
 
 impl Items {
     pub fn from_pocket_data(red: &[Pocket;5], fire_red: &[Pocket;6], game: &Game) -> Items {
-        Items {
-            items: match game {
-                Game::RED => {
-                    red[P_GENR as usize].content.iter().map(Item::from_slice).collect()
-                },
-                Game::FIRERED => {
-                    fire_red[P_GENR as usize].content.iter().map(Item::from_slice).collect()
+        match game {
+            Game::RED => {
+                Items {
+                    items: red[P_GENR as usize].content.iter().map(Item::from_slice).collect(),
+                    key_red: Some(red[P_KEYI as usize].content.iter().map(Item::from_slice).collect()),
+                    balls: red[P_BALL as usize].content.iter().map(Item::from_slice).collect(),
+                    tms: red[P_TMHM as usize].content.iter().map(Item::from_slice).collect(),
+                    pc_red: Some(red[P_PC as usize].content.iter().map(Item::from_slice).collect()),
+                    ..Default::default()
                 }
             },
-
-            key_red: red[P_KEYI as usize].content.iter().map(Item::from_slice).collect(),
-            key_firered: fire_red[P_KEYI as usize].content.iter().map(Item::from_slice).collect(),
-
-            balls: match game {
-                Game::RED => {
-                    red[P_BALL as usize].content.iter().map(Item::from_slice).collect()
-                },
-                Game::FIRERED => {
-                    fire_red[P_BALL as usize].content.iter().map(Item::from_slice).collect()
+            Game::FIRERED => {
+                Items {
+                    items: fire_red[P_GENR as usize].content.iter().map(Item::from_slice).collect(),
+                    key_firered: Some(fire_red[P_KEYI as usize].content.iter().map(Item::from_slice).collect()),
+                    balls: fire_red[P_BALL as usize].content.iter().map(Item::from_slice).collect(),
+                    berries: Some(fire_red[P_BERY as usize].content.iter().map(Item::from_slice).collect()),
+                    tms: fire_red[P_TMHM as usize].content.iter().map(Item::from_slice).collect(),
+                    pc_firered: Some(fire_red[P_PC as usize].content.iter().map(Item::from_slice).collect()),
+                    ..Default::default()
                 }
-            },
-
-            berries: fire_red[P_BERY as usize].content.iter().map(Item::from_slice).collect(),
-            tms: match game {
-                Game::RED => {
-                    red[P_TMHM as usize].content.iter().map(Item::from_slice).collect()
-                },
-                Game::FIRERED => {
-                    fire_red[P_TMHM as usize].content.iter().map(Item::from_slice).collect()
-                }
-            },
-            pc_red: red[P_PC as usize].content.iter().map(Item::from_slice).collect(),
-            pc_firered: fire_red[P_PC as usize].content.iter().map(Item::from_slice).collect()
+            }
         }
     }
 }
