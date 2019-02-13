@@ -1043,7 +1043,7 @@ impl GameState {
     }
 
     pub fn compare_progress(&self, flag: u32) -> u8 {
-        if self.red_progress &self.firered_progress & flag != 0 {
+        if self.red_progress & self.firered_progress & flag != 0 {
             return 0; // they both have the flag
         } else if self.red_progress & flag != 0 {
             return 1; // red has the flag set, but not firered

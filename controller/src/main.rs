@@ -101,6 +101,13 @@ fn main() {
             game_state.recurring_functions();
         }
 
+        if cycle % 2000 == 0 {
+            println!("Level cap: {}, Warp_state: {}", game_state.level_cap, match *WARP_MODE.lock().unwrap() {
+            WarpState::RANDOM => "RANDOM",
+            WarpState::LOCK_FIRERED => "LOCK FIRERED",
+            WarpState::LOCK_RED => "LOCK RED"})
+        }
+
         if cycle % 60000 == 59999 { // 5 minutes
             make_backup(false);
         }
