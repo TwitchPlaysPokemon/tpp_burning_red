@@ -1,3 +1,4 @@
+use crate::gamestate::WarpState;
 use crate::bizhawk;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
@@ -329,6 +330,7 @@ lazy_static! {
     pub static ref HUD: reqwest::Client = reqwest::Client::new();
     pub static ref OAKS_PARCEL_OBTAINED: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     pub static ref CONTROLLER_PATH: std::path::PathBuf = std::env::current_dir().unwrap();
+    pub static ref WARP_MODE: Arc<Mutex<WarpState>> = Arc::new(Mutex::new(WarpState::RANDOM));
 }
                                           
 pub static NATURE_EFFECTS: [[f32;5];25] = [/*ATK, DEF, SPE, SPA, SPD*/
@@ -549,6 +551,20 @@ pub static RED_ITEM_POCKETS: [u8;256] = [
 
 // Progress gates
 
+pub static LEVEL_CAPS: [(u32, u8);11] = [
+    (G_BOULDERBADGE, 23),
+    (G_CASCADEBADGE, 29),
+    (G_THUNDERBADGE, 32),
+    (G_RAINBOWBADGE, 39),
+    (G_SILPHSCOPE,   43),
+    (G_POKEFLUTE,    47),
+    (G_SOULBADGE,    51),
+    (G_MARSHBADGE,   51),
+    (G_VOLCANOBADGE, 55),
+    (G_EARTHBADGE,   59),
+    (0x80000000,     100)
+ ];
+
 pub const G_NONE:         u32 = 0x00000000;
 pub const G_BOULDERBADGE: u32 = 0x00000001; // level_cap = 23 
 pub const G_CASCADEBADGE: u32 = 0x00000002; // level_cap = 29
@@ -567,3 +583,4 @@ pub const G_SURF:         u32 = 0x00002000;
 pub const G_STRENGTH:     u32 = 0x00004000;
 pub const G_GUARDRUNK:    u32 = 0x00008000; 
 pub const G_DLVRD_PARCEL: u32 = 0x00010000; // level_cap = _
+

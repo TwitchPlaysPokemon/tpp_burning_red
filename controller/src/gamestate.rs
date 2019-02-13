@@ -113,7 +113,7 @@ pub struct GameState {
     pub enabled: bool,
     pub first_warp: bool,
     #[serde(skip_serializing, skip_deserializing)]
-    pub level_cap: u8
+    pub level_cap: u8,
 }
 
 impl GameState {
@@ -438,7 +438,17 @@ impl GameState {
                     if current_warp != 0xFF {println!("Map change detected, Map: {:02x}, Warp: {:02x}, Lastmap {:02x}", current_map, current_warp, last_map)};
                     if let Some(destination) = RED_FIRERED_WARP_MAP.get(&(current_map, current_warp, last_map)) {
                         self.save_state().unwrap();
-                        self.handle_map_change(destination.0, destination.1, 0, warp_enable);
+                        match *WARP_MODE.lock().unwrap() {
+                            WarpState::RANDOM => {
+                                if rand::random::<u16>() <= 0x2800 {
+                                    self.handle_map_change(destination.0, destination.1, 0, warp_enable);
+                                }
+                            }, 
+                            WarpState::LOCK_RED => {},
+                            WarpState::LOCK_FIRERED => {
+                                self.handle_map_change(destination.0, destination.1, 0, warp_enable);
+                            }
+                        }
                     } else if current_warp != 0xFF {
                         println!("Map unknown or not supported.");
                     }
@@ -460,16 +470,28 @@ impl GameState {
                     self.map_state.previous_lastmap = current_lastmap;
                     println!("Map change detected, Map: {:04x}, Warp: {:02x}", current_map, current_warp);
                     if let Some(destination) = FIRERED_RED_WARP_MAP.get(&(current_map, current_warp)) {
-                        BIZHAWK.pause().unwrap();
-                        BIZHAWK.framerewind().unwrap();
-                        BIZHAWK.save_state("firered_warp").unwrap();
-                        self.save_state().unwrap();
-                        //self.warp_rebound(&BIZHAWK, current_map, current_warp, 0x00);
-                        self.handle_map_change(destination.0 as u16, destination.1, destination.2, warp_enable);
+                        match *WARP_MODE.lock().unwrap() {
+                            WarpState::RANDOM => {
+                                if rand::random::<u16>() <= 0x2800 {
+                                    BIZHAWK.pause().unwrap();
+                                    BIZHAWK.framerewind().unwrap();
+                                    BIZHAWK.save_state("firered_warp").unwrap();
+                                    self.save_state().unwrap();
+                                    self.handle_map_change(destination.0 as u16, destination.1, destination.2, warp_enable);
+                                }
+                            }, 
+                            WarpState::LOCK_RED => {
+                                    BIZHAWK.pause().unwrap();
+                                    BIZHAWK.framerewind().unwrap();
+                                    BIZHAWK.save_state("firered_warp").unwrap();
+                                    self.save_state().unwrap();
+                                    self.handle_map_change(destination.0 as u16, destination.1, destination.2, warp_enable);
+                            },
+                            WarpState::LOCK_FIRERED => {}
+                        }
                     } else {
                         BIZHAWK.play().unwrap();
                         println!("Map unknown or not supported.");
-                        //self.warp_rebound(&BIZHAWK, current_map, current_warp, 0x00);
                     }
                     self.map_state.map_checked = true;
                 } else {
@@ -911,7 +933,13 @@ impl GameState {
     pub fn recurring_functions(&mut self) {
         self.check_for_new_mon();
         self.check_progress_gates();
+        self.get_lockdown_level_cap();
         self.enforce_level_cap();
+        /*println!("Level cap: {}, Warp_state: {}", self.level_cap, match *WARP_MODE.lock().unwrap() {
+            WarpState::RANDOM => "RANDOM",
+            WarpState::LOCK_FIRERED => "LOCK FIRERED",
+            WarpState::LOCK_RED => "LOCK RED"
+        });*/
     }
     pub fn check_for_new_mon(&mut self) {
         match &self.game {
@@ -987,6 +1015,42 @@ impl GameState {
             Game::FIRERED => {
                 
             }
+        }
+    }
+
+    pub fn get_lockdown_level_cap(&mut self) {
+        for i in LEVEL_CAPS.iter() {
+            match self.compare_progress(i.0) {
+                0 => {}, // continue to the next one
+                1 => {
+                    *WARP_MODE.lock().unwrap() = WarpState::LOCK_FIRERED;
+                    self.level_cap = i.1;
+                    break;
+                },
+                2 => {
+                    *WARP_MODE.lock().unwrap() = WarpState::LOCK_RED;
+                    self.level_cap = i.1;
+                    break;
+                },
+                3 => {
+                    *WARP_MODE.lock().unwrap() = WarpState::RANDOM;
+                    self.level_cap = i.1;
+                    break;
+                },
+                _ => {}
+            }
+        }
+    }
+
+    pub fn compare_progress(&self, flag: u32) -> u8 {
+        if self.red_progress &self.firered_progress & flag != 0 {
+            return 0; // they both have the flag
+        } else if self.red_progress & flag != 0 {
+            return 1; // red has the flag set, but not firered
+        } else if self.firered_progress & flag != 0 {
+            return 2; // firered has the flag set, but not red
+        } else {
+            return 3; // neither are set
         }
     }
 
@@ -1124,6 +1188,11 @@ impl MapState {
             last_change: 0x00
         }
     }
+}
+pub enum WarpState {
+    RANDOM,
+    LOCK_RED,
+    LOCK_FIRERED
 }
 
 #[derive(Serialize, Deserialize, Clone)]
