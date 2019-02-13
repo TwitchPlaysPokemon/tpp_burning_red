@@ -584,6 +584,11 @@ impl GameState {
                 let mut slot = 0;
                 let mut count = 0;
                 let mut data = vec![0;0x194];
+
+                for i in &mut data[0x01..0x08] {
+                    *i = 0xFF;
+                }
+                
                 for i in &self.party_uids {
                     if *i == 0x0000 {
                         data[0x01 + slot] = 0xFF;
@@ -603,6 +608,7 @@ impl GameState {
                     }
                 }
                 data[0x00] = count as u8;
+                data[count+1] = 0xFF;
                 BIZHAWK.write_slice_sym(&SYM["wPartyDataStart"], &data).unwrap();
             },
             Game::FIRERED => {
@@ -1107,7 +1113,7 @@ impl GameState {
                     }
                 }
                 if self.firered_progress & G_DLVRD_PARCEL == 0x00 {
-                    if BIZHAWK.read_slice_custom("*03005008+EE0+7/1".to_string(), 0x01).unwrap()[0] & 0x01 != 0x00 { // bit 2 is delivered oaks parcel
+                    if BIZHAWK.read_slice_custom("*03005008+EE0+7/1".to_string(), 0x01).unwrap()[0] & 0x04 == 0x00 { // bit 2 is delivered oaks parcel (pokedex on table visibility)
                         self.firered_progress |= G_DLVRD_PARCEL;
                     }
                 }
