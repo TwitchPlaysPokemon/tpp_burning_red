@@ -38,7 +38,11 @@ SECTION "rst 30", ROM0
 	rst $38
 
 SECTION "rst 38", ROM0
-	rst $38
+	di
+	ld hl, wd730
+	set 4, [hl]
+.lock_up
+	jr .lock_up
 
 ; Hardware interrupts
 SECTION "vblank", ROM0
