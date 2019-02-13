@@ -1173,6 +1173,7 @@ impl GameState {
 pub fn make_backup(manual: bool) {
     let pathstr = &CONTROLLER_PATH.to_str().unwrap();
     let backup_name = format!("{} {}", if manual {"ManualSave"} else {"AutoSave"}, Utc::now().format("%Y-%m-%d-%H%M%S"));
+    BIZHAWK.save_state_custom(format!("{}\\Backups\\{} {}", pathstr, BIZHAWK.get_rom_name().unwrap(), backup_name).as_str()).unwrap();
     std::fs::create_dir(format!("{}\\Backups\\{}", pathstr, backup_name)).ok();
     std::fs::copy(format!("{}\\States\\red_warp.State", pathstr),
                   format!("{}\\Backups\\{}\\red_warp.State", pathstr, backup_name)).ok();

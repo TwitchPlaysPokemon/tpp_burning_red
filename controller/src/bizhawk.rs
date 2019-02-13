@@ -253,6 +253,10 @@ impl Bizhawk {
         self.send_command(format!("savestate/{}\\States\\{}.State", &CONTROLLER_PATH.to_str().unwrap(), name).as_str())
     }
 
+    pub fn save_state_custom(&self, name: &str) -> Result<(), String> {
+        self.send_command(format!("savestate/{}.State", name).as_str())
+    }
+
     pub fn load_state(&self, name: &str) -> Result<(), String> {
         self.send_command(format!("loadstate/{}\\States\\{}.State", &CONTROLLER_PATH.to_str().unwrap(), name).as_str())
     }
