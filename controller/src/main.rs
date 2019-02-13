@@ -102,10 +102,10 @@ fn main() {
         }
 
         if cycle % 2000 == 0 {
-            println!("Level cap: {}, Warp_state: {}", game_state.level_cap, match *WARP_MODE.lock().unwrap() {
+            println!("Level cap: {}, Warp_state: {}, RED_PROGRESS: {:08X}, FIRERED_PROGRESS: {:08X}", game_state.level_cap, match *WARP_MODE.lock().unwrap() {
             WarpState::RANDOM => "RANDOM",
             WarpState::LOCK_FIRERED => "LOCK FIRERED",
-            WarpState::LOCK_RED => "LOCK RED"})
+            WarpState::LOCK_RED => "LOCK RED"}, game_state.red_progress, game_state.firered_progress);
         }
 
         if cycle % 60000 == 59999 { // 5 minutes
