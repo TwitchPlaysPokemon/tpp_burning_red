@@ -420,64 +420,6 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         //FUCHSIA_MEETING_ROOM
         (FUCHSIA_CITY               , 0x06, FUCHSIA_CITY                ) => (0x0703, 0x03),
 
-        //SAFARI_ZONE_ENTRANCE
-        (FUCHSIA_CITY               , 0x04, FUCHSIA_CITY                ) => (0x0703, 0x00),
-        (SAFARI_ZONE_CENTER         , 0x00, FUCHSIA_CITY                ) => (0x3F01, 0x01),
-        (SAFARI_ZONE_CENTER         , 0x01, FUCHSIA_CITY                ) => (0x3F01, 0x01),
-
-        //SAFARI_ZONE_EAST
-        (SAFARI_ZONE_NORTH          , 0x06, FUCHSIA_CITY                ) => (0x4101, 0x06),
-        (SAFARI_ZONE_NORTH          , 0x07, FUCHSIA_CITY                ) => (0x4101, 0x07),
-        (SAFARI_ZONE_CENTER         , 0x06, FUCHSIA_CITY                ) => (0x3F01, 0x09),
-        (SAFARI_ZONE_REST_HOUSE_3   , 0x00, FUCHSIA_CITY                ) => (0x4401, 0x01),
-
-        //SAFARI_ZONE_NORTH
-        (SAFARI_ZONE_WEST           , 0x00, FUCHSIA_CITY                ) => (0x4201, 0x00),
-        (SAFARI_ZONE_WEST           , 0x01, FUCHSIA_CITY                ) => (0x4201, 0x01),
-        (SAFARI_ZONE_WEST           , 0x02, FUCHSIA_CITY                ) => (0x4201, 0x03),
-        (SAFARI_ZONE_WEST           , 0x03, FUCHSIA_CITY                ) => (0x4201, 0x04),
-        (SAFARI_ZONE_CENTER         , 0x04, FUCHSIA_CITY                ) => (0x3F01, 0x03),
-        (SAFARI_ZONE_CENTER         , 0x05, FUCHSIA_CITY                ) => (0x3F01, 0x04),
-        (SAFARI_ZONE_EAST           , 0x00, FUCHSIA_CITY                ) => (0x4001, 0x00),
-        (SAFARI_ZONE_EAST           , 0x01, FUCHSIA_CITY                ) => (0x4001, 0x01),
-        (SAFARI_ZONE_REST_HOUSE_4   , 0x00, FUCHSIA_CITY                ) => (0x4501, 0x01),
-
-        //SAFARI_ZONE_WEST
-        (SAFARI_ZONE_NORTH          , 0x00, FUCHSIA_CITY                ) => (0x4101, 0x00),
-        (SAFARI_ZONE_NORTH          , 0x01, FUCHSIA_CITY                ) => (0x4101, 0x01),
-        (SAFARI_ZONE_NORTH          , 0x02, FUCHSIA_CITY                ) => (0x4101, 0x03),
-        (SAFARI_ZONE_NORTH          , 0x03, FUCHSIA_CITY                ) => (0x4101, 0x04),
-        (SAFARI_ZONE_CENTER         , 0x02, FUCHSIA_CITY                ) => (0x3F01, 0x06),
-        (SAFARI_ZONE_CENTER         , 0x03, FUCHSIA_CITY                ) => (0x3F01, 0x07),
-        (SAFARI_ZONE_SECRET_HOUSE   , 0x00, FUCHSIA_CITY                ) => (0x4701, 0x01),
-        (SAFARI_ZONE_REST_HOUSE_2   , 0x00, FUCHSIA_CITY                ) => (0x4601, 0x01),
-
-        //SAFARI_ZONE_CENTER
-        (SAFARI_ZONE_ENTRANCE       , 0x02, FUCHSIA_CITY                ) => (0x000B, 0x00),
-        (SAFARI_ZONE_ENTRANCE       , 0x03, FUCHSIA_CITY                ) => (0x000B, 0x00),
-        (SAFARI_ZONE_WEST           , 0x04, FUCHSIA_CITY                ) => (0x4201, 0x06),
-        (SAFARI_ZONE_WEST           , 0x05, FUCHSIA_CITY                ) => (0x4201, 0x07),
-        (SAFARI_ZONE_NORTH          , 0x04, FUCHSIA_CITY                ) => (0x4101, 0x09),
-        (SAFARI_ZONE_NORTH          , 0x05, FUCHSIA_CITY                ) => (0x4101, 0x0A),
-        (SAFARI_ZONE_EAST           , 0x02, FUCHSIA_CITY                ) => (0x4001, 0x03),
-        (SAFARI_ZONE_EAST           , 0x03, FUCHSIA_CITY                ) => (0x4001, 0x04),
-        (SAFARI_ZONE_REST_HOUSE_1   , 0x00, FUCHSIA_CITY                ) => (0x4301, 0x01),
-
-        //SAFARI_ZONE_REST_HOUSE_1
-        (SAFARI_ZONE_CENTER         , 0x08, FUCHSIA_CITY                ) => (0x3F01, 0x0C),
-
-        //SAFARI_ZONE_SECRET_HOUSE
-        (SAFARI_ZONE_WEST           , 0x06, FUCHSIA_CITY                ) => (0x4201, 0x09),
-
-        //SAFARI_ZONE_REST_HOUSE_2
-        (SAFARI_ZONE_WEST           , 0x07, FUCHSIA_CITY                ) => (0x4201, 0x0A),
-
-        //SAFARI_ZONE_REST_HOUSE_3
-        (SAFARI_ZONE_EAST           , 0x04, FUCHSIA_CITY                ) => (0x4001, 0x06),
-
-        //SAFARI_ZONE_REST_HOUSE_4
-        (SAFARI_ZONE_NORTH          , 0x08, FUCHSIA_CITY                ) => (0x4101, 0x0C),
-
         // CINNABAR_ISLAND
         (MANSION_1                  , 0x01, CINNABAR_ISLAND             ) => (0x3B01, 0x01),
         (CINNABAR_GYM               , 0x00, CINNABAR_ISLAND             ) => (0x000C, 0x01),
@@ -1480,65 +1422,6 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
 
         //FUCHSIA_MEETING_ROOM
         (0x0703, 0x03) => (FUCHSIA_CITY               , 0x06, FUCHSIA_CITY                ),
-
-        //SAFARI_ZONE_ENTRANCE
-        (0x0703, 0x00) => (FUCHSIA_CITY               , 0x04, FUCHSIA_CITY                ),
-        (0x3F01, 0x01) => (SAFARI_ZONE_CENTER         , 0x00, FUCHSIA_CITY                ),
-        (0x3F01, 0x01) => (SAFARI_ZONE_CENTER         , 0x01, FUCHSIA_CITY                ),
-
-        //SAFARI_ZONE_EAST
-        (0x4101, 0x06) => (SAFARI_ZONE_NORTH          , 0x06, FUCHSIA_CITY                ),
-        (0x4101, 0x07) => (SAFARI_ZONE_NORTH          , 0x07, FUCHSIA_CITY                ),
-        (0x3F01, 0x09) => (SAFARI_ZONE_CENTER         , 0x06, FUCHSIA_CITY                ),
-        (0x3F01, 0x0A) => (SAFARI_ZONE_CENTER         , 0x06, FUCHSIA_CITY                ),
-        (0x4401, 0x01) => (SAFARI_ZONE_REST_HOUSE_3   , 0x00, FUCHSIA_CITY                ),
-
-        //SAFARI_ZONE_NORTH
-        (0x4201, 0x00) => (SAFARI_ZONE_WEST           , 0x00, FUCHSIA_CITY                ),
-        (0x4201, 0x01) => (SAFARI_ZONE_WEST           , 0x01, FUCHSIA_CITY                ),
-        (0x4201, 0x03) => (SAFARI_ZONE_WEST           , 0x02, FUCHSIA_CITY                ),
-        (0x4201, 0x04) => (SAFARI_ZONE_WEST           , 0x03, FUCHSIA_CITY                ),
-        (0x3F01, 0x03) => (SAFARI_ZONE_CENTER         , 0x04, FUCHSIA_CITY                ),
-        (0x3F01, 0x04) => (SAFARI_ZONE_CENTER         , 0x05, FUCHSIA_CITY                ),
-        (0x4001, 0x00) => (SAFARI_ZONE_EAST           , 0x00, FUCHSIA_CITY                ),
-        (0x4001, 0x01) => (SAFARI_ZONE_EAST           , 0x01, FUCHSIA_CITY                ),
-        (0x4501, 0x01) => (SAFARI_ZONE_REST_HOUSE_4   , 0x00, FUCHSIA_CITY                ),
-
-        //SAFARI_ZONE_WEST
-        (0x4101, 0x00) => (SAFARI_ZONE_NORTH          , 0x00, FUCHSIA_CITY                ),
-        (0x4101, 0x01) => (SAFARI_ZONE_NORTH          , 0x01, FUCHSIA_CITY                ),
-        (0x4101, 0x03) => (SAFARI_ZONE_NORTH          , 0x02, FUCHSIA_CITY                ),
-        (0x4101, 0x04) => (SAFARI_ZONE_NORTH          , 0x03, FUCHSIA_CITY                ),
-        (0x3F01, 0x06) => (SAFARI_ZONE_CENTER         , 0x02, FUCHSIA_CITY                ),
-        (0x3F01, 0x07) => (SAFARI_ZONE_CENTER         , 0x03, FUCHSIA_CITY                ),
-        (0x4701, 0x01) => (SAFARI_ZONE_SECRET_HOUSE   , 0x00, FUCHSIA_CITY                ),
-        (0x4601, 0x01) => (SAFARI_ZONE_REST_HOUSE_2   , 0x00, FUCHSIA_CITY                ),
-
-        //SAFARI_ZONE_CENTER
-        (0x000B, 0x00) => (SAFARI_ZONE_ENTRANCE       , 0x02, FUCHSIA_CITY                ),
-        (0x000B, 0x00) => (SAFARI_ZONE_ENTRANCE       , 0x03, FUCHSIA_CITY                ),
-        (0x4201, 0x06) => (SAFARI_ZONE_WEST           , 0x04, FUCHSIA_CITY                ),
-        (0x4201, 0x07) => (SAFARI_ZONE_WEST           , 0x05, FUCHSIA_CITY                ),
-        (0x4101, 0x09) => (SAFARI_ZONE_NORTH          , 0x04, FUCHSIA_CITY                ),
-        (0x4101, 0x0A) => (SAFARI_ZONE_NORTH          , 0x05, FUCHSIA_CITY                ),
-        (0x4001, 0x03) => (SAFARI_ZONE_EAST           , 0x02, FUCHSIA_CITY                ),
-        (0x4001, 0x04) => (SAFARI_ZONE_EAST           , 0x03, FUCHSIA_CITY                ),
-        (0x4301, 0x01) => (SAFARI_ZONE_REST_HOUSE_1   , 0x00, FUCHSIA_CITY                ),
-
-        //SAFARI_ZONE_REST_HOUSE_1
-        (0x3F01, 0x0C) => (SAFARI_ZONE_CENTER         , 0x08, FUCHSIA_CITY                ),
-
-        //SAFARI_ZONE_SECRET_HOUSE
-        (0x4201, 0x09) => (SAFARI_ZONE_WEST           , 0x06, FUCHSIA_CITY                ),
-
-        //SAFARI_ZONE_REST_HOUSE_2
-        (0x4201, 0x0A) => (SAFARI_ZONE_WEST           , 0x07, FUCHSIA_CITY                ),
-
-        //SAFARI_ZONE_REST_HOUSE_3
-        (0x4001, 0x06) => (SAFARI_ZONE_EAST           , 0x04, FUCHSIA_CITY                ),
-
-        //SAFARI_ZONE_REST_HOUSE_4
-        (0x4101, 0x0C) => (SAFARI_ZONE_NORTH          , 0x08, FUCHSIA_CITY                ),
 
         // CINNABAR_ISLAND
         (0x3B01, 0x01) => (MANSION_1                  , 0x01, CINNABAR_ISLAND             ),
