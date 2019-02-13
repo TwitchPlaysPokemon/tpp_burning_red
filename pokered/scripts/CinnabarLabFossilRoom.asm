@@ -10,8 +10,10 @@ IF _ITEMAPI
 Lab4Script_GetFossilsInBag:
 ; construct a list of all fossils in the player's bag
 	push bc
+	push de
 	ld de, FossilsList
 	callba GetFilteredItemList
+	pop de
 	pop bc
 	ret
 
@@ -53,12 +55,6 @@ Lab4Script_GetFossilsInBag:
 	ret
 
 ENDC
-
-FossilsList:
-	db DOME_FOSSIL
-	db HELIX_FOSSIL
-	db OLD_AMBER
-	db $00
 
 Lab4Text1:
 	TX_ASM

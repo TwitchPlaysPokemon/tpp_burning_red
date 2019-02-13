@@ -7,7 +7,7 @@ GlitchCeladonCity_Script:
 	ld [wGlitchCeladonCityCurScript], a
 	ret
 	
-GlitchCeladonCity_ScriptPointers
+GlitchCeladonCity_ScriptPointers:
 	dw CheckFightingMapTrainers
 	dw DisplayEnemyTrainerTextAndStartBattle
 	dw EndTrainerBattle

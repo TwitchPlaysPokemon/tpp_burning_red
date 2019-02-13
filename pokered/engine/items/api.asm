@@ -122,11 +122,10 @@ GetFilteredItemList::
 	call ItemAPI
 	pop hl
 	pop de
-	ld bc, wFilteredBagItemsCount
+	ld bc, wFilteredBagItems
 	push af
 	xor a
-	ld [bc], a
-	inc bc
+	ld [wFilteredBagItemsCount], a
 	dec a
 	ld [bc], a
 	pop af
