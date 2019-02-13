@@ -23,6 +23,8 @@ pub struct HUDData {
     #[serde(skip_serializing_if = "Option::is_none")]
     items: Option<Items>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    level_cap: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     updates_paused: Option<bool>
 }
 
@@ -915,6 +917,7 @@ impl GameState {
                     game: Some("red.gb".to_string()),
                     badges: Some(((self.badges[0] as u16) << 8) | ((self.badges[1] as u16) & 0xFF)),
                     items: Some(Items::from_pocket_data(&RED_ITEM_STATE.lock().unwrap().inventory, &self.firered_items, &self.game)),
+                    level_cap: Some(self.level_cap),
                     updates_paused: None
                 }
             },
@@ -923,6 +926,7 @@ impl GameState {
                     game: Some("firered.gba".to_string()),
                     badges: Some(((self.badges[0] as u16) << 8) | ((self.badges[1] as u16) & 0xFF)),
                     items: Some(Items::from_pocket_data(&RED_ITEM_STATE.lock().unwrap().inventory, &self.firered_items, &self.game)),
+                    level_cap: Some(self.level_cap),
                     updates_paused: None
                 }
             }
@@ -934,6 +938,7 @@ impl GameState {
             game: None,
             badges: None,
             items: None,
+            level_cap: None,
             updates_paused: Some(!enable)
         };
         HUD.post("http://localhost:1337/override").body(to_string(&data).unwrap()).send().ok();

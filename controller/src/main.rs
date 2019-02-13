@@ -102,6 +102,10 @@ fn main() {
         }
 
         if cycle % 2000 == 0 {
+            if game_state.game == Game::FIRERED {
+                game_state.read_items();
+            }
+            game_state.send_hud_data();
             println!("Level cap: {}, Warp_state: {}, RED_PROGRESS: {:08X}, FIRERED_PROGRESS: {:08X}", game_state.level_cap, match *WARP_MODE.lock().unwrap() {
             WarpState::RANDOM => "RANDOM",
             WarpState::LOCK_FIRERED => "LOCK FIRERED",
