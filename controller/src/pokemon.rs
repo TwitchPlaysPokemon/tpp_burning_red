@@ -143,7 +143,7 @@ impl Pokemon {
             pp: [data[0x1D] & 0x3F, data[0x1E] & 0x3F, data[0x1F] & 0x3F, data[0x20] & 0x3F],
             exp: BigEndian::read_u32(&data[0x0D..0x11]) & 0x00FF_FFFF,
             ivs: Ivs::from(ivs),
-            status_condition: data[0x04] >> 1,
+            status_condition: data[0x04],
             level: if data[0x21] == 0xAA { data[0x03] } else { data[0x21] },
             pokerus_status: 0x00,
             pokerus_remaining: 0xFF,
@@ -190,7 +190,7 @@ impl Pokemon {
             data[0x00] = FIRERED_RED_SPECIES[self.species as usize];
 
             data[0x03] = self.level;
-            data[0x04] = self.status_condition << 1; // Status Condition
+            data[0x04] = self.status_condition; // Status Condition
             data[0x05] = BASE_STATS[self.species as usize].gen1._type[0]; // Type 1
             data[0x06] = BASE_STATS[self.species as usize].gen1._type[1]; // Type 2
 
@@ -302,7 +302,7 @@ impl Pokemon {
         self.moves = [data[0x08], data[0x09], data[0x0A], data[0x0B]];
         self.pp = [data[0x1D] & 0x3F, data[0x1E] & 0x3F, data[0x1F] & 0x3F, data[0x20] & 0x3F];
         self.exp = BigEndian::read_u32(&data[0x0D..0x11]) & 0x00FF_FFFF;
-        self.status_condition = data[0x04] >> 1;
+        self.status_condition = data[0x04];
 
         if self.level != data[0x21] {
             self.level = data[0x21];
@@ -586,7 +586,7 @@ impl Pokemon {
                 gen1.bytes[0x06] = BASE_STATS[self.species as usize].gen1._type[1]; // Type 2
             }
 
-            gen1.bytes[0x04] = self.status_condition << 1; // Status Condition
+            gen1.bytes[0x04] = self.status_condition; // Status Condition
 
             gen1.bytes[0x08] = self.moves[0] as u8; // Moves
             gen1.bytes[0x09] = self.moves[1] as u8;
