@@ -588,7 +588,7 @@ impl GameState {
                 for i in &mut data[0x01..0x08] {
                     *i = 0xFF;
                 }
-                
+
                 for i in &self.party_uids {
                     if *i == 0x0000 {
                         data[0x01 + slot] = 0xFF;
@@ -795,10 +795,12 @@ impl GameState {
 
                 let mut item_memory = BIZHAWK.read_slice_custom("*03005008+298/360".to_string(), 0x360).unwrap();
 
+                let mut enc_item_memory = &mut item_memory[0x0078..];
+
                 // Decrypt
-                for i in 0..(item_memory.len() / 0x04) {
-                    let current_section = LittleEndian::read_u16(&item_memory[(i*0x04 + 0x02)..(i*0x04) + 0x04]);
-                    LittleEndian::write_u16(&mut item_memory[(i*0x04 + 0x02)..(i*0x04) + 0x04], current_section ^ key);
+                for i in 0..(enc_item_memory.len() / 0x04) {
+                    let current_section = LittleEndian::read_u16(&enc_item_memory[(i*0x04 + 0x02)..(i*0x04) + 0x04]);
+                    LittleEndian::write_u16(&mut enc_item_memory[(i*0x04 + 0x02)..(i*0x04) + 0x04], current_section ^ key);
                 }
 
                 for i in 0..5 {
