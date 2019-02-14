@@ -875,7 +875,7 @@ impl GameState {
 
                 let mut item_memory = vec![0u8;0x23C];
 
-                for i in 0..3 {
+                for i in 0..4 {
                     let section = match i {
                         0 => &mut item_memory[0x0000..0x00A8],
                         1 => &mut item_memory[0x00A8..0x0120],
