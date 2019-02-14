@@ -873,18 +873,20 @@ impl GameState {
                 let items_pointer = BIZHAWK.read_u32(&MemRegion::IWRAM, 0x5008).unwrap() & 0x00FFFFFF;
                 let key = LittleEndian::read_u32(&BIZHAWK.read_slice_custom("*0300500C+F20/4".to_string(), 0x04).unwrap()) as u16;
 
-                let mut item_memory = vec![0u8;0x1C4];
+                let mut item_memory = vec![0u8;0x23C];
 
                 for i in 0..3 {
                     let section = match i {
                         0 => &mut item_memory[0x0000..0x00A8],
-                        1 => &mut item_memory[0x00A8..0x00DC],
-                        _ => &mut item_memory[0x00DC..0x01C4]
+                        1 => &mut item_memory[0x00A8..0x0120],
+                        2 => &mut item_memory[0x0120..0x0154],
+                        _ => &mut item_memory[0x0154..0x023C],
                     };
 
                     let pocket = match i {
                         0 => &self.firered_items[0].content,
-                        1 => &self.firered_items[2].content,
+                        1 => &self.firered_items[1].content,
+                        2 => &self.firered_items[2].content,
                         _ => &self.firered_items[3].content,
                     };
 
@@ -898,8 +900,7 @@ impl GameState {
                         }
                     }
 
-                    BIZHAWK.write_slice(&MemRegion::EWRAM, items_pointer + 0x310, &item_memory[0x0000..0x00A8]).unwrap();
-                    BIZHAWK.write_slice(&MemRegion::EWRAM, items_pointer + 0x430, &item_memory[0x00A8..0x01C4]).unwrap();
+                    BIZHAWK.write_slice(&MemRegion::EWRAM, items_pointer + 0x310, &item_memory).unwrap();
                 }
             }
         }
@@ -1120,22 +1121,28 @@ impl GameState {
                 }
             }
         }
-
+        let old_flags = self.firered_progress;
+        if self.game == Game::FIRERED {
+            self.read_items();
+        }
         let mut red_items = RED_ITEM_STATE.lock().unwrap();
         // key items / hms // This both checks the flag and removes the items if the other games doesent have them.
-        self.check_item(&mut red_items, G_SILPHSCOPE, 0x48, 0x0167, P_TMHM);
-        self.check_item(&mut red_items, G_POKEFLUTE, 0x49, 0x015E, P_TMHM);
-        self.check_item(&mut red_items, G_SSTICKET, 0x3F, 0x0109, P_TMHM);
-        self.check_item(&mut red_items, G_SECRETKEY, 0x2B, 0x015F, P_TMHM);
+        self.check_item(&mut red_items, G_SILPHSCOPE, 0x48, 0x0167, P_KEYI);
+        self.check_item(&mut red_items, G_POKEFLUTE, 0x49, 0x015E, P_KEYI);
+        self.check_item(&mut red_items, G_SSTICKET, 0x3F, 0x0109, P_KEYI);
+        self.check_item(&mut red_items, G_SECRETKEY, 0x2B, 0x015F, P_KEYI);
         self.check_item(&mut red_items, G_CUT, 0xC4, 0x0153, P_TMHM);
         self.check_item(&mut red_items, G_SURF, 0xC6, 0x0155, P_TMHM);
         self.check_item(&mut red_items, G_STRENGTH, 0xC7, 0x0156, P_TMHM);
+        if self.game == Game::FIRERED && old_flags != self.firered_progress {
+            self.write_items();
+        }
 
     }
 
-    pub fn check_item(&mut self, red_items: &mut ApiState, flag_to_check: u32, item_to_check: u16, item_to_add: u16, pocket: u8) {
-        self.check_item_red(red_items, flag_to_check, item_to_check, item_to_add, pocket as usize);
-        self.check_item_firered(red_items, flag_to_check, item_to_check, item_to_add, pocket as usize);
+    pub fn check_item(&mut self, red_items: &mut ApiState, flag_to_check: u32, item_1: u16, item_2: u16, pocket: u8) {
+        self.check_item_red(red_items, flag_to_check, item_1, item_2, pocket as usize);
+        self.check_item_firered(red_items, flag_to_check, item_2, item_1, pocket as usize);
     }
 
     pub fn check_item_red(&mut self, red_items: &mut ApiState, flag_to_check: u32, item_to_check: u16, item_to_add: u16, pocket: usize) {
