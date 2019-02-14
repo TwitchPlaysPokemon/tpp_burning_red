@@ -551,15 +551,21 @@ pub static RED_ITEM_POCKETS: [u8;256] = [
 
 // Progress gates
 
-pub static LEVEL_CAPS: [(u32, u8);11] = [
+pub static LEVEL_CAPS: [(u32, u8);17] = [
     (G_BOULDERBADGE, 23),
     (G_CASCADEBADGE, 29),
+    (G_SSTICKET,     30),
+    (G_CUT,          31),
     (G_THUNDERBADGE, 32),
     (G_RAINBOWBADGE, 39),
     (G_SILPHSCOPE,   43),
     (G_POKEFLUTE,    47),
+    (G_GUARDRUNK,    47),
     (G_SOULBADGE,    51),
     (G_MARSHBADGE,   51),
+    (G_SURF,         51),
+    (G_STRENGTH,     51),
+    (G_SECRETKEY,    53),
     (G_VOLCANOBADGE, 55),
     (G_EARTHBADGE,   59),
     (0x80000000,     100)
@@ -576,11 +582,11 @@ pub const G_VOLCANOBADGE: u32 = 0x00000040; // level_cap = 55
 pub const G_EARTHBADGE:   u32 = 0x00000080; // level_cap = 59
 pub const G_SILPHSCOPE:   u32 = 0x00000100; // level_cap = 43
 pub const G_POKEFLUTE:    u32 = 0x00000200; // level_cap = 47
-pub const G_SSTICKET:     u32 = 0x00000400; 
-pub const G_SECRETKEY:    u32 = 0x00000800; 
-pub const G_CUT:          u32 = 0x00001000; 
-pub const G_SURF:         u32 = 0x00002000; 
-pub const G_STRENGTH:     u32 = 0x00004000;
-pub const G_GUARDRUNK:    u32 = 0x00008000; 
+pub const G_SSTICKET:     u32 = 0x00000400; // level_cap = 30
+pub const G_SECRETKEY:    u32 = 0x00000800; // level_cap = 53
+pub const G_CUT:          u32 = 0x00001000; // level_cap = 31
+pub const G_SURF:         u32 = 0x00002000; // level_cap = 51
+pub const G_STRENGTH:     u32 = 0x00004000; // level_cap = 51
+pub const G_GUARDRUNK:    u32 = 0x00008000; // level_cap = 47
 pub const G_DLVRD_PARCEL: u32 = 0x00010000; // level_cap = _
 
