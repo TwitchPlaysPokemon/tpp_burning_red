@@ -57,7 +57,6 @@ fn main() {
             start_item_api();
         })
         .expect("error: failed to start ItemApi");
-
     
     let mut game_state = GameState::from_file().unwrap();
 
@@ -84,7 +83,7 @@ fn main() {
                     game_state.check_for_transition(current_frame, Arc::clone(&warp_enable));
                 }
             }
-        } else if game_state.game == gamestate::Game::FIRERED {
+        } else if game_state.game == gamestate::Game::FIRERED && cycle % 200 == 0 {
             game_state.collect_mapstate();
             // Keep the system disabled until we get oaks parcel 0x015D
             if LittleEndian::read_u16(&BIZHAWK.read_slice_custom("*03005008+3b8/2".to_string(), 0x02).unwrap()) == 0x015D { // if first slot is oaks parcel
@@ -93,7 +92,7 @@ fn main() {
                 game_state.enabled = true;
                 *OAKS_PARCEL_OBTAINED.lock().unwrap() = true;
             }
-        } else {
+        } else if cycle % 200 == 0 {
             game_state.collect_mapstate();
         }
 
@@ -106,6 +105,7 @@ fn main() {
                 game_state.read_items();
             }
             game_state.send_hud_data();
+            game_state.save_state().ok();
             println!("Level cap: {}, Warp_state: {}, RED_PROGRESS: {:08X}, FIRERED_PROGRESS: {:08X}", game_state.level_cap, match *WARP_MODE.lock().unwrap() {
             WarpState::RANDOM => "RANDOM",
             WarpState::LOCK_FIRERED => "LOCK FIRERED",
