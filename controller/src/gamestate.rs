@@ -1114,7 +1114,7 @@ impl GameState {
                     }
                 }
                 if self.firered_progress & G_DLVRD_PARCEL == 0x00 {
-                    if BIZHAWK.read_slice_custom("*03005008+EE0+7/1".to_string(), 0x01).unwrap()[0] & 0x04 == 0x00 { // bit 2 is delivered oaks parcel (pokedex on table visibility)
+                    if BIZHAWK.read_slice_custom("*03005008+EE0+7/1".to_string(), 0x01).unwrap()[0] & 0x04 != 0x00 { // bit 2 is delivered oaks parcel (pokedex on table visibility)
                         self.firered_progress |= G_DLVRD_PARCEL;
                     }
                 }
