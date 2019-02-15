@@ -114,24 +114,6 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
 
         //UNKNOWN_DUNGEON_1
         (CERULEAN_CITY              , 0x06, CERULEAN_CITY               ) => (0x0303, 0x07),
-        (UNKNOWN_DUNGEON_2          , 0x00, CERULEAN_CITY               ) => (0x4901, 0x00),
-        (UNKNOWN_DUNGEON_2          , 0x01, CERULEAN_CITY               ) => (0x4901, 0x03),
-        (UNKNOWN_DUNGEON_2          , 0x02, CERULEAN_CITY               ) => (0x4901, 0x04),
-        (UNKNOWN_DUNGEON_2          , 0x03, CERULEAN_CITY               ) => (0x4901, 0x01),
-        (UNKNOWN_DUNGEON_2          , 0x04, CERULEAN_CITY               ) => (0x4901, 0x05),
-        (UNKNOWN_DUNGEON_2          , 0x05, CERULEAN_CITY               ) => (0x4901, 0x02),
-        (UNKNOWN_DUNGEON_3          , 0x00, CERULEAN_CITY               ) => (0x4A01, 0x00),
-
-        //UNKNOWN_DUNGEON_2
-        (UNKNOWN_DUNGEON_1          , 0x02, CERULEAN_CITY               ) => (0x4801, 0x01),
-        (UNKNOWN_DUNGEON_1          , 0x03, CERULEAN_CITY               ) => (0x4801, 0x05),
-        (UNKNOWN_DUNGEON_1          , 0x04, CERULEAN_CITY               ) => (0x4801, 0x06),
-        (UNKNOWN_DUNGEON_1          , 0x05, CERULEAN_CITY               ) => (0x4801, 0x03),
-        (UNKNOWN_DUNGEON_1          , 0x06, CERULEAN_CITY               ) => (0x4801, 0x07),
-        (UNKNOWN_DUNGEON_1          , 0x07, CERULEAN_CITY               ) => (0x4801, 0x04),
-
-        //UNKNOWN_DUNGEON_3
-        (UNKNOWN_DUNGEON_1          , 0x08, CERULEAN_CITY               ) => (0x4801, 0x02),
 
         // LAVENDER_TOWN
         (LAVENDER_POKECENTER        , 0x00, LAVENDER_TOWN               ) => (0x0008, 0x01), 
@@ -155,30 +137,6 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
 
         //POKEMONTOWER_1
         (LAVENDER_TOWN              , 0x01, LAVENDER_TOWN               ) => (0x0403, 0x00),
-        (POKEMONTOWER_2             , 0x01, LAVENDER_TOWN               ) => (0x5901, 0x01),
-
-        //POKEMONTOWER_2
-        (POKEMONTOWER_3             , 0x00, LAVENDER_TOWN               ) => (0x5A01, 0x00),
-        (POKEMONTOWER_1             , 0x02, LAVENDER_TOWN               ) => (0x5801, 0x03),
-
-        //POKEMONTOWER_3
-        (POKEMONTOWER_2             , 0x00, LAVENDER_TOWN               ) => (0x5901, 0x00),
-        (POKEMONTOWER_4             , 0x01, LAVENDER_TOWN               ) => (0x5B01, 0x01),
-
-        //POKEMONTOWER_4
-        (POKEMONTOWER_5             , 0x00, LAVENDER_TOWN               ) => (0x5C01, 0x00),
-        (POKEMONTOWER_3             , 0x01, LAVENDER_TOWN               ) => (0x5A01, 0x01),
-
-        //POKEMONTOWER_5
-        (POKEMONTOWER_4             , 0x00, LAVENDER_TOWN               ) => (0x5B01, 0x00),
-        (POKEMONTOWER_6             , 0x00, LAVENDER_TOWN               ) => (0x5D01, 0x01),
-
-        //POKEMONTOWER_6
-        (POKEMONTOWER_5             , 0x01, LAVENDER_TOWN               ) => (0x5C01, 0x01),
-        (POKEMONTOWER_7             , 0x00, LAVENDER_TOWN               ) => (0x5E01, 0x00),
-
-        //POKEMONTOWER_7
-        (POKEMONTOWER_6             , 0x01, LAVENDER_TOWN               ) => (0x5D01, 0x00),
 
         //NAME_RATERS_HOUSE
         (LAVENDER_TOWN              , 0x05, LAVENDER_TOWN               ) => (0x0403, 0x04),
@@ -333,21 +291,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (ROCKET_HIDEOUT_1           , 0x01, CELADON_CITY                ) => (0x2A01, 0x00),
 
         //ROCKET_HIDEOUT_1
-        (ROCKET_HIDEOUT_2           , 0x00, CELADON_CITY                ) => (0x2B01, 0x01),
         (GAME_CORNER                , 0x02, CELADON_CITY                ) => (0x0E0A, 0x03),
-        (ROCKET_HIDEOUT_2           , 0x03, CELADON_CITY                ) => (0x2B01, 0x02),
-
-        //ROCKET_HIDEOUT_2
-        (ROCKET_HIDEOUT_1           , 0x00, CELADON_CITY                ) => (0x2A01, 0x01),
-        (ROCKET_HIDEOUT_3           , 0x00, CELADON_CITY                ) => (0x2C01, 0x00),
-        (ROCKET_HIDEOUT_1           , 0x03, CELADON_CITY                ) => (0x2A01, 0x02),
-
-        //ROCKET_HIDEOUT_3
-        (ROCKET_HIDEOUT_2           , 0x01, CELADON_CITY                ) => (0x2B01, 0x00),
-        (ROCKET_HIDEOUT_4           , 0x00, CELADON_CITY                ) => (0x2D01, 0x00),
-
-        //ROCKET_HIDEOUT_4
-        (ROCKET_HIDEOUT_3           , 0x01, CELADON_CITY                ) => (0x2C01, 0x01),
 
         //CELADON_MANSION_1
         (CELADON_CITY               , 0x02, CELADON_CITY                ) => (0x0603, 0x03),
@@ -453,22 +397,6 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
 
         //MANSION_1
         (CINNABAR_ISLAND            , 0x00, CINNABAR_ISLAND             ) => (0x0803, 0x00),
-        (MANSION_2                  , 0x00, CINNABAR_ISLAND             ) => (0x3C01, 0x02),
-        (MANSION_4                  , 0x00, CINNABAR_ISLAND             ) => (0x3E01, 0x00),
-
-        //MANSION_2
-        (MANSION_1                  , 0x04, CINNABAR_ISLAND             ) => (0x3B01, 0x03),
-        (MANSION_3                  , 0x00, CINNABAR_ISLAND             ) => (0x3D01, 0x02),
-        (MANSION_3                  , 0x02, CINNABAR_ISLAND             ) => (0x3D01, 0x01),
-        (MANSION_3                  , 0x01, CINNABAR_ISLAND             ) => (0x3D01, 0x00),
-
-        //MANSION_3
-        (MANSION_2                  , 0x01, CINNABAR_ISLAND             ) => (0x3C01, 0x03),
-        (MANSION_2                  , 0x03, CINNABAR_ISLAND             ) => (0x3C01, 0x00),
-        (MANSION_2                  , 0x02, CINNABAR_ISLAND             ) => (0x3C01, 0x01),
-
-        //MANSION_4
-        (MANSION_1                  , 0x05, CINNABAR_ISLAND             ) => (0x3B01, 0x04),
 
         // SAFFRON_CITY
         (COPYCATS_HOUSE_1F          , 0x00, SAFFRON_CITY                ) => (0x000E, 0x01),
@@ -612,43 +540,6 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         //SILPH_CO_11F
         (SILPH_CO_10F               , 0x01, SAFFRON_CITY                ) => (0x3801, 0x00),
         (SILPH_CO_7F                , 0x03, SAFFRON_CITY                ) => (0x3501, 0x01),
-
-        //INDIGO_PLATEAU
-        (INDIGO_PLATEAU_LOBBY       , 0x00, INDIGO_PLATEAU              ) => (0x000D, 0x00),
-
-        //INDIGO_PLATEAU_LOBBY
-        (INDIGO_PLATEAU             , 0x00, INDIGO_PLATEAU              ) => (0x0903, 0x00),
-        (INDIGO_PLATEAU             , 0x01, INDIGO_PLATEAU              ) => (0x0903, 0x00),
-        (LORELEIS_ROOM              , 0x00, INDIGO_PLATEAU              ) => (0x4B01, 0x00),
-
-        //LORELEIS_ROOM
-        (INDIGO_PLATEAU_LOBBY       , 0x02, INDIGO_PLATEAU              ) => (0x000D, 0x01),
-        (BRUNOS_ROOM                , 0x00, INDIGO_PLATEAU              ) => (0x4C01, 0x00),
-        (BRUNOS_ROOM                , 0x01, INDIGO_PLATEAU              ) => (0x4C01, 0x00),
-
-        //BRUNOS_ROOM
-        (LORELEIS_ROOM              , 0x02, INDIGO_PLATEAU              ) => (0x4B01, 0x01),
-        (LORELEIS_ROOM              , 0x03, INDIGO_PLATEAU              ) => (0x4B01, 0x01),
-        (AGATHAS_ROOM               , 0x00, INDIGO_PLATEAU              ) => (0x4D01, 0x00),
-        (AGATHAS_ROOM               , 0x01, INDIGO_PLATEAU              ) => (0x4D01, 0x00),
-
-        //AGATHAS_ROOM
-        (BRUNOS_ROOM                , 0x02, INDIGO_PLATEAU              ) => (0x4C01, 0x01),
-        (BRUNOS_ROOM                , 0x03, INDIGO_PLATEAU              ) => (0x4C01, 0x01),
-        (LANCES_ROOM                , 0x00, INDIGO_PLATEAU              ) => (0x4E01, 0x00),
-
-        //LANCES_ROOM
-        (AGATHAS_ROOM               , 0x02, INDIGO_PLATEAU              ) => (0x4D01, 0x01),
-        (CHAMPIONS_ROOM             , 0x00, INDIGO_PLATEAU              ) => (0x4F01, 0x00),
-
-        //CHAMPIONS_ROOM
-        (LANCES_ROOM                , 0x01, INDIGO_PLATEAU              ) => (0x4E01, 0x01),
-        (LANCES_ROOM                , 0x02, INDIGO_PLATEAU              ) => (0x4E01, 0x01),
-        (HALL_OF_FAME               , 0x00, INDIGO_PLATEAU              ) => (0x5001, 0x00),
-
-        //HALL_OF_FAME
-        (CHAMPIONS_ROOM             , 0x02, INDIGO_PLATEAU              ) => (0x4F01, 0x01),
-        (CHAMPIONS_ROOM             , 0x03, INDIGO_PLATEAU              ) => (0x4F01, 0x01),
 
         //ROUTE_2
         (DIGLETTS_CAVE_EXIT         , 0x00, ROUTE_2                     ) => (0x2401, 0x01),
@@ -970,32 +861,6 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
 
         //ROUTE_22_GATE
         (ROUTE_22                   , 0x00, ROUTE_22                    ) => (0x2903, 0x00),
-        (ROUTE_23                   , 0x00, ROUTE_23                    ) => (0x2A03, 0x02),
-        (ROUTE_23                   , 0x01, ROUTE_23                    ) => (0x2A03, 0x02),
-
-        //ROUTE_23
-        (ROUTE_22_GATE              , 0x02, ROUTE_23                    ) => (0x001C, 0x00),
-        (ROUTE_22_GATE              , 0x03, ROUTE_23                    ) => (0x001C, 0x00),
-        (VICTORY_ROAD_1             , 0x00, ROUTE_23                    ) => (0x2701, 0x01),
-        (VICTORY_ROAD_2             , 0x01, ROUTE_23                    ) => (0x2801, 0x06),
-
-        //VICTORY_ROAD_1
-        (ROUTE_23                   , 0x02, ROUTE_23                    ) => (0x2A03, 0x00),
-        (VICTORY_ROAD_2             , 0x00, ROUTE_23                    ) => (0x2801, 0x00),
-
-        //VICTORY_ROAD_2
-        (VICTORY_ROAD_1             , 0x02, ROUTE_23                    ) => (0x2701, 0x00),
-        (ROUTE_23                   , 0x03, ROUTE_23                    ) => (0x2A03, 0x01),
-        (VICTORY_ROAD_3             , 0x00, ROUTE_23                    ) => (0x2901, 0x01),
-        (VICTORY_ROAD_3             , 0x02, ROUTE_23                    ) => (0x2901, 0x03),
-        (VICTORY_ROAD_3             , 0x01, ROUTE_23                    ) => (0x2901, 0x02),
-        (VICTORY_ROAD_3             , 0x03, ROUTE_23                    ) => (0x2901, 0x00),
-
-        //VICTORY_ROAD_3
-        (VICTORY_ROAD_2             , 0x03, ROUTE_23                    ) => (0x2801, 0x02),
-        (VICTORY_ROAD_2             , 0x05, ROUTE_23                    ) => (0x2801, 0x03),
-        (VICTORY_ROAD_2             , 0x04, ROUTE_23                    ) => (0x2801, 0x04),
-        (VICTORY_ROAD_2             , 0x06, ROUTE_23                    ) => (0x2801, 0x01),
 
         //ROUTE_25
         (BILLS_HOUSE                , 0x00, ROUTE_25                    ) => (0x001E, 0x01),      
@@ -1117,24 +982,6 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
 
         //UNKNOWN_DUNGEON_1
         (0x0303, 0x07) => (CERULEAN_CITY              , 0x06, CERULEAN_CITY               ),
-        (0x4901, 0x00) => (UNKNOWN_DUNGEON_2          , 0x00, CERULEAN_CITY               ),
-        (0x4901, 0x03) => (UNKNOWN_DUNGEON_2          , 0x01, CERULEAN_CITY               ),
-        (0x4901, 0x04) => (UNKNOWN_DUNGEON_2          , 0x02, CERULEAN_CITY               ),
-        (0x4901, 0x01) => (UNKNOWN_DUNGEON_2          , 0x03, CERULEAN_CITY               ),
-        (0x4901, 0x05) => (UNKNOWN_DUNGEON_2          , 0x04, CERULEAN_CITY               ),
-        (0x4901, 0x02) => (UNKNOWN_DUNGEON_2          , 0x05, CERULEAN_CITY               ),
-        (0x4A01, 0x00) => (UNKNOWN_DUNGEON_3          , 0x00, CERULEAN_CITY               ),
-
-        //UNKNOWN_DUNGEON_2
-        (0x4801, 0x01) => (UNKNOWN_DUNGEON_1          , 0x02, CERULEAN_CITY               ),
-        (0x4801, 0x05) => (UNKNOWN_DUNGEON_1          , 0x03, CERULEAN_CITY               ),
-        (0x4801, 0x06) => (UNKNOWN_DUNGEON_1          , 0x04, CERULEAN_CITY               ),
-        (0x4801, 0x03) => (UNKNOWN_DUNGEON_1          , 0x05, CERULEAN_CITY               ),
-        (0x4801, 0x07) => (UNKNOWN_DUNGEON_1          , 0x06, CERULEAN_CITY               ),
-        (0x4801, 0x04) => (UNKNOWN_DUNGEON_1          , 0x07, CERULEAN_CITY               ),
-
-        //UNKNOWN_DUNGEON_3
-        (0x4801, 0x02) => (UNKNOWN_DUNGEON_1          , 0x08, CERULEAN_CITY               ),
 
         // LAVENDER_TOWN
         (0x0008, 0x01) => (LAVENDER_POKECENTER        , 0x00, LAVENDER_TOWN               ), 
@@ -1158,30 +1005,6 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
 
         //POKEMONTOWER_1
         (0x0403, 0x00) => (LAVENDER_TOWN              , 0x01, LAVENDER_TOWN               ),
-        (0x5901, 0x01) => (POKEMONTOWER_2             , 0x01, LAVENDER_TOWN               ),
-
-        //POKEMONTOWER_2
-        (0x5A01, 0x00) => (POKEMONTOWER_3             , 0x00, LAVENDER_TOWN               ),
-        (0x5801, 0x03) => (POKEMONTOWER_1             , 0x02, LAVENDER_TOWN               ),
-
-        //POKEMONTOWER_3
-        (0x5901, 0x00) => (POKEMONTOWER_2             , 0x00, LAVENDER_TOWN               ),
-        (0x5B01, 0x01) => (POKEMONTOWER_4             , 0x01, LAVENDER_TOWN               ),
-
-        //POKEMONTOWER_4
-        (0x5C01, 0x00) => (POKEMONTOWER_5             , 0x00, LAVENDER_TOWN               ),
-        (0x5A01, 0x01) => (POKEMONTOWER_3             , 0x01, LAVENDER_TOWN               ),
-
-        //POKEMONTOWER_5
-        (0x5B01, 0x00) => (POKEMONTOWER_4             , 0x00, LAVENDER_TOWN               ),
-        (0x5D01, 0x01) => (POKEMONTOWER_6             , 0x00, LAVENDER_TOWN               ),
-
-        //POKEMONTOWER_6
-        (0x5C01, 0x01) => (POKEMONTOWER_5             , 0x01, LAVENDER_TOWN               ),
-        (0x5E01, 0x00) => (POKEMONTOWER_7             , 0x00, LAVENDER_TOWN               ),
-
-        //POKEMONTOWER_7
-        (0x5D01, 0x00) => (POKEMONTOWER_6             , 0x01, LAVENDER_TOWN               ),
 
         //NAME_RATERS_HOUSE
         (0x0403, 0x03) => (LAVENDER_TOWN              , 0x05, LAVENDER_TOWN               ),
@@ -1336,21 +1159,7 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x2A01, 0x00) => (ROCKET_HIDEOUT_1           , 0x01, CELADON_CITY                ),
 
         //ROCKET_HIDEOUT_1
-        (0x2B01, 0x01) => (ROCKET_HIDEOUT_2           , 0x00, CELADON_CITY                ),
         (0x0E0A, 0x03) => (GAME_CORNER                , 0x02, CELADON_CITY                ),
-        (0x2B01, 0x02) => (ROCKET_HIDEOUT_2           , 0x03, CELADON_CITY                ),
-
-        //ROCKET_HIDEOUT_2
-        (0x2A01, 0x01) => (ROCKET_HIDEOUT_1           , 0x00, CELADON_CITY                ),
-        (0x2C01, 0x00) => (ROCKET_HIDEOUT_3           , 0x00, CELADON_CITY                ),
-        (0x2A01, 0x02) => (ROCKET_HIDEOUT_1           , 0x03, CELADON_CITY                ),
-
-        //ROCKET_HIDEOUT_3
-        (0x2B01, 0x00) => (ROCKET_HIDEOUT_2           , 0x01, CELADON_CITY                ),
-        (0x2D01, 0x00) => (ROCKET_HIDEOUT_4           , 0x00, CELADON_CITY                ),
-
-        //ROCKET_HIDEOUT_4
-        (0x2C01, 0x01) => (ROCKET_HIDEOUT_3           , 0x01, CELADON_CITY                ),
 
         //CELADON_MANSION_1
         (0x0603, 0x03) => (CELADON_CITY               , 0x02, CELADON_CITY                ),
@@ -1456,22 +1265,6 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
 
         //MANSION_1
         (0x0803, 0x00) => (CINNABAR_ISLAND            , 0x00, CINNABAR_ISLAND             ),
-        (0x3C01, 0x02) => (MANSION_2                  , 0x00, CINNABAR_ISLAND             ),
-        (0x3E01, 0x00) => (MANSION_4                  , 0x00, CINNABAR_ISLAND             ),
-
-        //MANSION_2
-        (0x3B01, 0x03) => (MANSION_1                  , 0x04, CINNABAR_ISLAND             ),
-        (0x3D01, 0x02) => (MANSION_3                  , 0x00, CINNABAR_ISLAND             ),
-        (0x3D01, 0x01) => (MANSION_3                  , 0x02, CINNABAR_ISLAND             ),
-        (0x3D01, 0x00) => (MANSION_3                  , 0x01, CINNABAR_ISLAND             ),
-
-        //MANSION_3
-        (0x3C01, 0x03) => (MANSION_2                  , 0x01, CINNABAR_ISLAND             ),
-        (0x3C01, 0x00) => (MANSION_2                  , 0x03, CINNABAR_ISLAND             ),
-        (0x3C01, 0x01) => (MANSION_2                  , 0x02, CINNABAR_ISLAND             ),
-
-        //MANSION_4
-        (0x3B01, 0x04) => (MANSION_1                  , 0x05, CINNABAR_ISLAND             ),
 
         // SAFFRON_CITY
         (0x000E, 0x01) => (COPYCATS_HOUSE_1F          , 0x00, SAFFRON_CITY                ),
@@ -1615,43 +1408,6 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         //SILPH_CO_11F
         (0x3801, 0x00) => (SILPH_CO_10F               , 0x01, SAFFRON_CITY                ),
         (0x3501, 0x01) => (SILPH_CO_7F                , 0x03, SAFFRON_CITY                ),
-
-        //INDIGO_PLATEAU
-        (0x000D, 0x00) => (INDIGO_PLATEAU_LOBBY       , 0x00, INDIGO_PLATEAU              ),
-
-        //INDIGO_PLATEAU_LOBBY
-        (0x0903, 0x00) => (INDIGO_PLATEAU             , 0x00, INDIGO_PLATEAU              ),
-        (0x0903, 0x00) => (INDIGO_PLATEAU             , 0x01, INDIGO_PLATEAU              ),
-        (0x4B01, 0x00) => (LORELEIS_ROOM              , 0x00, INDIGO_PLATEAU              ),
-
-        //LORELEIS_ROOM
-        (0x000D, 0x01) => (INDIGO_PLATEAU_LOBBY       , 0x02, INDIGO_PLATEAU              ),
-        (0x4C01, 0x00) => (BRUNOS_ROOM                , 0x00, INDIGO_PLATEAU              ),
-        (0x4C01, 0x00) => (BRUNOS_ROOM                , 0x01, INDIGO_PLATEAU              ),
-
-        //BRUNOS_ROOM
-        (0x4B01, 0x01) => (LORELEIS_ROOM              , 0x02, INDIGO_PLATEAU              ),
-        (0x4B01, 0x01) => (LORELEIS_ROOM              , 0x03, INDIGO_PLATEAU              ),
-        (0x4D01, 0x00) => (AGATHAS_ROOM               , 0x00, INDIGO_PLATEAU              ),
-        (0x4D01, 0x00) => (AGATHAS_ROOM               , 0x01, INDIGO_PLATEAU              ),
-
-        //AGATHAS_ROOM
-        (0x4C01, 0x01) => (BRUNOS_ROOM                , 0x02, INDIGO_PLATEAU              ),
-        (0x4C01, 0x01) => (BRUNOS_ROOM                , 0x03, INDIGO_PLATEAU              ),
-        (0x4E01, 0x00) => (LANCES_ROOM                , 0x00, INDIGO_PLATEAU              ),
-
-        //LANCES_ROOM
-        (0x4D01, 0x01) => (AGATHAS_ROOM               , 0x02, INDIGO_PLATEAU              ),
-        (0x4F01, 0x00) => (CHAMPIONS_ROOM             , 0x00, INDIGO_PLATEAU              ),
-
-        //CHAMPIONS_ROOM
-        (0x4E01, 0x01) => (LANCES_ROOM                , 0x01, INDIGO_PLATEAU              ),
-        (0x4E01, 0x01) => (LANCES_ROOM                , 0x02, INDIGO_PLATEAU              ),
-        (0x5001, 0x00) => (HALL_OF_FAME               , 0x00, INDIGO_PLATEAU              ),
-
-        //HALL_OF_FAME
-        (0x4F01, 0x01) => (CHAMPIONS_ROOM             , 0x02, INDIGO_PLATEAU              ),
-        (0x4F01, 0x01) => (CHAMPIONS_ROOM             , 0x03, INDIGO_PLATEAU              ),
 
         //ROUTE_2
         (0x2401, 0x01) => (DIGLETTS_CAVE_EXIT         , 0x00, ROUTE_2                     ),
@@ -1963,31 +1719,6 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
 
         //ROUTE_22_GATE
         (0x2903, 0x00) => (ROUTE_22                   , 0x00, ROUTE_22                    ),
-        (0x2A03, 0x02) => (ROUTE_23                   , 0x01, ROUTE_23                    ),
-
-        //ROUTE_23
-        (0x001C, 0x00) => (ROUTE_22_GATE              , 0x02, ROUTE_23                    ),
-        (0x001C, 0x00) => (ROUTE_22_GATE              , 0x03, ROUTE_23                    ),
-        (0x2701, 0x01) => (VICTORY_ROAD_1             , 0x00, ROUTE_23                    ),
-        (0x2801, 0x06) => (VICTORY_ROAD_2             , 0x01, ROUTE_23                    ),
-
-        //VICTORY_ROAD_1
-        (0x2A03, 0x00) => (ROUTE_23                   , 0x02, ROUTE_23                    ),
-        (0x2801, 0x00) => (VICTORY_ROAD_2             , 0x00, ROUTE_23                    ),
-
-        //VICTORY_ROAD_2
-        (0x2701, 0x00) => (VICTORY_ROAD_1             , 0x02, ROUTE_23                    ),
-        (0x2A03, 0x01) => (ROUTE_23                   , 0x03, ROUTE_23                    ),
-        (0x2901, 0x01) => (VICTORY_ROAD_3             , 0x00, ROUTE_23                    ),
-        (0x2901, 0x03) => (VICTORY_ROAD_3             , 0x02, ROUTE_23                    ),
-        (0x2901, 0x02) => (VICTORY_ROAD_3             , 0x01, ROUTE_23                    ),
-        (0x2901, 0x00) => (VICTORY_ROAD_3             , 0x03, ROUTE_23                    ),
-
-        //VICTORY_ROAD_3
-        (0x2801, 0x02) => (VICTORY_ROAD_2             , 0x03, ROUTE_23                    ),
-        (0x2801, 0x03) => (VICTORY_ROAD_2             , 0x05, ROUTE_23                    ),
-        (0x2801, 0x04) => (VICTORY_ROAD_2             , 0x04, ROUTE_23                    ),
-        (0x2801, 0x01) => (VICTORY_ROAD_2             , 0x06, ROUTE_23                    ),
 
         //ROUTE_25
         (0x001E, 0x01) => (BILLS_HOUSE                , 0x00, ROUTE_25                    ),      
