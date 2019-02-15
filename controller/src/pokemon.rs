@@ -196,10 +196,10 @@ impl Pokemon {
 
             data[0x07] = (self.uid & 0x00FF) as u8;
 
-            data[0x08] = self.moves[0] as u8; // Moves
-            data[0x09] = self.moves[1] as u8;
-            data[0x0A] = self.moves[2] as u8;
-            data[0x0B] = self.moves[3] as u8;
+            data[0x08] = (self.moves[0] as u8) % 166; // Moves
+            data[0x09] = (self.moves[1] as u8) % 166;
+            data[0x0A] = (self.moves[2] as u8) % 166;
+            data[0x0B] = (self.moves[3] as u8) % 166;
 
             BigEndian::write_u32(&mut data[0x0D..0x11], self.exp); // Exp
             /* EXP will write 4 bytes here, so we need to write the previous loaction 
@@ -376,7 +376,7 @@ impl Pokemon {
             uid,
             pv: LittleEndian::read_u32(&data[0x00..0x04]),
             species: data[0x20],
-            moves: [data[0x2C], data[0x2E], data[0x30], data[0x32]],
+            moves: [data[0x2C] % 166, data[0x2E] % 166, data[0x30] % 166, data[0x32] % 166],
             pp: [data[0x34], data[0x35], data[0x36], data[0x37]],
             exp: LittleEndian::read_u32(&data[0x24..0x28]),
             ivs: Ivs::from(LittleEndian::read_u32(&data[0x48..0x4C])),
@@ -588,10 +588,10 @@ impl Pokemon {
 
             gen1.bytes[0x04] = self.status_condition; // Status Condition
 
-            gen1.bytes[0x08] = self.moves[0] as u8; // Moves
-            gen1.bytes[0x09] = self.moves[1] as u8;
-            gen1.bytes[0x0A] = self.moves[2] as u8;
-            gen1.bytes[0x0B] = self.moves[3] as u8;
+            gen1.bytes[0x08] = (self.moves[0] as u8) % 166; // Moves
+            gen1.bytes[0x09] = (self.moves[1] as u8) % 166;
+            gen1.bytes[0x0A] = (self.moves[2] as u8) % 166;
+            gen1.bytes[0x0B] = (self.moves[3] as u8) % 166;
 
             gen1.bytes[0x1D] = (data[0x28] << 6) | self.pp[0]; // Move PP
             gen1.bytes[0x1E] = ((data[0x28] & 0x0C) << 4) | self.pp[1];
