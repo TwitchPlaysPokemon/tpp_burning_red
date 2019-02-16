@@ -409,12 +409,12 @@ fn item_api_handler() -> &'static str {
             response = ApiResponse::PAGE;
             item_memory[0x00] = ITEM_TRUE;
             item_memory[0x01..0x0E].clone_from_slice(&api_state.inventory[P_PC as usize].name);
-            item_memory[0x12] = content.len() as u8;
+            item_memory[0x11] = content.len() as u8;
             for (i, item) in content.iter().enumerate() {
-                item_memory[0x13 + i*2] = item[0] as u8;
-                item_memory[0x14 + i*2] = if item[1] > 99 { 99 } else { item[1] as u8 };
+                item_memory[0x12 + i*2] = item[0] as u8;
+                item_memory[0x13 + i*2] = if item[1] > 99 { 99 } else { item[1] as u8 };
             }
-            item_memory[0x13 + content.len() * 2] = 0xff;
+            item_memory[0x12 + content.len() * 2] = 0xff;
         } else {
             let page = code & 0x7f;
             let content = &api_state.inventory[page as usize].content;
