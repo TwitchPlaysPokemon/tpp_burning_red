@@ -551,7 +551,7 @@ pub static RED_ITEM_POCKETS: [u8;256] = [
 
 // Progress gates
 
-pub static LEVEL_CAPS: [(u32, u8);17] = [
+pub static LEVEL_CAPS: [(u32, u8);18] = [
     (G_BOULDERBADGE, 23),
     (G_CASCADEBADGE, 29),
     (G_SSTICKET,     30),
@@ -561,8 +561,9 @@ pub static LEVEL_CAPS: [(u32, u8);17] = [
     (G_SILPHSCOPE,   43),
     (G_POKEFLUTE,    47),
     (G_GUARDRUNK,    47),
-    (G_SOULBADGE,    51),
+    (G_FREED_SILPH,  49),
     (G_MARSHBADGE,   51),
+    (G_SOULBADGE,    51),
     (G_SURF,         51),
     (G_STRENGTH,     51),
     (G_SECRETKEY,    53),
@@ -572,21 +573,23 @@ pub static LEVEL_CAPS: [(u32, u8);17] = [
  ];
 
 pub const G_NONE:         u32 = 0x00000000;
-pub const G_BOULDERBADGE: u32 = 0x00000001; // level_cap = 23 
-pub const G_CASCADEBADGE: u32 = 0x00000002; // level_cap = 29
-pub const G_THUNDERBADGE: u32 = 0x00000004; // level_cap = 32
-pub const G_RAINBOWBADGE: u32 = 0x00000008; // level_cap = 39
-pub const G_SOULBADGE:    u32 = 0x00000010; // level_cap = 51
-pub const G_MARSHBADGE:   u32 = 0x00000020; // level_cap = 51
-pub const G_VOLCANOBADGE: u32 = 0x00000040; // level_cap = 55
-pub const G_EARTHBADGE:   u32 = 0x00000080; // level_cap = 59
-pub const G_SILPHSCOPE:   u32 = 0x00000100; // level_cap = 43
-pub const G_POKEFLUTE:    u32 = 0x00000200; // level_cap = 47
-pub const G_SSTICKET:     u32 = 0x00000400; // level_cap = 30
-pub const G_SECRETKEY:    u32 = 0x00000800; // level_cap = 53
-pub const G_CUT:          u32 = 0x00001000; // level_cap = 31
-pub const G_SURF:         u32 = 0x00002000; // level_cap = 51
-pub const G_STRENGTH:     u32 = 0x00004000; // level_cap = 51
-pub const G_GUARDRUNK:    u32 = 0x00008000; // level_cap = 47
-pub const G_DLVRD_PARCEL: u32 = 0x00010000; // level_cap = _
+pub const G_BOULDERBADGE: u32 = 0x00000001;
+pub const G_CASCADEBADGE: u32 = 0x00000002;
+pub const G_THUNDERBADGE: u32 = 0x00000004;
+pub const G_RAINBOWBADGE: u32 = 0x00000008;
+pub const G_SOULBADGE:    u32 = 0x00000010;
+pub const G_MARSHBADGE:   u32 = 0x00000020;
+pub const G_VOLCANOBADGE: u32 = 0x00000040;
+pub const G_EARTHBADGE:   u32 = 0x00000080;
+pub const G_SILPHSCOPE:   u32 = 0x00000100;
+pub const G_POKEFLUTE:    u32 = 0x00000200;
+pub const G_SSTICKET:     u32 = 0x00000400;
+pub const G_SECRETKEY:    u32 = 0x00000800;
+pub const G_CUT:          u32 = 0x00001000;
+pub const G_SURF:         u32 = 0x00002000;
+pub const G_STRENGTH:     u32 = 0x00004000;
+pub const G_GUARDRUNK:    u32 = 0x00008000;
+pub const G_DLVRD_PARCEL: u32 = 0x00010000;
+pub const G_FREED_SILPH:  u32 = 0x00020000;
+pub const G_BEAT_E4:      u32 = 0x00040000;
 

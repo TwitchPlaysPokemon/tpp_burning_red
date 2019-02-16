@@ -1103,8 +1103,18 @@ impl GameState {
                     }
                 }
                 if self.red_progress & G_DLVRD_PARCEL == 0x00 {
-                    if BIZHAWK.read_u8(&MemRegion::WRAM, SYM["wEventFlags"].addr as u32 + 7).unwrap() & 0x01 != 0x00 { // bit 0 is delivered oaks parcel
+                    if BIZHAWK.read_u8(&MemRegion::WRAM, SYM["wEventFlags"].addr as u32 + 0x07).unwrap() & 0x01 != 0x00 { // bit 0 is delivered oaks parcel
                         self.red_progress |= G_DLVRD_PARCEL;
+                    }
+                }
+                if self.red_progress & G_FREED_SILPH == 0x00 {
+                    if BIZHAWK.read_u8(&MemRegion::WRAM, SYM["wEventFlags"].addr as u32 + 0xF1).unwrap() & 0x80 != 0x00 { // bit 7 is giovanni defeated in silph co
+                        self.red_progress |= G_FREED_SILPH;
+                    }
+                }
+                if self.red_progress & G_BEAT_E4 == 0x00 {
+                    if BIZHAWK.read_u8(&MemRegion::WRAM, SYM["wEventFlags"].addr as u32 + 0x120).unwrap() & 0x02 != 0x00 { // bit 1 is defeated rival in E4
+                        self.red_progress |= G_BEAT_E4;
                     }
                 }
             },
@@ -1117,6 +1127,16 @@ impl GameState {
                 if self.firered_progress & G_DLVRD_PARCEL == 0x00 {
                     if BIZHAWK.read_slice_custom("*03005008+EE0+7/1".to_string(), 0x01).unwrap()[0] & 0x04 != 0x00 { // bit 2 is delivered oaks parcel (pokedex on table visibility)
                         self.firered_progress |= G_DLVRD_PARCEL;
+                    }
+                }
+                if self.firered_progress & G_FREED_SILPH == 0x00 {
+                    if BIZHAWK.read_slice_custom("*03005008+EE0+7/1".to_string(), 0x01).unwrap()[0] & 0x40 != 0x00 { // bit 6 is team rocket defeated in silph co
+                        self.firered_progress |= G_FREED_SILPH;
+                    }
+                }
+                if self.firered_progress & G_BEAT_E4 == 0x00 {
+                    if BIZHAWK.read_slice_custom("*03005008+EE0+105/1".to_string(), 0x01).unwrap()[0] & 0x10 != 0x00 { // bit 4 is beat E4 at least once
+                        self.firered_progress |= G_BEAT_E4;
                     }
                 }
             }
