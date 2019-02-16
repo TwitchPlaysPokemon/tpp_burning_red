@@ -773,49 +773,6 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         //ROUTE_15_GATE_2F
         (ROUTE_15_GATE_1F           , 0x04, ROUTE_15                    ) => (0x0018, 0x04),
 
-        //ROUTE_16
-        (ROUTE_16_GATE_1F           , 0x00, ROUTE_16                    ) => (0x0119, 0x02),
-        (ROUTE_16_GATE_1F           , 0x01, ROUTE_16                    ) => (0x0119, 0x02),
-        (ROUTE_16_GATE_1F           , 0x02, ROUTE_16                    ) => (0x0119, 0x03),
-        (ROUTE_16_GATE_1F           , 0x03, ROUTE_16                    ) => (0x0119, 0x03),
-        (ROUTE_16_GATE_1F           , 0x04, ROUTE_16                    ) => (0x0119, 0x00),
-        (ROUTE_16_GATE_1F           , 0x05, ROUTE_16                    ) => (0x0119, 0x00),
-        (ROUTE_16_GATE_1F           , 0x06, ROUTE_16                    ) => (0x0119, 0x01),
-        (ROUTE_16_GATE_1F           , 0x07, ROUTE_16                    ) => (0x0119, 0x01),
-        (ROUTE_16_HOUSE             , 0x00, ROUTE_16                    ) => (0x0019, 0x01),
-
-        //ROUTE_16_GATE_1F
-        (ROUTE_16                   , 0x00, ROUTE_16                    ) => (0x2203, 0x03),
-        (ROUTE_16                   , 0x01, ROUTE_16                    ) => (0x2203, 0x03),
-        (ROUTE_16                   , 0x02, ROUTE_16                    ) => (0x2203, 0x04),
-        (ROUTE_16                   , 0x04, ROUTE_16                    ) => (0x2203, 0x01),
-        (ROUTE_16                   , 0x05, ROUTE_16                    ) => (0x2203, 0x01),
-        (ROUTE_16                   , 0x06, ROUTE_16                    ) => (0x2203, 0x02),
-        (ROUTE_16                   , 0x07, ROUTE_16                    ) => (0x2203, 0x02),
-        (ROUTE_16_GATE_2F           , 0x00, ROUTE_16                    ) => (0x0219, 0x00),
-
-        //ROUTE_16_GATE_2F
-        (ROUTE_16_GATE_1F           , 0x08, ROUTE_16                    ) => (0x0119, 0x04),
-
-        //ROUTE_16_HOUSE
-        (ROUTE_16                   , 0x08, ROUTE_16                    ) => (0x2203, 0x00),
-
-        //ROUTE_18
-        (ROUTE_18_GATE_1F           , 0x00, ROUTE_18                    ) => (0x001A, 0x00),
-        (ROUTE_18_GATE_1F           , 0x01, ROUTE_18                    ) => (0x001A, 0x00),
-        (ROUTE_18_GATE_1F           , 0x02, ROUTE_18                    ) => (0x001A, 0x01),
-        (ROUTE_18_GATE_1F           , 0x03, ROUTE_18                    ) => (0x001A, 0x01),
-
-        //ROUTE_18_GATE_1F
-        (ROUTE_18                   , 0x00, ROUTE_18                    ) => (0x2403, 0x00),
-        (ROUTE_18                   , 0x01, ROUTE_18                    ) => (0x2403, 0x00),
-        (ROUTE_18                   , 0x02, ROUTE_18                    ) => (0x2403, 0x01),
-        (ROUTE_18                   , 0x03, ROUTE_18                    ) => (0x2403, 0x01),
-        (ROUTE_18_GATE_2F           , 0x00, ROUTE_18                    ) => (0x011A, 0x00),
-
-        //ROUTE_18_GATE_2F
-        (ROUTE_18_GATE_1F           , 0x04, ROUTE_18                    ) => (0x001A, 0x02),
-
         //ROUTE_20
         (SEAFOAM_ISLANDS_1          , 0x00, ROUTE_20                    ) => (0x5301, 0x03),
         (SEAFOAM_ISLANDS_1          , 0x02, ROUTE_20                    ) => (0x5301, 0x04),
@@ -1630,49 +1587,6 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
 
         //ROUTE_15_GATE_2F
         (0x0018, 0x04) => (ROUTE_15_GATE_1F           , 0x04, ROUTE_15                    ),
-
-        //ROUTE_16
-        (0x0119, 0x02) => (ROUTE_16_GATE_1F           , 0x00, ROUTE_16                    ),
-        (0x0119, 0x02) => (ROUTE_16_GATE_1F           , 0x01, ROUTE_16                    ),
-        (0x0119, 0x03) => (ROUTE_16_GATE_1F           , 0x02, ROUTE_16                    ),
-        (0x0119, 0x03) => (ROUTE_16_GATE_1F           , 0x03, ROUTE_16                    ),
-        (0x0119, 0x00) => (ROUTE_16_GATE_1F           , 0x04, ROUTE_16                    ),
-        (0x0119, 0x00) => (ROUTE_16_GATE_1F           , 0x05, ROUTE_16                    ),
-        (0x0119, 0x01) => (ROUTE_16_GATE_1F           , 0x06, ROUTE_16                    ),
-        (0x0119, 0x01) => (ROUTE_16_GATE_1F           , 0x07, ROUTE_16                    ),
-        (0x0019, 0x01) => (ROUTE_16_HOUSE             , 0x00, ROUTE_16                    ),
-
-        //ROUTE_16_GATE_1F
-        (0x2203, 0x03) => (ROUTE_16                   , 0x00, ROUTE_16                    ),
-        (0x2203, 0x03) => (ROUTE_16                   , 0x01, ROUTE_16                    ),
-        (0x2203, 0x04) => (ROUTE_16                   , 0x02, ROUTE_16                    ),
-        (0x2203, 0x01) => (ROUTE_16                   , 0x04, ROUTE_16                    ),
-        (0x2203, 0x01) => (ROUTE_16                   , 0x05, ROUTE_16                    ),
-        (0x2203, 0x02) => (ROUTE_16                   , 0x06, ROUTE_16                    ),
-        (0x2203, 0x02) => (ROUTE_16                   , 0x07, ROUTE_16                    ),
-        (0x0219, 0x00) => (ROUTE_16_GATE_2F           , 0x00, ROUTE_16                    ),
-
-        //ROUTE_16_GATE_2F
-        (0x0119, 0x04) => (ROUTE_16_GATE_1F           , 0x08, ROUTE_16                    ),
-
-        //ROUTE_16_HOUSE
-        (0x2203, 0x00) => (ROUTE_16                   , 0x08, ROUTE_16                    ),
-
-        //ROUTE_18
-        (0x001A, 0x00) => (ROUTE_18_GATE_1F           , 0x00, ROUTE_18                    ),
-        (0x001A, 0x00) => (ROUTE_18_GATE_1F           , 0x01, ROUTE_18                    ),
-        (0x001A, 0x01) => (ROUTE_18_GATE_1F           , 0x02, ROUTE_18                    ),
-        (0x001A, 0x01) => (ROUTE_18_GATE_1F           , 0x03, ROUTE_18                    ),
-
-        //ROUTE_18_GATE_1F
-        (0x2403, 0x00) => (ROUTE_18                   , 0x00, ROUTE_18                    ),
-        (0x2403, 0x00) => (ROUTE_18                   , 0x01, ROUTE_18                    ),
-        (0x2403, 0x01) => (ROUTE_18                   , 0x02, ROUTE_18                    ),
-        (0x2403, 0x01) => (ROUTE_18                   , 0x03, ROUTE_18                    ),
-        (0x011A, 0x00) => (ROUTE_18_GATE_2F           , 0x00, ROUTE_18                    ),
-
-        //ROUTE_18_GATE_2F
-        (0x001A, 0x02) => (ROUTE_18_GATE_1F           , 0x04, ROUTE_18                    ),
 
         //ROUTE_20
         (0x5301, 0x03) => (SEAFOAM_ISLANDS_1          , 0x00, ROUTE_20                    ),
