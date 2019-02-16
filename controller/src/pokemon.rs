@@ -256,11 +256,22 @@ impl Pokemon {
         }
     }
 
-    pub fn update_from_pk1(&mut self, data: &[u8], nickname: &[u8]) -> Result<(), String> {
+    pub fn update_from_pk1(&mut self, data: &[u8], nickname: &[u8], seen: &mut [u8], owned: &mut [u8]) -> Result<(), String> {
+        
+        let mut data = data.to_vec();
 
         let mut new_name = Vec::new();
         let mut recalc_stats = false;
         let mut species_change = false;
+
+        if let Some((evolution, level)) = TRADE_EVOS.get(&RED_FIRERED_SPECIES[data[0x00] as usize]) {
+            if data[0x21] >= *level {
+                species_change = true;
+                data[0x00] = FIRERED_RED_SPECIES[*evolution as usize];
+                set_flag(seen, *evolution as usize);
+                set_flag(owned, *evolution as usize);
+            }
+        }
 
         // Update gen 1 data struct
         if let Some(gen1) = &mut self.gen1 {
@@ -297,6 +308,7 @@ impl Pokemon {
         if self.species != RED_FIRERED_SPECIES[data[0x00] as usize] {
             self.species = RED_FIRERED_SPECIES[data[0x00] as usize];
             species_change = true;
+            recalc_stats = true;
         }
 
         self.moves = [data[0x08], data[0x09], data[0x0A], data[0x0B]];
@@ -515,7 +527,7 @@ impl Pokemon {
         }
     }
 
-    pub fn update_from_pk3(&mut self, data: &[u8]) -> Result<(), String> {
+    pub fn update_from_pk3(&mut self, data: &[u8], seen: &mut [u8], owned: &mut [u8]) -> Result<(), String> {
 
         let mut data = data.to_vec();
 
@@ -524,6 +536,16 @@ impl Pokemon {
         let mut new_name = Vec::new();
         let mut recalc_stats = false;
         let mut species_change = false;
+
+        if let Some((evolution, level)) = TRADE_EVOS.get(&data[0x20]) {
+            if data[0x54] >= *level {
+                species_change = true;
+                data[0x20] = *evolution;
+                set_flag(seen, *evolution as usize);
+                set_flag(owned, *evolution as usize);
+            }
+        }
+
         // Update gen 3 data struct
         if let Some(gen3) = &mut self.gen3 {
             gen3.evs = [data[0x38] as u16, 
@@ -563,6 +585,7 @@ impl Pokemon {
         if self.species != data[0x20] {
             self.species = data[0x20];
             species_change = true;
+            recalc_stats = true;
         }
 
         self.moves = [data[0x2C], data[0x2E], data[0x30], data[0x32]];

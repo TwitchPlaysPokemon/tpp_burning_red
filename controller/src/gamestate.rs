@@ -434,7 +434,18 @@ impl GameState {
                     if current_warp != 0xFF {println!("Map change detected, Map: {:02x}, Warp: {:02x}, Lastmap {:02x}", current_map, current_warp, last_map)};
                     if let Some(destination) = RED_FIRERED_WARP_MAP.get(&(current_map, current_warp, last_map)) {
                         self.save_state().unwrap();
-                        match *WARP_MODE.lock().unwrap() {
+                        let warp_mode = if current_map == ROUTE_22_GATE {
+                            if self.red_progress & G_BEAT_E4 == 0x00 { 
+                                WarpState::LOCK_RED 
+                            } else if self.firered_progress & G_BEAT_E4 == 0x00 { 
+                                WarpState::LOCK_FIRERED 
+                            } else {
+                                WarpState::RANDOM
+                            }
+                        } else {
+                            (*WARP_MODE.lock().unwrap()).clone()
+                        };
+                        match warp_mode {
                             WarpState::RANDOM => {
                                 if rand::random::<u16>() <= 0x2800 {
                                     self.handle_map_change(destination.0, destination.1, 0, warp_enable);
@@ -466,7 +477,18 @@ impl GameState {
                     self.map_state.previous_lastmap = current_lastmap;
                     println!("Map change detected, Map: {:04x}, Warp: {:02x}", current_map, current_warp);
                     if let Some(destination) = FIRERED_RED_WARP_MAP.get(&(current_map, current_warp)) {
-                        match *WARP_MODE.lock().unwrap() {
+                        let warp_mode = if current_map == 0x001C {
+                            if self.red_progress & G_BEAT_E4 == 0x00 { 
+                                WarpState::LOCK_RED 
+                            } else if self.firered_progress & G_BEAT_E4 == 0x00 { 
+                                WarpState::LOCK_FIRERED 
+                            } else {
+                                WarpState::RANDOM
+                            }
+                        } else {
+                            (*WARP_MODE.lock().unwrap()).clone()
+                        };
+                        match warp_mode {
                             WarpState::RANDOM => {
                                 if rand::random::<u16>() <= 0x2800 {
                                     BIZHAWK.pause().unwrap();
@@ -520,7 +542,7 @@ impl GameState {
                             }
                         } else {
                             if let Some(pokemon) = self.pokemon_list.get_mut(&uid) {
-                                pokemon.update_from_pk1(pk1, nickname).unwrap();
+                                pokemon.update_from_pk1(pk1, nickname, &mut self.seen, &mut self.owned).unwrap();
                             } else {
                                 self.pokemon_list.insert(uid, Pokemon::from_pk1(pk1, nickname, &self.trainer, uid));
                             }
@@ -558,7 +580,7 @@ impl GameState {
                                 }
                             } else {
                                 if let Some(pokemon) = self.pokemon_list.get_mut(&uid) {
-                                    pokemon.update_from_pk3(pk3).unwrap();
+                                    pokemon.update_from_pk3(pk3, &mut self.seen, &mut self.owned).unwrap();
                                 } else {
                                     self.pokemon_list.insert(uid, Pokemon::from_pk3(pk3, &self.trainer, uid));
                                 }
@@ -1205,6 +1227,20 @@ pub fn make_backup(manual: bool) {
                   format!("{}\\Backups\\{}\\Gamestate", pathstr, backup_name)).ok();
 }
 
+pub fn check_flag(flags: &[u8], flag_to_check: usize) -> bool {
+    let flag_to_check = flag_to_check - 1;
+    let byte = flag_to_check / 8;
+    let bit = flag_to_check % 8;
+    flags[byte] & (0x01 << bit) != 0x00
+}
+
+pub fn set_flag(flags: &mut [u8], flag_to_set: usize) {
+    let flag_to_set = flag_to_set - 1;
+    let byte = flag_to_set / 8;
+    let bit = flag_to_set % 8;
+    flags[byte] |= 0x01 << bit;
+}
+
 #[derive(Serialize, Deserialize, Clone, Default)]
 pub struct MapState {
     previous_map: u16,
@@ -1225,6 +1261,7 @@ impl MapState {
         }
     }
 }
+#[derive(Clone)]
 pub enum WarpState {
     RANDOM,
     LOCK_RED,

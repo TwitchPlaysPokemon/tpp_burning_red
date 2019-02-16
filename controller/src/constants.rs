@@ -2,6 +2,7 @@ use crate::gamestate::WarpState;
 use crate::bizhawk;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
+use maplit::hashmap;
 use std::time;
 use crate::item_api::ApiState;
 use crate::warp_connections::*;
@@ -316,6 +317,14 @@ impl BaseStats {
     }
 }
 
+fn trade_evos() -> HashMap<u8, (u8, u8)> {
+    hashmap!(
+        0x40 => (0x41, 0x3C),
+        0x43 => (0x44, 0x3C),
+        0x4B => (0x4C, 0x32),
+        0x5D => (0x5E, 0x32))
+}
+
 lazy_static! {
     pub static ref RED_FIRERED_WARP_MAP: HashMap<(u8, u8, u8), (u16, u8)> = get_connections_red_firered();
     pub static ref FIRERED_RED_WARP_MAP: HashMap<(u16, u8), (u8, u8, u8)> = get_connections_firered_red();
@@ -331,6 +340,7 @@ lazy_static! {
     pub static ref OAKS_PARCEL_OBTAINED: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     pub static ref CONTROLLER_PATH: std::path::PathBuf = std::env::current_dir().unwrap();
     pub static ref WARP_MODE: Arc<Mutex<WarpState>> = Arc::new(Mutex::new(WarpState::RANDOM));
+    pub static ref TRADE_EVOS: HashMap<u8, (u8, u8)> = trade_evos();
 }
                                           
 pub static NATURE_EFFECTS: [[f32;5];25] = [/*ATK, DEF, SPE, SPA, SPD*/
