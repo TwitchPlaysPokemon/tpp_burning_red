@@ -135,13 +135,19 @@ impl Pokemon {
 
         data[0x07] = (uid & 0x00FF) as u8;
 
+        if RED_FIRERED_SPECIES[data[0x00] as usize] == 152 {
+            BigEndian::write_u24(&mut data[0x0E..0x11], 156_250);
+            data[0x21] = 50;
+            data[0x03] = 50;
+        };
+
         let mut pokemon = Pokemon {
             uid,
             pv: 0,
             species: RED_FIRERED_SPECIES[data[0x00] as usize],
             moves: [data[0x08], data[0x09], data[0x0A], data[0x0B]],
             pp: [data[0x1D] & 0x3F, data[0x1E] & 0x3F, data[0x1F] & 0x3F, data[0x20] & 0x3F],
-            exp: BigEndian::read_u32(&data[0x0D..0x11]) & 0x00FF_FFFF,
+            exp: BigEndian::read_u24(&data[0x0E..0x11]),
             ivs: Ivs::from(ivs),
             status_condition: data[0x04],
             level: if data[0x21] == 0xAA { data[0x03] } else { data[0x21] },
@@ -383,6 +389,11 @@ impl Pokemon {
         decrypt_unshuffle_pk3(&mut data);
 
         data[0x3E] = (uid & 0x00FF) as u8;
+
+        if data[0x20] == 152 {
+            LittleEndian::write_u32(&mut data[0x24..0x28], 156_250);
+            data[0x54] = 50;
+        };
 
         let mut pokemon = Pokemon {
             uid,

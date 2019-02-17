@@ -232,7 +232,7 @@ pub const COLOSSEUM: u8 = 0xF0;
 pub const LORELEIS_ROOM: u8 = 0xF5;
 pub const BRUNOS_ROOM: u8 = 0xF6;
 pub const AGATHAS_ROOM: u8 = 0xF7;
-pub const GLITCH_CELEDON_CITY: u8 = 0xF8;
+pub const GLITCH_CELADON_CITY: u8 = 0xF8;
 pub const BATTLE_TENT_CORRUPT: u8 = 0xF9;
 
 // Red Item API codes
@@ -284,7 +284,7 @@ pub struct BaseStats {
 impl BaseStats {
     pub fn from_bytes(gen1_bytes: &[u8], gen2_bytes: &[u8], gen3_bytes: &[u8]) -> Vec<BaseStats> {
         let mut stats_vec = Vec::new();
-        for i in 0..152 {
+        for i in 0..153 {
             let mut current_mon = &gen1_bytes[(i*0x1C)..(i*0x1C)+0x1C];
             let gen1 = PKBase {
                 stats: [u16::from(current_mon[0x01]),
@@ -571,9 +571,9 @@ pub static LEVEL_CAPS: [(u32, u8);18] = [
     (G_SILPHSCOPE,   43),
     (G_POKEFLUTE,    47),
     (G_GUARDRUNK,    47),
+    (G_SOULBADGE,    49),
     (G_FREED_SILPH,  49),
     (G_MARSHBADGE,   51),
-    (G_SOULBADGE,    51),
     (G_SURF,         51),
     (G_STRENGTH,     51),
     (G_SECRETKEY,    53),

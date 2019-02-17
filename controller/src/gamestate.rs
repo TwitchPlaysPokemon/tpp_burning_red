@@ -105,7 +105,7 @@ pub struct GameState {
     owned: [u8;19], // 152 bits
     party_uids: [u16;6], // For HashMap
     pokemon_list: HashMap<u16, Pokemon>,
-    map_state: MapState,
+    pub map_state: MapState,
     pub enabled: bool,
     pub first_warp: bool,
     #[serde(skip_serializing, skip_deserializing)]
@@ -336,8 +336,9 @@ impl GameState {
                     self.send_hud_data();
 
                     self.hud_enable(true);
-
-                    BIZHAWK.write_u8(&MemRegion::EWRAM, 0x0000_FC4, 0x01).unwrap();
+                    if !(map == 0x3403 || map == 0x3503) {
+                        BIZHAWK.write_u8(&MemRegion::IWRAM, 0x0000_0FC4, 0x01).unwrap();
+                    }
 
                     BIZHAWK.play().unwrap();
                 },
@@ -394,8 +395,12 @@ impl GameState {
                     BIZHAWK.throttle().unwrap();
                     BIZHAWK.start_drawing().unwrap();
 
-                    let current_music = BIZHAWK.read_u8_sym(&SYM["wLastMusicSoundID"]).unwrap();
-                    BIZHAWK.write_slice_sym(&SYM["wAudioFadeOutControl"], &[current_music, 0x00, 0x00]).unwrap();
+                    if map as u8 == GLITCH_CELADON_CITY || map as u8 == BATTLE_TENT_CORRUPT { // music hotfix
+                        BIZHAWK.write_slice_sym(&SYM["wAudioFadeOutControl"], &[0x00, 0x00, 0x00, 0xFF]).unwrap();
+                    } else {
+                        let current_music = BIZHAWK.read_u8_sym(&SYM["wLastMusicSoundID"]).unwrap();
+                        BIZHAWK.write_slice_sym(&SYM["wAudioFadeOutControl"], &[current_music, 0x00, 0x00]).unwrap();
+                    }
                     BIZHAWK.write_u8_sym(&SYM["wLastMap"], last_map).unwrap();
 
                     BIZHAWK.unmute().unwrap();
@@ -434,26 +439,30 @@ impl GameState {
                     if current_warp != 0xFF {println!("Map change detected, Map: {:02x}, Warp: {:02x}, Lastmap {:02x}", current_map, current_warp, last_map)};
                     if let Some(destination) = RED_FIRERED_WARP_MAP.get(&(current_map, current_warp, last_map)) {
                         self.save_state().unwrap();
-                        let warp_mode = if current_map == ROUTE_22_GATE {
-                            if self.red_progress & G_BEAT_E4 == 0x00 { 
-                                WarpState::LOCK_RED 
-                            } else if self.firered_progress & G_BEAT_E4 == 0x00 { 
-                                WarpState::LOCK_FIRERED 
-                            } else {
-                                WarpState::RANDOM
-                            }
+                        if current_map == GLITCH_CELADON_CITY || current_map == BATTLE_TENT_CORRUPT { // if glitch city, bypass randomizer, warp every time
+                            self.handle_map_change(destination.0, destination.1, 0, warp_enable);
                         } else {
-                            (*WARP_MODE.lock().unwrap()).clone()
-                        };
-                        match warp_mode {
-                            WarpState::RANDOM => {
-                                if rand::random::<u16>() <= 0x2800 {
+                            let warp_mode = if current_map == ROUTE_22_GATE {
+                                if self.red_progress & G_BEAT_E4 == 0x00 { 
+                                    WarpState::LOCK_RED 
+                                } else if self.firered_progress & G_BEAT_E4 == 0x00 { 
+                                    WarpState::LOCK_FIRERED 
+                                } else {
+                                    WarpState::RANDOM
+                                }
+                            } else {
+                                (*WARP_MODE.lock().unwrap()).clone()
+                            };
+                            match warp_mode {
+                                WarpState::RANDOM => {
+                                    if rand::random::<u16>() <= 0x2800 {
+                                        self.handle_map_change(destination.0, destination.1, 0, warp_enable);
+                                    }
+                                }, 
+                                WarpState::LOCK_RED => {},
+                                WarpState::LOCK_FIRERED => {
                                     self.handle_map_change(destination.0, destination.1, 0, warp_enable);
                                 }
-                            }, 
-                            WarpState::LOCK_RED => {},
-                            WarpState::LOCK_FIRERED => {
-                                self.handle_map_change(destination.0, destination.1, 0, warp_enable);
                             }
                         }
                     } else if current_warp != 0xFF {
@@ -477,35 +486,39 @@ impl GameState {
                     self.map_state.previous_lastmap = current_lastmap;
                     println!("Map change detected, Map: {:04x}, Warp: {:02x}", current_map, current_warp);
                     if let Some(destination) = FIRERED_RED_WARP_MAP.get(&(current_map, current_warp)) {
-                        let warp_mode = if current_map == 0x001C {
-                            if self.red_progress & G_BEAT_E4 == 0x00 { 
-                                WarpState::LOCK_RED 
-                            } else if self.firered_progress & G_BEAT_E4 == 0x00 { 
-                                WarpState::LOCK_FIRERED 
-                            } else {
-                                WarpState::RANDOM
-                            }
+                        if current_map == 0x3403 || current_map == 0x3503 { // if glitch city, bypass randomizer, warp every time
+                            self.handle_map_change(destination.0 as u16, destination.1, destination.2, warp_enable);
                         } else {
-                            (*WARP_MODE.lock().unwrap()).clone()
-                        };
-                        match warp_mode {
-                            WarpState::RANDOM => {
-                                if rand::random::<u16>() <= 0x2800 {
-                                    BIZHAWK.pause().unwrap();
-                                    BIZHAWK.framerewind().unwrap();
-                                    BIZHAWK.save_state("firered_warp").unwrap();
-                                    self.save_state().unwrap();
-                                    self.handle_map_change(destination.0 as u16, destination.1, destination.2, warp_enable);
+                            let warp_mode = if current_map == 0x001C {
+                                if self.red_progress & G_BEAT_E4 == 0x00 { 
+                                    WarpState::LOCK_RED 
+                                } else if self.firered_progress & G_BEAT_E4 == 0x00 { 
+                                    WarpState::LOCK_FIRERED 
+                                } else {
+                                    WarpState::RANDOM
                                 }
-                            }, 
-                            WarpState::LOCK_RED => {
-                                    BIZHAWK.pause().unwrap();
-                                    BIZHAWK.framerewind().unwrap();
-                                    BIZHAWK.save_state("firered_warp").unwrap();
-                                    self.save_state().unwrap();
-                                    self.handle_map_change(destination.0 as u16, destination.1, destination.2, warp_enable);
-                            },
-                            WarpState::LOCK_FIRERED => {}
+                            } else {
+                                (*WARP_MODE.lock().unwrap()).clone()
+                            };
+                            match warp_mode {
+                                WarpState::RANDOM => {
+                                    if rand::random::<u16>() <= 0x2800 {
+                                        BIZHAWK.pause().unwrap();
+                                        BIZHAWK.framerewind().unwrap();
+                                        BIZHAWK.save_state("firered_warp").unwrap();
+                                        self.save_state().unwrap();
+                                        self.handle_map_change(destination.0 as u16, destination.1, destination.2, warp_enable);
+                                    }
+                                }, 
+                                WarpState::LOCK_RED => {
+                                        BIZHAWK.pause().unwrap();
+                                        BIZHAWK.framerewind().unwrap();
+                                        BIZHAWK.save_state("firered_warp").unwrap();
+                                        self.save_state().unwrap();
+                                        self.handle_map_change(destination.0 as u16, destination.1, destination.2, warp_enable);
+                                },
+                                WarpState::LOCK_FIRERED => {}
+                            }
                         }
                     } else {
                         BIZHAWK.play().unwrap();
@@ -1243,7 +1256,7 @@ pub fn set_flag(flags: &mut [u8], flag_to_set: usize) {
 
 #[derive(Serialize, Deserialize, Clone, Default)]
 pub struct MapState {
-    previous_map: u16,
+    pub previous_map: u16,
     previous_warp: u8,
     previous_lastmap: u32,
     map_checked: bool,

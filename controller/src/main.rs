@@ -23,6 +23,7 @@ use crate::gamestate::*;
 use crate::constants::*;
 use crate::gfx_system::*;
 use crate::item_api::*;
+use crate::bizhawk::*;
 use std::thread;
 use byteorder::{ByteOrder, LittleEndian};
 use std::sync::{Arc, Mutex};
@@ -115,6 +116,59 @@ fn main() {
         if cycle % 60000 == 59999 { // 5 minutes
             make_backup(false);
         }
+
+        match &game_state.game {
+            Game::RED => {
+                if cycle % 10 == 0 {
+                    if game_state.map_state.previous_map == GLITCH_CELADON_CITY as u16 || game_state.map_state.previous_map == BATTLE_TENT_CORRUPT as u16 {
+                        let location = (rand::random::<u16>() % 0x2000) as u32;
+                        let mut byte_to_corrupt = BIZHAWK.read_u8(&MemRegion::VRAM, location).unwrap();
+
+                        match rand::random::<u16>() {
+                            0x0000 ... 0x0FFF => { // invert the byte
+                                byte_to_corrupt = !byte_to_corrupt;
+                            },
+                            0x1000 ... 0x1FFF => { // randomize the byte
+                                byte_to_corrupt = rand::random::<u8>();
+                            },
+                            0x2000 ... 0x8FFF => { // set a random bit
+                                byte_to_corrupt |= 0x01 << (rand::random::<u8>() % 8);
+                            },
+                            0x9000 ... 0xFFFF => { // reset a random bit
+                                byte_to_corrupt &= !(0x01 << (rand::random::<u8>() % 8));
+                            }
+                        }
+                        
+                        BIZHAWK.write_u8(&MemRegion::VRAM, location, byte_to_corrupt).unwrap();
+                    }
+                }
+            },
+            Game::FIRERED => {
+                if cycle % 2 == 0 {
+                    if game_state.map_state.previous_map == 0x3403 || game_state.map_state.previous_map == 0x3503 {
+                        let location = rand::random::<u32>() % 0x18000;
+                        let mut byte_to_corrupt = BIZHAWK.read_u8(&MemRegion::VRAM, location).unwrap();
+
+                        match rand::random::<u16>() {
+                            0x0000 ... 0x0FFF => { // invert the byte
+                                byte_to_corrupt = !byte_to_corrupt;
+                            },
+                            0x1000 ... 0x1FFF => { // randomize the byte
+                                byte_to_corrupt = rand::random::<u8>();
+                            },
+                            0x2000 ... 0x8FFF => { // set a random bit
+                                byte_to_corrupt |= 0x01 << (rand::random::<u8>() % 8);
+                            },
+                            0x9000 ... 0xFFFF => { // reset a random bit
+                                byte_to_corrupt &= !(0x01 << (rand::random::<u8>() % 8));
+                            }
+                        }
+                        BIZHAWK.write_u8(&MemRegion::VRAM, location, byte_to_corrupt).unwrap();
+                    }
+                }
+            }
+        } 
+        
 
         cycle += 1;
         let new_time = Instant::now();

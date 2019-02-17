@@ -255,6 +255,7 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (CELADON_DINER              , 0x00, CELADON_CITY                ) => (0x110A, 0x01),
         (CELADON_HOUSE              , 0x00, CELADON_CITY                ) => (0x120A, 0x01),
         (CELADON_HOTEL              , 0x00, CELADON_CITY                ) => (0x130A, 0x01),
+        (GLITCH_CELADON_CITY        , 0x00, CELADON_CITY                ) => (0x3403, 0x00),
 
         //CELADON_POKECENTER
         (CELADON_CITY               , 0x05, CELADON_CITY                ) => (0x0603, 0x04),
@@ -823,7 +824,16 @@ pub fn get_connections_red_firered() -> HashMap<(u8, u8, u8), (u16, u8)> {
         (BILLS_HOUSE                , 0x00, ROUTE_25                    ) => (0x001E, 0x01),      
 
         //BILLS_HOUSE
-        (ROUTE_25                   , 0x00, ROUTE_25                    ) => (0x2C03, 0x00)
+        (ROUTE_25                   , 0x00, ROUTE_25                    ) => (0x2C03, 0x00),
+
+        //GLITCH_CELADON_CITY
+        (GLITCH_CELADON_CITY        , 0x01, GLITCH_CELADON_CITY         ) => (0x3403, 0x08),
+        (GLITCH_CELADON_CITY        , 0x02, GLITCH_CELADON_CITY         ) => (0x3403, 0x0B),
+        (GLITCH_CELADON_CITY        , 0x03, GLITCH_CELADON_CITY         ) => (0x3403, 0x0C),
+        (BATTLE_TENT_CORRUPT        , 0x00, GLITCH_CELADON_CITY         ) => (0x3503, 0x00),
+
+        //BATTLE_TENT_CORRUPT
+        (GLITCH_CELADON_CITY        , 0x00, GLITCH_CELADON_CITY         ) => (0x3403, 0x01),
     )
 }
 
@@ -1080,6 +1090,7 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x110A, 0x01) => (CELADON_DINER              , 0x00, CELADON_CITY                ),
         (0x120A, 0x01) => (CELADON_HOUSE              , 0x00, CELADON_CITY                ),
         (0x130A, 0x01) => (CELADON_HOTEL              , 0x00, CELADON_CITY                ),
+        (0x3403, 0x00) => (GLITCH_CELADON_CITY        , 0x00, CELADON_CITY                ),
 
         //CELADON_POKECENTER
         (0x0603, 0x04) => (CELADON_CITY               , 0x05, CELADON_CITY                ),
@@ -1638,7 +1649,26 @@ pub fn get_connections_firered_red() -> HashMap<(u16, u8), (u8, u8, u8)> {
         (0x001E, 0x01) => (BILLS_HOUSE                , 0x00, ROUTE_25                    ),      
 
         //BILLS_HOUSE
-        (0x2C03, 0x00) => (ROUTE_25                   , 0x00, ROUTE_25                    )
+        (0x2C03, 0x00) => (ROUTE_25                   , 0x00, ROUTE_25                    ),
+
+        //GLITCH_CELADON_CITY
+        (0x3403, 0x08) => (GLITCH_CELADON_CITY        , 0x01, GLITCH_CELADON_CITY         ),
+        (0x3403, 0x0B) => (GLITCH_CELADON_CITY        , 0x02, GLITCH_CELADON_CITY         ),
+        (0x3403, 0x0C) => (GLITCH_CELADON_CITY        , 0x03, GLITCH_CELADON_CITY         ),
+        (0x3503, 0x00) => (BATTLE_TENT_CORRUPT        , 0x00, GLITCH_CELADON_CITY         ),
+        (0x3403, 0x02) => (GLITCH_CELADON_CITY        , 0x01, GLITCH_CELADON_CITY         ),
+        (0x3403, 0x03) => (GLITCH_CELADON_CITY        , 0x01, GLITCH_CELADON_CITY         ),
+        (0x3403, 0x04) => (GLITCH_CELADON_CITY        , 0x01, GLITCH_CELADON_CITY         ),
+        (0x3403, 0x05) => (GLITCH_CELADON_CITY        , 0x03, GLITCH_CELADON_CITY         ),
+        (0x3403, 0x06) => (GLITCH_CELADON_CITY        , 0x03, GLITCH_CELADON_CITY         ),
+        (0x3403, 0x07) => (GLITCH_CELADON_CITY        , 0x03, GLITCH_CELADON_CITY         ),
+        (0x3403, 0x09) => (GLITCH_CELADON_CITY        , 0x00, GLITCH_CELADON_CITY         ),
+        (0x3403, 0x0A) => (GLITCH_CELADON_CITY        , 0x02, GLITCH_CELADON_CITY         ),
+        (0x3403, 0x0B) => (GLITCH_CELADON_CITY        , 0x01, GLITCH_CELADON_CITY         ),
+        (0x3403, 0x0D) => (GLITCH_CELADON_CITY        , 0x02, GLITCH_CELADON_CITY         ),
+
+        //BATTLE_TENT_CORRUPT
+        (0x3403, 0x01) => (GLITCH_CELADON_CITY        , 0x04, GLITCH_CELADON_CITY         )
     )
 }
 
@@ -1866,7 +1896,7 @@ pub fn get_map_requirements() -> HashMap<u8, u32> {
         LORELEIS_ROOM            => G_NONE,
         BRUNOS_ROOM              => G_NONE,
         AGATHAS_ROOM             => G_NONE,
-        GLITCH_CELEDON_CITY      => G_SURF | G_STRENGTH | G_CUT,
+        GLITCH_CELADON_CITY      => G_SURF | G_STRENGTH | G_CUT,
         BATTLE_TENT_CORRUPT      => G_NONE
     )
 }
