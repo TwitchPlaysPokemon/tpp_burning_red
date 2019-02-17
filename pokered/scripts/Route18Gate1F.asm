@@ -13,7 +13,7 @@ Route18Gate1F_ScriptPointers:
 	dw Route18GateScript3
 
 Route18GateScript0:
-	call Route16GateScript_49755
+	call Route16GateScript_CheckBicycle
 	ret nz
 	ld hl, CoordsData_498cc
 	call ArePlayerCoordsInArray
@@ -88,7 +88,7 @@ Route18Gate1F_TextPointers:
 
 Route18GateText1:
 	TX_ASM
-	call Route16GateScript_49755
+	call Route16GateScript_CheckBicycle
 	jr z, .asm_3c84d
 	ld hl, Route18GateText_4992d
 	call PrintText
