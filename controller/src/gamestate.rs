@@ -483,7 +483,11 @@ impl GameState {
                 let current_warp = map_data[0x0E];
                 
                 if self.map_state.previous_lastmap != current_lastmap {
+
                     self.map_state.previous_lastmap = current_lastmap;
+                    self.map_state.previous_map = current_map;
+                    self.map_state.previous_warp = current_warp;
+
                     println!("Map change detected, Map: {:04x}, Warp: {:02x}", current_map, current_warp);
                     if let Some(destination) = FIRERED_RED_WARP_MAP.get(&(current_map, current_warp)) {
                         if current_map == 0x3403 || current_map == 0x3503 { // if glitch city, bypass randomizer, warp every time
