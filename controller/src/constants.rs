@@ -340,6 +340,7 @@ lazy_static! {
     pub static ref OAKS_PARCEL_OBTAINED: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     pub static ref CONTROLLER_PATH: std::path::PathBuf = std::env::current_dir().unwrap();
     pub static ref WARP_MODE: Arc<Mutex<WarpState>> = Arc::new(Mutex::new(WarpState::RANDOM));
+    pub static ref CALLBACK: Arc<Mutex<()>> = Arc::new(Mutex::new(()));
     pub static ref TRADE_EVOS: HashMap<u8, (u8, u8)> = trade_evos();
 }
                                           

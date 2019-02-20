@@ -48,6 +48,18 @@ impl Bizhawk {
         }
         Ok(())
     }
+    pub fn send_command_sync(&self, command: &str) -> Result<(), String> {
+        let lock = CALLBACK.lock();
+        if let Ok(mut result) = self.client.get(format!("http://localhost:{}/{}", self.port, command).as_str()).send() {
+            let response = result.text().unwrap_or_default();
+            if response != "ok" {
+                return Err(response)
+            }
+        } else {
+            return Err("Failed to send command to bizhawk.".to_string())
+        }
+        Ok(())
+    }
 
     pub fn send_command_and_get_response(&self, command: &str) -> Result<String, String> {
         if let Ok(mut result) = self.client.get(format!("http://localhost:{}/{}", self.port, command).as_str()).send() {
@@ -62,10 +74,15 @@ impl Bizhawk {
     }
 
     pub fn on_memory_write(&self, name: &str, address: u32, len: u8, url: &str) -> Result<(), String> {
-        self.send_command(format!("{}/OnMemoryWrite/{:X}/{:X}/{}", name, address, len, url).as_str())
+        self.send_command_sync(format!("{}/OnMemoryWrite/{:X}/{:X}/{}", name, address, len, url).as_str())
     }
+
+    pub fn on_memory_read(&self, name: &str, address: u32, len: u8, url: &str) -> Result<(), String> {
+        self.send_command_sync(format!("{}/OnMemoryRead/{:X}/{:X}/{}", name, address, len, url).as_str())
+    }
+
     pub fn remove_callback(&self, name: &str) -> Result<(), String> {
-        self.send_command(format!("{}/RemoveMemoryCallback", name).as_str())
+        self.send_command_sync(format!("{}/RemoveMemoryCallback", name).as_str())
     }
 
     pub fn write_u8(&self, region: &MemRegion, address: u32, value: u8) -> Result<(), String> {
@@ -250,70 +267,71 @@ impl Bizhawk {
     }
 
     pub fn save_state(&self, name: &str) -> Result<(), String> {
-        self.send_command(format!("savestate/{}\\States\\{}.State", &CONTROLLER_PATH.to_str().unwrap(), name).as_str())
+        self.send_command_sync(format!("savestate/{}\\States\\{}.State", &CONTROLLER_PATH.to_str().unwrap(), name).as_str())
     }
 
     pub fn save_state_custom(&self, name: &str) -> Result<(), String> {
-        self.send_command(format!("savestate/{}.State", name).as_str())
+        self.send_command_sync(format!("savestate/{}.State", name).as_str())
     }
 
     pub fn load_state(&self, name: &str) -> Result<(), String> {
-        self.send_command(format!("loadstate/{}\\States\\{}.State", &CONTROLLER_PATH.to_str().unwrap(), name).as_str())
+        self.send_command_sync(format!("loadstate/{}\\States\\{}.State", &CONTROLLER_PATH.to_str().unwrap(), name).as_str())
     }
 
     pub fn load_rom(&self, name: &str) -> Result<(), String> {
-        self.send_command(format!("loadrom/{}\\Roms\\{}", &CONTROLLER_PATH.to_str().unwrap(), name).as_str())
+        self.send_command_sync(format!("loadrom/{}\\Roms\\{}", &CONTROLLER_PATH.to_str().unwrap(), name).as_str())
     }
 
     pub fn pause(&self) -> Result<(), String> {
-        self.send_command("pause")
+        self.send_command_sync("pause")
     }
 
     pub fn play(&self) -> Result<(), String> {
-        self.send_command("play")
+        self.send_command_sync("play")
     }
 
     pub fn stop_drawing(&self) -> Result<(), String> {
-        self.send_command("stopdrawing")
+        self.send_command_sync("stopdrawing")
     }
 
     pub fn start_drawing(&self) -> Result<(), String> {
-        self.send_command("startdrawing")
+        self.send_command_sync("startdrawing")
     }
 
     pub fn mute(&self) -> Result<(), String> {
-        self.send_command("mute")
+        self.send_command_sync("mute")
     }
 
     pub fn unmute(&self) -> Result<(), String> {
-        self.send_command("unmute")
+        self.send_command_sync("unmute")
     }
 
     pub fn unthrottle(&self, frames: u32) -> Result<(), String> {
         if frames == 0 {
-            self.send_command("unthrottle")
+            self.send_command_sync("unthrottle")
         } else {
-            self.send_command(format!("unthrottle/{}", frames).as_str())
+            self.send_command_sync(format!("unthrottle/{}", frames).as_str())
         }
     }
 
     pub fn throttle(&self) -> Result<(), String> {
-        self.send_command("throttle")
+        self.send_command_sync("throttle")
     }
 
     pub fn frameadvance(&self) -> Result<(), String> {
-        self.send_command("frameadvance")
+        self.send_command_sync("frameadvance")
     }
 
     pub fn framerewind(&self) -> Result<(), String> {
-        self.send_command("framerewind")
+        self.send_command_sync("framerewind")
     }
 
     pub fn clear_screen(&self, color: u32) -> Result<(), String> {
-        self.send_command(format!("clearscreen/{:06X}", color).as_str())
+        self.send_command_sync(format!("clearscreen/{:06X}", color).as_str())
     }
 
     pub fn framecount(&self) -> Result<u32, String> {
+        let lock = CALLBACK.lock();
         match self.send_command_and_get_response("framecount") {
             Ok(dword) => Ok(u32::from_str_radix(dword.as_str(), 10).unwrap()),
             Err(error) => Err(error)
@@ -321,10 +339,11 @@ impl Bizhawk {
     }
 
     pub fn toggle_rewind(&self, enable: bool) -> Result<(), String> {
-        self.send_command(format!("togglerewind/{}", enable).as_str())
+        self.send_command_sync(format!("togglerewind/{}", enable).as_str())
     }
 
     pub fn get_rom_name(&self) -> Result<String, String> {
+        let lock = CALLBACK.lock();
         if let Ok(mut result) = self.client.get(format!("http://localhost:{}/GetROMName", self.port).as_str()).send() {
             let response = result.text().unwrap_or_default();
             Ok(response)

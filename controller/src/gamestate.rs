@@ -368,7 +368,7 @@ impl GameState {
 
                     self.write_items();
 
-                    BIZHAWK.on_memory_write("item_api", SYM["wItemAPICommand"].bus_addr as u32, 0x04, "http://localhost:5340/item_api").ok();
+                    BIZHAWK.on_memory_read("item_api", SYM["wItemAPICommand"].bus_addr as u32, 0x04, "http://localhost:5340/item_api").ok();
 
                     BIZHAWK.write_u8_sym(&SYM["wDestinationWarpID"], warp).unwrap();
                     BIZHAWK.write_u8_sym(&SYM["wCurMap"], map as u8).unwrap();
